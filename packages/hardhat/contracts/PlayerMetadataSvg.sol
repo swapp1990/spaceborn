@@ -23,7 +23,7 @@ library PlayerMetadataSvg {
 	}
 
 	function tokenURI(address owner, uint256 tokenId, string memory playerName, uint8 level, uint256 xp) internal pure returns (string memory) {
-		string memory name = string(abi.encodePacked('#',tokenId.toString(),': ', playerName));
+		// string memory name = string(abi.encodePacked('#',tokenId.toString(),': ', playerName));
 		string memory image = Base64.encode(bytes(generateSVGofTokenById(owner, playerName, level, xp)));
 
 		return string(
@@ -33,7 +33,7 @@ library PlayerMetadataSvg {
 					bytes(
 						abi.encodePacked(
 							'{"name":"',
-							name,
+							playerName,
 							// '","level":', level,
 							// '","xp":', xp,
 							'","image": "',

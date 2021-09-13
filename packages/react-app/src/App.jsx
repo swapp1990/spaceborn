@@ -421,37 +421,36 @@ function App(props) {
 
   return (
     <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
       <Header />
       {networkDisplay}
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
+          <Menu.Item key="/app">
             <Link
               onClick={() => {
-                setRoute("/");
+                setRoute("/app");
               }}
-              to="/"
+              to="/app"
             >
               Scifi Loot
             </Link>
           </Menu.Item>
-          <Menu.Item key="/contract">
+          <Menu.Item key="/app/contract">
             <Link
               onClick={() => {
-                setRoute("/contract");
+                setRoute("/app/contract");
               }}
-              to="/contract"
+              to="/app/contract"
             >
               Contract
             </Link>
           </Menu.Item>
-          <Menu.Item key="/testLoot">
+          <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {
-                setRoute("/testLoot");
+                setRoute("/app/testLoot");
               }}
-              to="/testLoot"
+              to="/app/testLoot"
             >
               Test Loot Mints
             </Link>
@@ -459,7 +458,7 @@ function App(props) {
         </Menu>
 
         <Switch>
-          <Route exact path="/">
+          <Route exact path="/app">
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -480,7 +479,7 @@ function App(props) {
             />
           </Route>
 
-          <Route path="/contract">
+          <Route path="/app/contract">
             <Contract
               name="Alien"
               signer={userSigner}
@@ -490,22 +489,8 @@ function App(props) {
             />
           </Route>
 
-          <Route path="/testLoot">
+          <Route path="/app/testLoot">
             <LootUI
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route>
-
-          <Route path="/treasureHunt">
-            <TreasureHuntUI
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}

@@ -1,8 +1,10 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import React from "react";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
+import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import ReactDOM from "react-dom";
 import App from "./App";
+import Home from "./Home";
 import "./index.css";
 
 const themes = {
@@ -20,10 +22,19 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <ThemeSwitcherProvider themeMap={themes} defaultTheme={prevTheme || "light"}>
-      <App subgraphUri={subgraphUri} />
-    </ThemeSwitcherProvider>
-  </ApolloProvider>,
+  <BrowserRouter>
+    <Switch>
+      <Route exact path="/">
+        <Home />
+      </Route>
+      <Route exact path="/app">
+        <ApolloProvider client={client}>
+          <ThemeSwitcherProvider themeMap={themes} defaultTheme={prevTheme || "light"}>
+            <App subgraphUri={subgraphUri} />
+          </ThemeSwitcherProvider>
+        </ApolloProvider>
+      </Route>
+    </Switch>
+  </BrowserRouter>,
   document.getElementById("root"),
 );

@@ -15,6 +15,7 @@ import {
   Typography,
   Modal,
 } from "antd";
+import { configConsumerProps } from "antd/lib/config-provider";
 
 import React, { useEffect, useState } from "react";
 import { ReactComponent as CardEx } from "../card_ex.svg";
@@ -42,6 +43,7 @@ export default function MVPUI({
   const [aliens, setAliens] = useState([]);
   const [alienSelected, setAlienSelected] = useState(null);
   const [gameScreenUpdating, setGameScreenUpdating] = useState(false);
+  const [disableHuntMore, setDisableHuntMore] = useState(false);
   const [canMint, setCanMint] = useState(null);
   const [aliensDefeated, setAliensDefeated] = useState(0);
   const [equipped, setEquipped] = useState([]);
@@ -51,6 +53,24 @@ export default function MVPUI({
   const [logs, setLogs] = useState([]);
 
   const [randRes, setRandRes] = useState([0, 0, 0]);
+
+  useEffect(async () => {
+    if (readContracts && readContracts.Player) {
+      init();
+    }
+  }, [readContracts, address]);
+
+  useEffect(async () => {
+    if (readContracts && playerNft) {
+      console.log("set player nft ");
+    }
+    if (readContracts && readContracts.Alien) {
+      updateGameScreen();
+      addEventListener("Alien", "PlayerWon", onPlayerWon);
+      addEventListener("Alien", "AlienWon", onAlienWon);
+      updatePrevLogs();
+    }
+  }, [readContracts, playerNft]);
 
   function initEmptyEquip() {
     let emptyEquipped = [];
@@ -63,13 +83,9 @@ export default function MVPUI({
   const init = async () => {
     updateProfile();
     updateWallet();
-    updateGameScreen();
-    updatePrevLogs();
 
     addEventListener("ScifiLoot", "LootMinted", onLootMinted);
     addEventListener("Player", "PlayerCreated", onPlayerCreated);
-    addEventListener("Alien", "PlayerWon", onPlayerWon);
-    addEventListener("Alien", "AlienWon", onAlienWon);
     addEventListener("Alien", "PlayerLostLoot", onPlayerLostLoot);
     addEventListener("Alien", "MintedAliens", onMintedAliens);
     initEmptyEquip();
@@ -132,7 +148,7 @@ export default function MVPUI({
     const jsonManifestString = atob(tokenURI.substring(29));
     try {
       const jsonManifest = JSON.parse(jsonManifestString);
-      //   console.log("jsonManifest", jsonManifest);
+      console.log("jsonManifest", jsonManifest);
       setPlayerNft({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
     } catch (e) {
       console.log(e);
@@ -192,11 +208,15 @@ export default function MVPUI({
       }
     });
     const aliensUpdate = [];
+    setDisableHuntMore(false);
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
       try {
         if (!killedAliens.includes(tokenId)) {
           //   console.log("alien tokenId", tokenId);
           const alien = await readContracts.Alien.aliens(tokenId);
+          if (alien.wonCount == 0) {
+            setDisableHuntMore(true);
+          }
           //   console.log({ alien });
           if (alien.isDead) continue;
           const tokenURI = await readContracts["Alien"].tokenURI(tokenId);
@@ -283,7 +303,9 @@ export default function MVPUI({
 
   function updateLogs(txt) {
     let prevLogs = logs;
-    prevLogs.push({ txt: txt });
+    if (!prevLogs.includes(txt)) {
+      prevLogs.push(txt);
+    }
     setLogs(prevLogs.reverse());
   }
 
@@ -294,12 +316,6 @@ export default function MVPUI({
       updateWallet();
     }
   }
-
-  useEffect(async () => {
-    if (readContracts && readContracts.Player) {
-      init();
-    }
-  }, [readContracts, address]);
 
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
   const atob = input => {
@@ -484,13 +500,7 @@ export default function MVPUI({
     showModal();
     setModalImageSrc(imgSrc);
   }
-  function showHuntMore() {
-    let foundFreshAlien = aliens.find(f => f.wonCount == 0);
-    if (foundFreshAlien) {
-      return false;
-    }
-    return aliens.length > 1;
-  }
+
   const lootItemModal = (
     <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
       <img style={{ width: 300 }} src={modalImageSrc} />
@@ -505,7 +515,7 @@ export default function MVPUI({
             <Card
               title="Which alien do you choose to fight?"
               extra={
-                <Button onClick={huntMore} type="dashed" disabled={showHuntMore()}>
+                <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
                   Hunt for more aliens
                 </Button>
               }
@@ -588,7 +598,7 @@ export default function MVPUI({
         renderItem={item => (
           <List.Item>
             <div onClick={() => console.log(item)}>
-              <Card>{item.txt}</Card>
+              <Card>{item}</Card>
             </div>
           </List.Item>
         )}
@@ -657,7 +667,7 @@ export default function MVPUI({
                   {/* <a href={"https://opensea.io/assets/"+(readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address)+"/"+item.id} target="_blank">
                         	
                         </a> */}
-                  <img src={playerNft.image} />
+                  <img src={playerNft.image} style={{ width: 300 }} />
                   {/* <div>{item.description}</div> */}
                 </Card>
                 {walletComp}
