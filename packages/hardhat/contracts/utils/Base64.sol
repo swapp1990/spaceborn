@@ -1,5 +1,5 @@
-pragma solidity >=0.8.0 <0.9.0;
-
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 library Base64 {
     bytes internal constant TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 

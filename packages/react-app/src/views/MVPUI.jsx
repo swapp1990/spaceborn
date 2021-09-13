@@ -21,7 +21,7 @@ import { ReactComponent as CardEx } from "../card_ex.svg";
 import { useContractReader } from "../hooks";
 import namesJson from "../randomNames.json";
 
-const { Text, Link } = Typography;
+const { Text, Link, Title } = Typography;
 
 export default function MVPUI({
   address,
@@ -41,6 +41,7 @@ export default function MVPUI({
   const [walletLoot, setWalletLoot] = useState([]);
   const [aliens, setAliens] = useState([]);
   const [alienSelected, setAlienSelected] = useState(null);
+  const [gameScreenUpdating, setGameScreenUpdating] = useState(false);
   const [canMint, setCanMint] = useState(null);
   const [aliensDefeated, setAliensDefeated] = useState(0);
   const [equipped, setEquipped] = useState([]);
@@ -63,6 +64,7 @@ export default function MVPUI({
     updateProfile();
     updateWallet();
     updateGameScreen();
+    updatePrevLogs();
 
     addEventListener("ScifiLoot", "LootMinted", onLootMinted);
     addEventListener("Player", "PlayerCreated", onPlayerCreated);
@@ -72,6 +74,22 @@ export default function MVPUI({
     addEventListener("Alien", "MintedAliens", onMintedAliens);
     initEmptyEquip();
   };
+
+  function updatePrevLogs() {
+    let contractName = "Alien";
+    let eventName = "PlayerWon";
+    console.log("updatePrevLogs");
+    readContracts[contractName].on(eventName, (...args) => {
+      let eventBlockNum = args[args.length - 1].blockNumber;
+      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      let msg = args.pop().args;
+      onPlayerWon(msg);
+      //   if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
+      //     let msg = args.pop().args;
+      //     callback(msg);
+      //   }
+    });
+  }
 
   //Testing random probs of contract
   //   async function getRandom() {
@@ -106,7 +124,6 @@ export default function MVPUI({
     }
     const tokenURI = await readContracts.Player.tokenURI(tokenId);
     const jsonManifestString = atob(tokenURI.substring(29));
-    // console.log({ jsonManifestString });
     try {
       const jsonManifest = JSON.parse(jsonManifestString);
       //   console.log("jsonManifest", jsonManifest);
@@ -119,12 +136,15 @@ export default function MVPUI({
   async function updateWallet() {
     // console.log({ address });
     const balanceLoot = await readContracts.ScifiLoot.balanceOf(address);
+    if (balanceLoot.toNumber() == walletLoot.length) {
+      console.log("wallet is updated!");
+      return;
+    }
     const walletLootUpdate = [];
     for (let tokenIndex = 0; tokenIndex < balanceLoot; tokenIndex++) {
       try {
-        console.log("GEtting token index", tokenIndex);
+        // console.log("GEtting token index", tokenIndex);
         const tokenId = await readContracts.ScifiLoot.tokenOfOwnerByIndex(address, tokenIndex);
-        // console.log("tokenId", tokenId);
         const tokenURI = await readContracts.ScifiLoot.tokenURI(tokenId);
         const jsonManifestString = atob(tokenURI.substring(29));
         try {
@@ -142,6 +162,7 @@ export default function MVPUI({
   }
 
   async function updateGameScreen() {
+    setGameScreenUpdating(true);
     const aliensMinted = await readContracts.Alien.lastTokenId();
     let killedAliens = await readContracts.Alien.getKilledAliens(address);
     // console.log({ deadAliens });
@@ -160,6 +181,7 @@ export default function MVPUI({
           setAlienSelected({ id: id, uri: tokenURI, owner: address, ...jsonManifest });
         } catch (e) {
           console.log(e);
+          setGameScreenUpdating(false);
         }
       }
     });
@@ -179,10 +201,12 @@ export default function MVPUI({
             aliensUpdate.push({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
           } catch (e) {
             console.log(e);
+            setGameScreenUpdating(false);
           }
         }
       } catch (e) {
         console.log(e);
+        setGameScreenUpdating(false);
       }
     }
     // console.log(aliensUpdate);
@@ -191,13 +215,14 @@ export default function MVPUI({
     const player_wins = (await readContracts.Alien.player2wins(address)).toNumber();
     // console.log({ player_wins });
     setAliensDefeated(player_wins);
+    setGameScreenUpdating(false);
   }
 
   const addEventListener = async (contractName, eventName, callback) => {
     await readContracts[contractName].removeListener(eventName);
     readContracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      //   console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
       if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
@@ -210,7 +235,7 @@ export default function MVPUI({
   }
 
   function onLootMinted(msg) {
-    console.log("onLootMinted ");
+    // console.log("onLootMinted ");
     updateGameScreen();
     updateWallet();
     setAlienSelected(null);
@@ -221,7 +246,7 @@ export default function MVPUI({
   }
 
   async function onPlayerWon(msg) {
-    console.log("onPlayerWon", msg.startProbs.toNumber(), msg.finalProbs.toNumber(), msg.sender);
+    // console.log("onPlayerWon", msg.startProbs.toNumber(), msg.finalProbs.toNumber(), msg.sender);
     if (msg.sender == address) {
     } else {
     }
@@ -234,7 +259,7 @@ export default function MVPUI({
   }
 
   async function onAlienWon(msg) {
-    console.log("onAlienWon", msg.startProbs.toNumber(), msg.finalProbs.toNumber(), msg.sender);
+    // console.log("onAlienWon", msg.startProbs.toNumber(), msg.finalProbs.toNumber(), msg.sender);
     if (msg.sender == address) {
       setAlienWon(true);
       setAlienSelected(null);
@@ -256,7 +281,7 @@ export default function MVPUI({
     prevLogs = prevLogs.filter((value, index, self) => {
       return self.indexOf(value) === index;
     });
-    setLogs(prevLogs);
+    setLogs(prevLogs.reverse());
   }
 
   async function onPlayerLostLoot(msg) {
@@ -297,7 +322,7 @@ export default function MVPUI({
   const createPlayer = async () => {
     console.log({ playerName });
     if (playerName == "") return;
-    const result = await tx(writeContracts.Player.mintYourPlayer(playerName));
+    const result = await tx(writeContracts.Player.mint(playerName));
     updateProfile();
   };
 
@@ -333,9 +358,16 @@ export default function MVPUI({
     console.log(result);
   }
 
-  function getBgColor(idx) {
+  function getWalletItemBgColor(idx) {
     let equippedFound = equipped.find(loot => loot.id == idx);
     if (equippedFound) {
+      return { backgroundColor: "lightgreen" };
+    }
+    return { backgroundColor: "white" };
+  }
+
+  function getAlienBgColor(idx) {
+    if (alienSelected && alienSelected.id == idx) {
       return { backgroundColor: "pink" };
     }
     return { backgroundColor: "white" };
@@ -409,7 +441,7 @@ export default function MVPUI({
         renderItem={item => (
           <List.Item>
             <div onClick={() => toggleToFight(item.id)}>
-              <Card title={item.name} style={getBgColor(item.id)} hoverable>
+              <Card title={item.name} style={getWalletItemBgColor(item.id)} hoverable>
                 <img style={{ width: 150 }} src={item.image} />
                 <a
                   href={
@@ -449,6 +481,13 @@ export default function MVPUI({
     showModal();
     setModalImageSrc(imgSrc);
   }
+  function showHuntMore() {
+    let foundFreshAlien = aliens.find(f => f.wonCount == 0);
+    if (foundFreshAlien) {
+      return false;
+    }
+    return aliens.length > 1;
+  }
   const lootItemModal = (
     <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
       <img style={{ width: 300 }} src={modalImageSrc} />
@@ -457,27 +496,30 @@ export default function MVPUI({
 
   const gameScreen = (
     <Card style={{ width: 800 }} title="Game Screen">
-      <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+      <div style={{ maxWidth: 820, margin: "auto", paddingBottom: 32 }}>
         <>
           {!canMint && (
             <Card
               title="Which alien do you choose to fight?"
               extra={
-                <Button onClick={huntMore} type="dashed" disabled={aliens.length > 1}>
+                <Button onClick={huntMore} type="dashed" disabled={showHuntMore()}>
                   Hunt for more aliens
                 </Button>
               }
             >
-              <div>Aliens Defeated: {aliensDefeated}</div>
-              {alienSelected && <span>Chosen Alien: {alienSelected.alienName}</span>}
+              <div>
+                <Title level={3}>Aliens Defeated: {aliensDefeated}</Title>
+              </div>
+              {alienSelected && <Title level={4}>Chosen Alien: {alienSelected.alienName}</Title>}
               <List
                 grid={{ gutter: 16, column: 3 }}
                 dataSource={aliens}
+                loading={gameScreenUpdating}
                 style={{ overflow: "auto", height: "400px" }}
                 renderItem={(item, idx) => (
                   <List.Item>
                     <div onClick={() => alienChosen(item.id)}>
-                      <Card hoverable bordered title={item.name}>
+                      <Card hoverable bordered title={item.name} style={getAlienBgColor(item.id)}>
                         <img style={{ width: 150 }} src={item.image} />
                       </Card>
                     </div>
@@ -488,6 +530,11 @@ export default function MVPUI({
                 {alienSelected && (
                   <div>
                     <div>Fill Slots</div>
+                    <div style={{ marginBottom: 10 }}>
+                      <Text mark>
+                        Note: If you lose the fight, there is a chance your NFT is lost and transferred to the Alien.
+                      </Text>
+                    </div>
                     <List
                       grid={{ gutter: 16, column: 3 }}
                       dataSource={equipped}
