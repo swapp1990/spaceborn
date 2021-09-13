@@ -1,10 +1,10 @@
-
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.8.0;
 //SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 pragma experimental ABIEncoderV2;
 

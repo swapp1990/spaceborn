@@ -1,4 +1,5 @@
-pragma solidity >=0.6.0 <0.8.0;
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 import 'base64-sol/base64.sol';
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -23,12 +24,12 @@ library LootMetadataSvg {
 		'<rect width="100%" height="100%" fill="black"/>',
 		'<text x="50%" y="8%" dominant-baseline="middle" text-anchor="middle" class="base">',name,'</text>',
 		'<text x="50%" y="15%" dominant-baseline="middle" text-anchor="middle" class="title">',rarity,'</text>',
-		'<rect width="230" height="140" fill="floralwhite" x="85" y="90" rx="5"/>',
+		'<rect width="230" height="140" fill="floralwhite" x="85" y="90" rx="5"/>'));
 		// '<text x="50%" y="10%" dominant-baseline="middle" text-anchor="middle" class="title">Loot Dropped by Alien named ',name,'</text>',
-		'<text x="50%" y="30%" dominant-baseline="middle" text-anchor="middle" class="quote" font-style="italic"><tspan dy="1.2em" x="50%">',lores[0],'</tspan><tspan dy="1.2em" x="50%">',lores[1],'</tspan><tspan dy="1.2em" x="50%">',lores[2],'</tspan><tspan dy="1.2em" x="50%"></tspan></text>',
-		'<text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" class="base">',catName,'</text>',
+		svg = string(abi.encodePacked(svg, '<text x="50%" y="30%" dominant-baseline="middle" text-anchor="middle" class="quote" font-style="italic"><tspan dy="1.2em" x="50%">',lores[0],'</tspan><tspan dy="1.2em" x="50%">',lores[1],'</tspan><tspan dy="1.2em" x="50%">',lores[2],'</tspan><tspan dy="1.2em" x="50%"></tspan></text>',
+		'<text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" class="base">',catName,'</text>'));
 		// '<text x="50%" y="75%" dominant-baseline="middle" text-anchor="middle" class="subtitle">Super Alloy</text>',
-		'<text x="50%" y="83%" dominant-baseline="middle" text-anchor="middle" class="subtitle">Manufacturer: ',corpName,'</text>',
+		svg = string(abi.encodePacked(svg,'<text x="50%" y="83%" dominant-baseline="middle" text-anchor="middle" class="subtitle">Manufacturer: ',corpName,'</text>',
 		'<text x="50%" y="95%" dominant-baseline="middle" text-anchor="middle" class="note" font-style="italic">Dropped by alien named ',alienName,'</text>',
 		'</svg>'
 		));

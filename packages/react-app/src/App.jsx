@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, LootUI, TreasureHuntUI, WandMintTest, Hints, Subgraph } from "./views";
+import { WandMintTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -421,52 +421,44 @@ function App(props) {
 
   return (
     <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
       <Header />
       {networkDisplay}
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
+          <Menu.Item key="/app">
             <Link
               onClick={() => {
-                setRoute("/");
+                setRoute("/app");
               }}
-              to="/"
+              to="/app"
             >
-              Scifi Loot
+              Wands
             </Link>
           </Menu.Item>
-          <Menu.Item key="/contract">
+          <Menu.Item key="/app/contract">
             <Link
               onClick={() => {
-                setRoute("/contract");
+                setRoute("/app/contract");
               }}
-              to="/contract"
+              to="/app/contract"
             >
               Contract
             </Link>
           </Menu.Item>
-          <Menu.Item key="/testWizard">
+          {/* <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {
-                setRoute("/testWizard");
+                setRoute("/app/testLoot");
               }}
-              to="/testWizard"
+              to="/app/testLoot"
             >
               Test Wand Mints
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
 
         <Switch>
-          <Route exact path="/">
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-            {/* <MVPUI */}
+          <Route exact path="/app">
             <WandMintTest
               address={address}
               userSigner={userSigner}
@@ -480,7 +472,7 @@ function App(props) {
             />
           </Route>
 
-          <Route path="/contract">
+          <Route path="/app/contract">
             <Contract
               name="Wands"
               signer={userSigner}
@@ -490,7 +482,7 @@ function App(props) {
             />
           </Route>
 
-          <Route path="/testLoot">
+          {/* <Route path="/app/testLoot">
             <LootUI
               address={address}
               userSigner={userSigner}
@@ -502,21 +494,7 @@ function App(props) {
               writeContracts={writeContracts}
               readContracts={readContracts}
             />
-          </Route>
-
-          <Route path="/treasureHunt">
-            <TreasureHuntUI
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route>
+          </Route> */}
         </Switch>
       </BrowserRouter>
 

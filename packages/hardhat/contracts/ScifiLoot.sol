@@ -1,14 +1,15 @@
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.8.0;
 //SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./LootMetadataSvg.sol";
 import "./Alien.sol";
 
-contract ScifiLoot is ERC721, Ownable {
+contract ScifiLoot is ERC721Enumerable, Ownable {
 	using Counters for Counters.Counter;
   	Counters.Counter private _tokenIds;
 	Alien alienContract;  
@@ -93,13 +94,13 @@ contract ScifiLoot is ERC721, Ownable {
 		loot2Names["Gizmo"] = ["Neutralizer","Replicator","Battery","Fuel Canister","Supercomputer"];
 		loot2Names["Pill"] = ["Soma","Nootropic","LSX","Regeneration","Food Replacement"];
 
-		faction2Corps["Munitiers"] = ["Tempest Space Corps","Stalker Armada","Demolition Star Division","Giant’s Claw Division" ];
+		faction2Corps["Munitiers"] = ["Tempest Space Corps","Stalker Armada","Demolition Star Division","Giant Claw Division" ];
 		faction2Corps["Ancients"] = ["Eternal Dominion","Unity Space Forces","Angel Wing Care","Federation Navy"];
 		faction2Corps["Rogue"] = ["Infernal Squadron","Darkness Fleet", "Black Hole Division", "Crimson Skies"];
 		faction2Corps["Freelance"] = ["Limbo Corp", "Void Stellar", "Aurora Navy", "Frostfire Legion"];
 
 		faction2lore["Munitiers"] = ["Humans conquered the stars.", "And then we promptly stained the stars", "with blood sacrifices."];
-		faction2lore["Ancients"] = ["We knew that freedom wouldn’t be free.", "But we didn’t anticipate", "that it would be so expensive."];
+		faction2lore["Ancients"] = ["We knew that freedom wouldnt be free.", "But we didnt anticipate", "that it would be so expensive."];
 		faction2lore["Rogue"] = ["Moloch hired numerous guards to", "protect this item from thieves.", "He never counted on the guards stealing."];
 		faction2lore["Freelance"] = ["The multiverse is a strange and wonderful place", "filled with wonderful ideas", "ready to be imported into our galaxy."];
   	}
