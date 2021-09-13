@@ -4,3 +4,4 @@ export { default as Subgraph } from "./Subgraph";
 export { default as TreasureHuntUI } from "./TreasureHuntUI";
 export { default as LootUI } from "./LootUI";
 export { default as MVPUI } from "./MVPUI";
+export { default as WandMintTest } from "./WandMintTest";

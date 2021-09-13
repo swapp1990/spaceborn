@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, LootUI, TreasureHuntUI, Hints, Subgraph } from "./views";
+import { MVPUI, LootUI, TreasureHuntUI, WandMintTest, Hints, Subgraph } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -446,14 +446,14 @@ function App(props) {
               Contract
             </Link>
           </Menu.Item>
-          <Menu.Item key="/testLoot">
+          <Menu.Item key="/testWizard">
             <Link
               onClick={() => {
-                setRoute("/testLoot");
+                setRoute("/testWizard");
               }}
-              to="/testLoot"
+              to="/testWizard"
             >
-              Test Loot Mints
+              Test Wand Mints
             </Link>
           </Menu.Item>
         </Menu>
@@ -467,7 +467,7 @@ function App(props) {
             */}
 
             {/* <MVPUI */}
-            <MVPUI
+            <WandMintTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
@@ -482,7 +482,7 @@ function App(props) {
 
           <Route path="/contract">
             <Contract
-              name="Alien"
+              name="Wands"
               signer={userSigner}
               provider={localProvider}
               address={address}

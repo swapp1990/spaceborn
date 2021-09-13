@@ -5,28 +5,24 @@
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  //   await deploy("NftTreasureHunt", {
+
+  await deploy("Wands", {
+    from: deployer,
+    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    log: true,
+  });
+
+  //   await deploy("Alien", {
   //     from: deployer,
   //     //args: [ "Hello", ethers.utils.parseEther("1.5") ],
   //     log: true,
   //   });
-  await deploy("Player", {
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
 
-  await deploy("Alien", {
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
+  //   const alienContract = await ethers.getContract("Alien", deployer);
+  //   const names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
+  //   const baseProbs = [10, 10, 10, 10, 15, 45];
 
-  const alienContract = await ethers.getContract("Alien", deployer);
-  const names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
-  const baseProbs = [10, 10, 10, 10, 15, 45];
-
-  await alienContract.mintMultipleAliens(names, baseProbs);
+  //   await alienContract.mintMultipleAliens(names, baseProbs);
   //   await alienContract.mintAlien("Allen", 10);
   //   await alienContract.mintAlien("Bernard", 20);
   //   await alienContract.mintAlien("Lucy", 30);
@@ -43,11 +39,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   //   await alienContract.mintAlien("Kevin", 90);
   //   await alienContract.mintAlien("Mark", 95);
 
-  await deploy("ScifiLoot", {
-    from: deployer,
-    args: [alienContract.address],
-    log: true,
-  });
+  //   await deploy("ScifiLoot", {
+  //     from: deployer,
+  //     args: [alienContract.address],
+  //     log: true,
+  //   });
   //   await yourContract.mintYourPlayer("swapp");
   //   const url = "https://austingriffith.com/portfolio/paintings/?id=zebra";
   //   await yourContract.mintCitizen(url, "CitizenRed1", 0);
@@ -87,4 +83,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
   */
 };
-module.exports.tags = ["Loot"];
+module.exports.tags = ["Wands"];

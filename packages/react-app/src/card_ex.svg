@@ -1,26 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">
 <style>
-	.title {fill: white; font-family: serif; font-size: 16px;}
-	.subtitle  {fill: white; font-family: serif; font-size: 16px;}
-	.base { fill: white; font-family: serif; font-size: 20px; }
-	.quote { fill: black; font-family: serif; font-size: 10px; font-style = italic; }
+	.base { fill: white; font-family: serif; font-size: 18px; }
+	.topright { fill: white; font-family: serif; font-size: 12px; }
 </style>
 	<rect width="100%" height="100%" fill="black" />
-	<text x="50%" y="8%" dominant-baseline="middle" text-anchor="middle" class="base">Super Duper Blaster Canon</text> 
-	<text x="50%" y="15%" dominant-baseline="middle" text-anchor="middle" class="title">UNCOMMON</text>
-	<rect width="60%" height="30%" fill="floralwhite" x="70" y="75" rx="5"/>
-	
-	<text x="50%" y="25%" dominant-baseline="middle" text-anchor="middle" class="quote" font-style="italic">
-	<tspan dy="1.2em" x="50%">How doth the little crocodile</tspan>    
- 	<tspan dy="1.2em" x="50%" dx="1em">Improve his shining tail,</tspan>          
- 	<tspan dy="1.2em" x="50%">And pour the waters of the Nile</tspan>
- 	<tspan dy="1.2em" x="50%" dx="1em">On every golden scale!</tspan>
-	</text>
+	<text text-anchor="end" x="98%" y="4%" class="topright">#556</text>
 
-	<text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" class="base">WEAPON</text>
-	<text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" class="subtitle">Material: Super Alloy</text>
-	<text x="50%" y="78%" dominant-baseline="middle" text-anchor="middle" class="subtitle">Manufacturer: Tempest Space Corps</text>
-	<!-- <text x="50%" y="68%" dominant-baseline="middle" text-anchor="middle" class="base">Buffs Applied: Moonshot Bots/Punks/Loot Project</text> -->
-	<!-- <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" class="base">Silver Ring of Brilliance</text>
-	<text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" class="base">Apocalypse Belt of the Deceiver</text> -->
+	<text x="7%" y="15%" class="base">Wand Core:</text>
+	<text text-anchor="end" x="95%" y="15%" class="base" font-style = "italic">Golden Feather of Phoenix</text>
+	<text x="7%" y="25%" class="base">Core Type:</text>
+	<text text-anchor="end" x="95%" y="25%" class="base" font-style = "italic">Birthstone</text>
+	<text x="7%" y="35%" class="base">Wood:</text>
+	<text text-anchor="end" x="95%" y="35%" class="base" font-style = "italic">Chestnut</text>
+	<text x="7%" y="45%" class="base">Length:</text>
+	<text text-anchor="end" x="95%" y="45%" class="base" font-style = "italic">11"</text>
+	<text x="7%" y="55%" class="base">Wandmaker:</text>
+	<text text-anchor="end" x="95%" y="55%" class="base" font-style = "italic">Ollivander's</text>
 </svg>
