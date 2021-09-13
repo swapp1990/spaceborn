@@ -78,16 +78,22 @@ export default function MVPUI({
   function updatePrevLogs() {
     let contractName = "Alien";
     let eventName = "PlayerWon";
-    console.log("updatePrevLogs");
     readContracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
       console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
-      let msg = args.pop().args;
-      onPlayerWon(msg);
-      //   if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
-      //     let msg = args.pop().args;
-      //     callback(msg);
-      //   }
+      if (eventBlockNum != localProvider._lastBlockNumber) {
+        let msg = args.pop().args;
+        onPlayerWon(msg);
+      }
+    });
+    eventName = "AlienWon";
+    readContracts[contractName].on(eventName, (...args) => {
+      let eventBlockNum = args[args.length - 1].blockNumber;
+      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      if (eventBlockNum != localProvider._lastBlockNumber) {
+        let msg = args.pop().args;
+        onAlienWon(msg);
+      }
     });
   }
 
@@ -278,9 +284,6 @@ export default function MVPUI({
   function updateLogs(txt) {
     let prevLogs = logs;
     prevLogs.push({ txt: txt });
-    prevLogs = prevLogs.filter((value, index, self) => {
-      return self.indexOf(value) === index;
-    });
     setLogs(prevLogs.reverse());
   }
 

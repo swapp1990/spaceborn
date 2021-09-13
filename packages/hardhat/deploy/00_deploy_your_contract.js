@@ -23,10 +23,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   const alienContract = await ethers.getContract("Alien", deployer);
-  const names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
-  const baseProbs = [10, 10, 10, 10, 15, 45];
+  //   const names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
+  //   const baseProbs = [10, 10, 10, 10, 15, 45];
 
-  await alienContract.mintMultipleAliens(names, baseProbs);
+  //   await alienContract.mintMultipleAliens(names, baseProbs);
   //   await alienContract.mintAlien("Allen", 10);
   //   await alienContract.mintAlien("Bernard", 20);
   //   await alienContract.mintAlien("Lucy", 30);
