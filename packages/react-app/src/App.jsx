@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { WandMintTest } from "./views";
+import { WandMintTest, WandsUI } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -459,7 +459,7 @@ function App(props) {
 
         <Switch>
           <Route exact path="/app">
-            <WandMintTest
+            <WandsUI
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}

@@ -1,19 +1,18 @@
 pragma solidity ^0.8.0;
 //SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./WandMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
 
-contract Wands is ERC721, Ownable {
+contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 	using Strings for uint256;
-	using Counters for Counters.Counter;
-  	Counters.Counter private _tokenIds;
 	
 	struct Wands {
 		uint256 tokenId;
@@ -21,8 +20,6 @@ contract Wands is ERC721, Ownable {
 	}
 
 	mapping (uint256 => Wands) public wandItems;
-
-	event WandMinted(uint256 tokenId, uint256 rand);
 
 	constructor() public ERC721("Wands", "WAND") {
 
@@ -132,6 +129,8 @@ contract Wands is ERC721, Ownable {
 		"Cornelius Agrippa"
 	];
 
+	event WandMinted(uint256 tokenId, address sender);
+
 	function pluck(uint256 tokenId, uint size) internal view returns (string[] memory) {
 		uint256 rand = getRandom(tokenId);
 		string[] memory results = new string[](size);
@@ -175,9 +174,27 @@ contract Wands is ERC721, Ownable {
 		return results;
 	}
 
-	function randomTokenURI(uint256 id, string memory alienName) public view returns (string memory) {
+	function mint(uint256 tokenId) public nonReentrant {
+		require(tokenId > 0 && tokenId <= 10000, "Token ID invalid");
+		// require(price <= msg.value, "Ether value sent is not correct");
+		_safeMint(_msgSender(), tokenId);
+		emit WandMinted(tokenId, _msgSender());
+	}
+
+	function randomTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
 		string[] memory results = pluck(id, 5);
 		return WandMetadataSvg.tokenURI( address(this), id, results);
+	}
+
+	function getTokenURI(uint256 id) public view returns (string memory) {
+		// require(_exists(id), "not exist");
+		string[] memory results = pluck(id, 5);
+		return WandMetadataSvg.tokenURI( address(this), id, results);
+	}
+
+	function getTokenOwner(uint256 id) public view returns (address) {
+		if(!_exists(id)) return address(0);
+		return ownerOf(id);
 	}
 }
