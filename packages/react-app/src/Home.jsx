@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <div className="home">
-        <h1>Sci-fi Gear</h1>
+        <h1>Wands for Wizards</h1>
         <Button type={"primary"}>
           <Link
             onClick={() => {

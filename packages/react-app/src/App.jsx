@@ -47,7 +47,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkebyArbitrum; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = false;
@@ -435,7 +435,7 @@ function App(props) {
               Wands
             </Link>
           </Menu.Item>
-          <Menu.Item key="/app/contract">
+          {/* <Menu.Item key="/app/contract">
             <Link
               onClick={() => {
                 setRoute("/app/contract");
@@ -444,7 +444,7 @@ function App(props) {
             >
               Contract
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
           {/* <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {

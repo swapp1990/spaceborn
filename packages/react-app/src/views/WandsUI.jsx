@@ -17,6 +17,7 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { ReactComponent as CardUnknown } from "../card_unknown.svg";
+import { fromWei, toWei, toBN, numberToHex } from "web3-utils";
 
 const { Search } = Input;
 const { Text, Link } = Typography;
@@ -117,7 +118,22 @@ export default function WandsUI({
   }
 
   async function mintToken() {
-    const result = await tx(writeContracts.Wands.mint(token.id));
+    const value = toWei("0.05");
+    const result = await tx(
+      writeContracts.Wands.mint(token.id, {
+        value: value,
+      }),
+    );
+    console.log({ result });
+  }
+
+  async function mintWithCastle() {
+    const value = toWei("0.01");
+    const result = await tx(
+      writeContracts.Wands.mintWithcastle(token.id, {
+        value: value,
+      }),
+    );
     console.log({ result });
   }
 
@@ -149,11 +165,11 @@ export default function WandsUI({
     <Card
       title="Wallet"
       style={{ marginLeft: 30, marginRight: 30 }}
-      extra={
-        <Button type="dashed" disabled>
-          Claim a free loot
-        </Button>
-      }
+      //   extra={
+      //     // <Button type="dashed" disabled>
+      //     //   Claim a free loot
+      //     // </Button>
+      //   }
     >
       <List
         grid={{ gutter: 16, column: 2 }}
@@ -189,11 +205,11 @@ export default function WandsUI({
     <Card
       title="Game Screen"
       style={{ marginLeft: 30, marginRight: 30 }}
-      extra={
-        <Button type="dashed" disabled>
-          Claim a free loot
-        </Button>
-      }
+      //   extra={
+      //     <Button type="dashed" disabled>
+      //       Claim a free loot
+      //     </Button>
+      //   }
     >
       <div style={{ margin: "auto", paddingTop: 5 }}>
         <div>
@@ -218,11 +234,23 @@ export default function WandsUI({
           </div>
         )}
         {isAvailable && (
-          <div style={{ paddingTop: 10 }}>
-            <Button type="primary" onClick={mintToken}>
-              Mint (0.01 ETH)
-            </Button>
-          </div>
+          <>
+            <div style={{ paddingTop: 10 }}>
+              <Button type="primary" onClick={mintToken} style={{ marginRight: 20 }}>
+                Mint (0.05 ETH)
+              </Button>
+              <Button type="primary" onClick={mintWithCastle}>
+                Mint with Castle (0.01 ETH)
+              </Button>
+            </div>
+            <Divider />
+            <Text>
+              Mint your own castle at{" "}
+              <a href="https://www.castledao.com" target="_blank">
+                castledao!
+              </a>
+            </Text>
+          </>
         )}
       </div>
     </Card>

@@ -11,8 +11,24 @@ import "./WandMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
 
+interface CastlesInterface {
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+}
+
 contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
+	uint256 public castlesPrice = 10000000000000000; // 0.01 ETH
+	uint256 public price = 50000000000000000; //0.05 ETH
+
 	using Strings for uint256;
+
+	//Castle Contract (arbitrum)
+    address public castlesAddress = 0x71f5C328241fC3e03A8c79eDCD510037802D369c;
+    CastlesInterface public castlesContract = CastlesInterface(castlesAddress);
+
+	// Allow to extract from the smart contract, otherwise.. you're ded
+    function ownerWithdraw() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
 	
 	struct Wands {
 		uint256 tokenId;
@@ -174,11 +190,18 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		return results;
 	}
 
-	function mint(uint256 tokenId) public nonReentrant {
+	function mint(uint256 tokenId) public payable nonReentrant {
 		require(tokenId > 0 && tokenId <= 10000, "Token ID invalid");
-		// require(price <= msg.value, "Ether value sent is not correct");
+		require(price <= msg.value, "Ether value sent is not correct");
 		_safeMint(_msgSender(), tokenId);
 		emit WandMinted(tokenId, _msgSender());
+	}
+
+	function mintWithcastle(uint256 tokenId) public payable nonReentrant {
+		require(tokenId > 0 && tokenId <= 10000, "Token ID invalid");
+		require(castlesPrice <= msg.value, "Ether value sent is not correct");
+		require(castlesContract.ownerOf(tokenId) == msg.sender, "Not the owner of this castle");
+		_safeMint(_msgSender(), tokenId);
 	}
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {
@@ -197,4 +220,10 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		if(!_exists(id)) return address(0);
 		return ownerOf(id);
 	}
+
+	// Allow the owner to claim in case some item remains unclaimed in the future
+    function ownerClaim(uint256 tokenId) public nonReentrant onlyOwner {
+        require(tokenId <= 10000, "Token ID invalid");
+        _safeMint(owner(), tokenId);
+    }
 }

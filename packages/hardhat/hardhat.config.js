@@ -25,8 +25,8 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 // Select the network you want to deploy to here:
 //
 // const defaultNetwork = "rinkeby";
-// const defaultNetwork = "rinkebyArbitrum";
-const defaultNetwork = "localhost";
+const defaultNetwork = "rinkebyArbitrum";
+// const defaultNetwork = "localhost";
 
 function mnemonic() {
   try {
@@ -111,6 +111,7 @@ module.exports = {
         l1: "rinkeby",
       },
     },
+
     localArbitrum: {
       url: "http://localhost:8547",
       gasPrice: 0,
