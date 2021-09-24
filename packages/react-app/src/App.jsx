@@ -474,7 +474,7 @@ function App(props) {
 
           <Route path="/app/contract">
             <Contract
-              name="TestNFT"
+              name="Wands"
               signer={userSigner}
               provider={localProvider}
               address={address}

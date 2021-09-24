@@ -25,11 +25,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   const wandsContract = await ethers.getContract("Wands", deployer);
+  await wandsContract.setConnector(testContract.address, 10, 10000);
   await wandsContract.transferOwnership(
     "0x76c48E1F02774C40372a3497620D946136136172"
   );
   console.log("connect ", testContract.address);
-  await wandsContract.setConnector(testContract.address, 10, 10000);
+
   const hasConnector = await wandsContract.hasConnector(testContract.address);
   console.log({ hasConnector });
   /*

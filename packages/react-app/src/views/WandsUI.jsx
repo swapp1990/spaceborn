@@ -36,6 +36,9 @@ export default function WandsUI({
   const [imgSrc, setImgSrc] = useState(null);
   const [token, setToken] = useState();
   const [isAvailable, setIsAvailable] = useState(false);
+  const [isOwnCastle, setIsOwnCastle] = useState(false);
+  const [castleNftId, setCastleNftId] = useState(false);
+  const castlesContract = "0xd04067d0070348BDc01CA759e57aEb4E1FBB7116";
 
   useEffect(async () => {
     if (readContracts && readContracts.Wands) {
@@ -43,9 +46,15 @@ export default function WandsUI({
     }
   }, [readContracts, address]);
 
-  function init() {
+  async function init() {
     addEventListener("Wands", "WandMinted", onWandMinted);
     update();
+
+    const balance = await readContracts.Wands.balanceOfPartner(castlesContract, address);
+    // console.log({ balance });
+    if (balance > 0) {
+      setIsOwnCastle(true);
+    }
   }
 
   const addEventListener = async (contractName, eventName, callback) => {
@@ -113,7 +122,7 @@ export default function WandsUI({
     const base64_data = result.split("base64,")[1];
     const decoded_str = atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
-    console.log(decoded_json);
+    // console.log(decoded_json);
     return decoded_json;
   }
 
@@ -128,12 +137,13 @@ export default function WandsUI({
   }
 
   async function mintWithCastle() {
+    if (!castleNftId) return;
     const value = toWei("0.01");
-    const contract = "0xd04067d0070348BDc01CA759e57aEb4E1FBB7116";
-    const isConnected = await readContracts.Wands.hasConnector(contract);
-    console.log({ isConnected });
+    // const isConnected = await readContracts.Wands.hasConnector(castlesContract);
+    console.log({ castleNftId });
+
     const result = await tx(
-      writeContracts.Wands.mintAsPartner(contract, 100, token.id, {
+      writeContracts.Wands.mintAsPartner(castlesContract, castleNftId, token.id, {
         value: value,
       }),
     );
@@ -183,7 +193,7 @@ export default function WandsUI({
             <div onClick={() => console.log("wallet")}>
               <Card title={item.name} hoverable style={{ width: 180 }}>
                 <img style={{ width: 120 }} src={item.image} />
-                <a
+                {/* <a
                   href={
                     "https://opensea.io/assets/" +
                     (readContracts && readContracts.ScifiLoot && readContracts.ScifiLoot.address) +
@@ -193,7 +203,7 @@ export default function WandsUI({
                   target="_blank"
                 >
                   View on OpenSea
-                </a>
+                </a> */}
               </Card>
             </div>
             <Button type="primary" onClick={() => viewItem(item.image)}>
@@ -242,10 +252,22 @@ export default function WandsUI({
               <Button type="primary" onClick={mintToken} style={{ marginRight: 20 }}>
                 Mint (0.05 ETH)
               </Button>
-              <Button type="primary" onClick={mintWithCastle}>
-                Mint with Castle (0.01 ETH)
-              </Button>
             </div>
+            <div style={{ marginTop: 10 }}>
+              <Search
+                placeholder="Castledao NFT ID"
+                enterButton="Mint with Castle (0.01 ETH)"
+                size="large"
+                onChange={e => {
+                  console.log(e.target.value);
+                  setCastleNftId(e.target.value);
+                }}
+                onSearch={mintWithCastle}
+                style={{ width: 400 }}
+                disabled={!isOwnCastle}
+              />
+            </div>
+            <div>{!isOwnCastle && <Text>You don't own any Castles NFT</Text>}</div>
             <Divider />
             <Text>
               Mint your own castle at{" "}

@@ -13,6 +13,7 @@ pragma experimental ABIEncoderV2;
 
 interface IConnector {
   function ownerOf(uint256 tokenId) external view returns (address owner);
+  function balanceOf(address _owner) external view returns (uint256);
 }
 
 struct Connector {
@@ -58,6 +59,12 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	function hasConnector(address _contract) external view returns (bool) {
 		return connectors[_contract].exists;
+	}
+
+	function balanceOfPartner(address _contract, address sender) external view returns (uint256) {
+		IConnector connector = IConnector(_contract);
+		require(connectors[_contract].exists);
+		return connector.balanceOf(sender);
 	}
 	
 	struct Wands {
@@ -246,6 +253,7 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		require(connector.ownerOf(_partnerId) == msg.sender, "You do not own the _partnerId");
 
 		_safeMint(_msgSender(), _wandsId);
+		emit WandMinted(_wandsId, _msgSender());
 	}
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {

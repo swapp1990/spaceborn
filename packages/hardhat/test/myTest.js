@@ -71,6 +71,16 @@ describe("Wands NFT Game", function () {
         });
         expect(await testContract.exists(111)).to.equal(true);
 
+        expect(await wandsContract.hasConnector(testContract.address)).to.equal(
+          true
+        );
+        expect(
+          await wandsContract.balanceOfPartner(
+            testContract.address,
+            firstPlayer.address
+          )
+        ).to.equal(1);
+
         await wandsContract.mintAsPartner(testContract.address, 123, 400, {
           value: ethers.utils.parseEther("0.01"),
         });
