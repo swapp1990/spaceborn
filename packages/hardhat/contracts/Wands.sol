@@ -130,6 +130,26 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		"Warewolf"
 	];
 
+	string[] private rareBreeds = [
+		"Sphynx",
+		"Angus",
+		"Appaloosa",
+		"Giant",
+		"Blue",
+		"Barasingha",
+		"Tarantula",
+		"Proteidae",
+		"Elaphocentaur",
+		"Keythongs",
+		"Poseidon",
+		"Ningyo",
+		"Pegasi",
+		"Semiserratus",
+		"Phoenician",
+		"Quetzalcoatl",
+		"Therianthropic"
+	];
+
 	string[] private parts = [
 		"Feather",
 		"Skin",
@@ -173,13 +193,37 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	string[] private wandMakers = [
 		"Romeo Zeigler",
-		"Isaac Scamander",
 		"Johannes Jonker",
 		"Willow Wisp",
 		"Arnold Peasegood",
-		"Melvin Wimple",
+		"Alfons Bloemenberg",
 		"Penguin Brothers",
-		"Cornelius Agrippa"
+		"Penzy's Wands",
+		"Hildebrande",
+		"Juan Jose Bolibar",
+		"Goblin Stick Makers",
+		"Hartebeck"
+	];
+
+	string[] private specialty = [
+		"Theurgy", 
+		"Arcane Magic", 
+		"Rune Magic", 
+		"Necromancy", 
+		"Shamanism", 
+		"Elemental magic", 
+		"Storm magic",
+		"Blood magic", 
+		"Aeromancy", 
+		"Alchemy", 
+		"Thaumaturgy", 
+		"Bilocation", 
+		"Pyrokinesis", 
+		"Divination", 
+		"Telepathy", 
+		"Levitation", 
+		"Telekinesis", 
+		"Hydrokinesis"
 	];
 
 	event WandMinted(uint256 tokenId, address sender);
@@ -202,6 +246,9 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		string memory part = parts[rand%parts.length];
 		uint idx = (rand % (end-start))+ start;
 		string memory creature = creatures[idx];
+		if(rand < 50) {
+			creature = string(abi.encodePacked("'", rareBreeds[idx], "' ", creature));
+		}
 		string memory coreType = "Birthstone";
 		if(idx < 9 && rand < 40) {
 			coreType = "Synthetic";
@@ -217,6 +264,8 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 			pre = prefix[rand%prefix.length];
 			pre = string(abi.encodePacked(pre, ' '));
 		}
+
+		string memory specialtyStr = specialty[rand%specialty.length];
 		
 		uint woodIdx = (rand % (end-start))+ start;
 		results[0] = string(abi.encodePacked(pre,part," of ", creature));
@@ -224,6 +273,7 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		results[2] = woodType[woodIdx];
 		results[3] = wandMakers[rand%wandMakers.length];
 		results[4] = length;
+		results[5] = specialtyStr;
 		return results;
 	}
 
@@ -258,13 +308,13 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
-		string[] memory results = pluck(id, 5);
+		string[] memory results = pluck(id, 6);
 		return WandMetadataSvg.tokenURI( address(this), id, results);
 	}
 
 	function getTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
-		string[] memory results = pluck(id, 5);
+		string[] memory results = pluck(id, 6);
 		return WandMetadataSvg.tokenURI( address(this), id, results);
 	}
 

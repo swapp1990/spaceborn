@@ -459,7 +459,7 @@ function App(props) {
 
         <Switch>
           <Route exact path="/app">
-            <WandsUI
+            <WandMintTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
@@ -481,20 +481,6 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
           </Route>
-
-          {/* <Route path="/app/testLoot">
-            <LootUI
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-            />
-          </Route> */}
         </Switch>
       </BrowserRouter>
 

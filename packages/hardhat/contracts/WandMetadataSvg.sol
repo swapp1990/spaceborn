@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 library WandMetadataSvg {
 	using Strings for uint256;
 
-	function generateSVGofTokenById(address owner, uint256 id, string memory core, string memory coreType, string memory wood, string memory maker, string memory length) internal pure returns (string memory) {
+	function generateSVGofTokenById(address owner, uint256 id, string memory core, string memory coreType, string memory wood, string memory maker, string memory length, string memory specialty) internal pure returns (string memory) {
 		string memory svg = string(abi.encodePacked(
 		'<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><style>.base { fill: white; font-family: serif; font-size: 18px; }.topright { fill: white; font-family: serif; font-size: 12px;}</style><rect width="100%" height="100%" fill="black"/>',
 		'<text text-anchor="end" x="98%" y="4%" class="topright">#',
@@ -20,20 +20,22 @@ library WandMetadataSvg {
 		wood,
 		'</text><text x="7%" y="45%" class="base">Length:</text><text text-anchor="end" x="95%" y="45%" class="base" font-style = "italic">'
 		));
+
 		svg = string(abi.encodePacked(
 		svg,
 		length,
 		'</text><text x="7%" y="55%" class="base">Wandmaker:</text><text text-anchor="end" x="95%" y="55%" class="base" font-style = "italic">',
 		maker,
-		'</text></svg>'
-		''));
+		'</text><text x="7%" y="65%" class="base">Specialty:</text><text text-anchor="end" x="95%" y="65%" class="base" font-style = "italic">',
+		specialty,
+		'</text></svg>'));
 		return svg;
 	}
 
 	function tokenURI(address owner, uint256 tokenId, string[] memory attrs) internal pure returns (string memory) {
 		string memory name = string(abi.encodePacked('Wand Item #',tokenId.toString()));
 
-		string memory image = Base64.encode(bytes(generateSVGofTokenById(owner,tokenId,attrs[0],attrs[1],attrs[2],attrs[3],attrs[4])));
+		string memory image = Base64.encode(bytes(generateSVGofTokenById(owner,tokenId,attrs[0],attrs[1],attrs[2],attrs[3],attrs[4],attrs[5])));
 
 		return string(
 			abi.encodePacked(

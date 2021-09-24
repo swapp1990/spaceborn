@@ -71,6 +71,7 @@ export default function WandsUI({
 
   function onWandMinted(msg) {
     console.log("onWandMinted ", msg);
+
     update();
   }
 

@@ -47,7 +47,7 @@ export default function WandMintTest({
   }
   const mintWand = async () => {
     const token_idx = getRandomInt(1000);
-    const result = await readContracts.Wands.randomTokenURI(token_idx, "Test");
+    const result = await readContracts.Wands.randomTokenURI(token_idx);
     setTokenIdx(token_idx);
 
     const base64_data = result.split("base64,")[1];
