@@ -129,8 +129,11 @@ export default function WandsUI({
 
   async function mintWithCastle() {
     const value = toWei("0.01");
+    const contract = "0xd04067d0070348BDc01CA759e57aEb4E1FBB7116";
+    const isConnected = await readContracts.Wands.hasConnector(contract);
+    console.log({ isConnected });
     const result = await tx(
-      writeContracts.Wands.mintWithcastle(token.id, {
+      writeContracts.Wands.mintAsPartner(contract, 100, token.id, {
         value: value,
       }),
     );

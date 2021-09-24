@@ -12,6 +12,26 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
+  await deploy("TestNFT", {
+    from: deployer,
+    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    log: true,
+  });
+
+  const testContract = await ethers.getContract("TestNFT", deployer);
+
+  await testContract.mint(1, {
+    value: ethers.utils.parseEther("0.01"),
+  });
+
+  const wandsContract = await ethers.getContract("Wands", deployer);
+  await wandsContract.transferOwnership(
+    "0x76c48E1F02774C40372a3497620D946136136172"
+  );
+  console.log("connect ", testContract.address);
+  await wandsContract.setConnector(testContract.address, 10, 10000);
+  const hasConnector = await wandsContract.hasConnector(testContract.address);
+  console.log({ hasConnector });
   /*
   //If you want to send value to an address from the deployer
   const deployerWallet = ethers.provider.getSigner()
@@ -19,13 +39,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     to: "0x34aA3F359A9D614239015126635CE7732c18fDF3",
     value: ethers.utils.parseEther("0.001")
   })
-  */
-
-  /*
-  //If you want to send some ETH to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
-  value: ethers.utils.parseEther("0.05")
-  });
   */
 
   /*

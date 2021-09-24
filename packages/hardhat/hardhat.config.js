@@ -25,7 +25,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 // Select the network you want to deploy to here:
 //
 // const defaultNetwork = "rinkeby";
-const defaultNetwork = "arbitrum";
+const defaultNetwork = "rinkebyArbitrum";
 // const defaultNetwork = "localhost";
 
 function mnemonic() {
@@ -103,7 +103,8 @@ module.exports = {
     },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
-      gasPrice: 1000000000,
+      gas: 21000000,
+      gasPrice: 8000000000,
       accounts: {
         mnemonic: mnemonic(),
       },

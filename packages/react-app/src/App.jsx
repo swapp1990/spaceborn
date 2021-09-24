@@ -435,7 +435,7 @@ function App(props) {
               Wands
             </Link>
           </Menu.Item>
-          {/* <Menu.Item key="/app/contract">
+          <Menu.Item key="/app/contract">
             <Link
               onClick={() => {
                 setRoute("/app/contract");
@@ -444,7 +444,7 @@ function App(props) {
             >
               Contract
             </Link>
-          </Menu.Item> */}
+          </Menu.Item>
           {/* <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {
@@ -474,7 +474,7 @@ function App(props) {
 
           <Route path="/app/contract">
             <Contract
-              name="Wands"
+              name="TestNFT"
               signer={userSigner}
               provider={localProvider}
               address={address}
