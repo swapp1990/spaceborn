@@ -4,82 +4,105 @@ const { solidity } = require("ethereum-waffle");
 
 use(solidity);
 
-describe("My NFT Game", function () {
-  let alienContract;
-  let lootContract;
+describe("Wands NFT Game", function () {
+  let testContract;
+  let wandsContract;
   let firstPlayer;
+  let secondPlayer;
 
-  describe("Alien", function () {
-    it("Should deploy Alien", async function () {
-      const Alien = await ethers.getContractFactory("Alien");
-      alienContract = await Alien.deploy();
+  describe("TestNFT", function () {
+    it("Should deploy TestNFT", async function () {
+      const TestNFT = await ethers.getContractFactory("TestNFT");
+      testContract = await TestNFT.deploy();
       const [owner] = await ethers.getSigners();
       firstPlayer = owner;
     });
 
-    describe("test buffs", function () {
-      it("test buff values", async function () {
-        let buff = await alienContract.testFight(20, 10, [1, 2, 3]);
-        console.log(buff.toNumber());
-        buff = await alienContract.testFight(50, 3, [1, 2]);
-        console.log(buff.toNumber());
-        buff = await alienContract.testFight(90, 3, [1]);
-        console.log(buff.toNumber());
+    describe("mint test", function () {
+      it("should mint nft", async function () {
+        await testContract.mint(123, {
+          value: ethers.utils.parseEther("0.01"),
+        });
+        expect(await testContract.exists(123)).to.equal(true);
+        expect(await testContract.exists(122)).to.equal(false);
+      });
+    });
+  });
+
+  describe("WandsNFT", function () {
+    it("Should deploy WandsNFT", async function () {
+      const WandsNFT = await ethers.getContractFactory("Wands");
+      wandsContract = await WandsNFT.deploy();
+      const TestNFT = await ethers.getContractFactory("TestNFT");
+      testContract = await TestNFT.deploy();
+      const [owner, second] = await ethers.getSigners();
+      firstPlayer = owner;
+      secondPlayer = second;
+    });
+
+    describe("mint wands", function () {
+      it("should mint nft", async function () {
+        await wandsContract.mint(123, {
+          value: ethers.utils.parseEther("0.05"),
+        });
+        expect(await wandsContract.exists(123)).to.equal(true);
+        expect(await wandsContract.exists(122)).to.equal(false);
       });
     });
 
-    //     describe("mintAlien()", function () {
-    //       it("Should be able to mint a new NFT", async function () {
-    //         await alienContract.mintAlien("Alen", 0);
-    //         expect(await alienContract.lastTokenId()).to.equal(1);
-    //       });
-    //       it("Should be able to mint multiple NFTs", async function () {
-    //         await alienContract.mintAlien("Trish", 0);
-    //         await alienContract.mintAlien("Lina", 20);
-    //         expect(await alienContract.lastTokenId()).to.equal(3);
-    //       });
-    //       it("Player should win fight", async function () {
-    //         await alienContract.fightAlien(1, 23);
-    //         const aln = await alienContract.aliens(1);
-    //         expect(await aln.isDead).to.equal(true);
-    //       });
-    //     });
-    //   });
+    describe("add TestNFT connector to Wands", function () {
+      it("should add connector", async function () {
+        await wandsContract.setConnector(testContract.address, 10, 1000);
+        expect(await wandsContract.hasConnector(testContract.address)).to.equal(
+          true
+        );
+      });
+    });
 
-    //   describe("Loot", function () {
-    //     it("Should deploy Loot", async function () {
-    //       const ScifiLoot = await ethers.getContractFactory("ScifiLoot");
-    //       lootContract = await ScifiLoot.deploy(alienContract.address);
-    //     });
-    //     it("Should mint new loot", async function () {
-    //       const killedAlienId = 1;
-    //       await lootContract.mintLoot(killedAlienId);
-    //       const lootItem = await lootContract.lootItems(1);
-    //       //   console.log(await lootContract.ownerOf(lootItem.tokenId));
-    //       //   console.log(await lootContract.getAddress());
-    //       expect(await lootItem.tokenId).to.equal(1);
-    //       expect(await lootItem.alienId).to.equal(1);
-    //       expect(await lootItem.alienName).to.equal("Alen");
-    //       expect(await lootContract.ownerOf(lootItem.tokenId)).to.equal(
-    //         firstPlayer.address
-    //       );
-    //     });
-    //     it("Should transfer loot to alien", async function () {
-    //       await alienContract.transferLoot(1);
-    //       const alienContractAddress = await alienContract.getAddress();
-    //       expect(await lootContract.isTokenExists(1)).to.equal(true);
-    //       expect(await lootContract.ownerOf(1)).to.equal(alienContractAddress);
-    //     });
-    //     it("Should fight aliens with equipped loot", async function () {
-    //       const killedAlienId = 2;
-    //       await alienContract.fightAlien(killedAlienId, 77);
-    //       const aln = await alienContract.aliens(killedAlienId);
-    //       expect(await aln.isDead).to.equal(true);
+    describe("Mint Wands as partner", function () {
+      it("should mint as partner", async function () {
+        await testContract.mint(123, {
+          value: ethers.utils.parseEther("0.01"),
+        });
+        expect(await testContract.exists(123)).to.equal(true);
 
-    //       await lootContract.mintLoot(killedAlienId);
-    //       const lootItem = await lootContract.lootItems(2);
-    //       expect(await lootItem.alienName).to.equal("Trish");
-    //       await alienContract.fightAlien(1, 23);
-    //     });
+        await testContract.connect(secondPlayer).mint(111, {
+          value: ethers.utils.parseEther("0.01"),
+        });
+        expect(await testContract.exists(111)).to.equal(true);
+
+        await wandsContract.mintAsPartner(testContract.address, 123, 400, {
+          value: ethers.utils.parseEther("0.01"),
+        });
+        expect(await wandsContract.exists(400)).to.equal(true);
+        expect(await wandsContract.exists(401)).to.equal(false);
+
+        await wandsContract.mintAsPartner(testContract.address, 123, 401, {
+          value: ethers.utils.parseEther("0.01"),
+        });
+
+        expect(await wandsContract.exists(401)).to.equal(true);
+
+        //Error: 'You do not own the _partnerId'
+        // except(
+        //   await wandsContract.mintAsPartner(testContract.address, 111, 402, {
+        //     value: ethers.utils.parseEther("0.01"),
+        //   })
+        // ).eventually.to.rejectWith(
+        //   Error,
+        //   "VM Exception while processing transaction: reverted with reason string 'You do not own the _partnerId'"
+        // );
+
+        await wandsContract.removeConnector(testContract.address);
+        expect(await wandsContract.hasConnector(testContract.address)).to.equal(
+          false
+        );
+
+        //Error: 'Contract not allowed'
+        // await wandsContract.mintAsPartner(testContract.address, 123, 402, {
+        //   value: ethers.utils.parseEther("0.01"),
+        // });
+      });
+    });
   });
 });

@@ -11,24 +11,54 @@ import "./WandMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
 
-interface CastlesInterface {
-    function ownerOf(uint256 tokenId) external view returns (address owner);
+interface IConnector {
+  function ownerOf(uint256 tokenId) external view returns (address owner);
+}
+
+struct Connector {
+    address _contract;
+    uint256 start;
+    uint256 end;
+    bool exists;
 }
 
 contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
-	uint256 public castlesPrice = 10000000000000000; // 0.01 ETH
+	uint256 public partnerPrice = 10000000000000000; // 0.01 ETH
 	uint256 public price = 50000000000000000; //0.05 ETH
 
 	using Strings for uint256;
 
-	//Castle Contract (arbitrum)
-    address public castlesAddress = 0x71f5C328241fC3e03A8c79eDCD510037802D369c;
-    CastlesInterface public castlesContract = CastlesInterface(castlesAddress);
+	mapping(address => Connector) public connectors;
+
+	event ConnectorCreated(address _contract, uint256 start, uint256 end);
+	event ConnectorRemoved(address _contract);
 
 	// Allow to extract from the smart contract, otherwise.. you're ded
     function ownerWithdraw() external onlyOwner {
         payable(owner()).transfer(address(this).balance);
     }
+
+	function setConnector(
+		address _contract,
+		uint256 _start,
+		uint256 _end
+	) external onlyOwner {
+		connectors[_contract]._contract = _contract;
+		connectors[_contract].start = _start;
+		connectors[_contract].end = _end;
+		connectors[_contract].exists = true;
+
+		emit ConnectorCreated(_contract, _start, _end);
+	}
+
+	function removeConnector(address _contract) external onlyOwner {
+		delete connectors[_contract];
+		emit ConnectorRemoved(_contract);
+	}
+
+	function hasConnector(address _contract) external view returns (bool) {
+		return connectors[_contract].exists;
+	}
 	
 	struct Wands {
 		uint256 tokenId;
@@ -192,16 +222,30 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	function mint(uint256 tokenId) public payable nonReentrant {
 		require(tokenId > 0 && tokenId <= 10000, "Token ID invalid");
-		require(price <= msg.value, "Ether value sent is not correct");
+		require(price == msg.value, "Ether value sent is not correct");
 		_safeMint(_msgSender(), tokenId);
 		emit WandMinted(tokenId, _msgSender());
 	}
 
-	function mintWithcastle(uint256 tokenId) public payable nonReentrant {
-		require(tokenId > 0 && tokenId <= 10000, "Token ID invalid");
-		require(castlesPrice <= msg.value, "Ether value sent is not correct");
-		require(castlesContract.ownerOf(tokenId) == msg.sender, "Not the owner of this castle");
-		_safeMint(_msgSender(), tokenId);
+	function exists(uint256 tokenId) external view returns(bool) {
+		return _exists(tokenId);
+	}
+
+	function mintAsPartner(
+		address _contract,
+		uint256 _partnerId,
+		uint256 _wandsId
+	) external payable nonReentrant {
+		require(connectors[_contract].exists, "Contract not allowed");
+		require(msg.value >= partnerPrice, "Eth sent is not enough");
+		require(_wandsId > connectors[_contract].start && _wandsId < connectors[_contract].end, "_wandsId not in range");
+		require(!_exists(_wandsId), "_wandsId doesn't exist");
+
+		IConnector connector = IConnector(_contract);
+
+		require(connector.ownerOf(_partnerId) == msg.sender, "You do not own the _partnerId");
+
+		_safeMint(_msgSender(), _wandsId);
 	}
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {

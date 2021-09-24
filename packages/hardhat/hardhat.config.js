@@ -25,7 +25,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 // Select the network you want to deploy to here:
 //
 // const defaultNetwork = "rinkeby";
-const defaultNetwork = "rinkebyArbitrum";
+const defaultNetwork = "arbitrum";
 // const defaultNetwork = "localhost";
 
 function mnemonic() {
@@ -176,6 +176,14 @@ module.exports = {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
       chainId: 43113,
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+    },
+    arbitrum: {
+      url: "https://arb1.arbitrum.io/rpc",
+      gasPrice: 225000000000,
+      chainId: 42161,
       accounts: {
         mnemonic: mnemonic(),
       },

@@ -40,6 +40,7 @@
     "graphiql": "^1.0.5",
     "graphql": "^15.3.0",
     "isomorphic-fetch": "^3.0.0",
+    "motion": "^10.0.0",
     "node-sass": "^4.14.1",
     "node-watch": "^0.7.1",
     "postcss": "^8.2.6",
