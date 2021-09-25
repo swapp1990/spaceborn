@@ -38,7 +38,7 @@ export default function WandsUI({
   const [isAvailable, setIsAvailable] = useState(false);
   const [isOwnCastle, setIsOwnCastle] = useState(false);
   const [castleNftId, setCastleNftId] = useState(false);
-  const castlesContract = "0xd04067d0070348BDc01CA759e57aEb4E1FBB7116";
+  const castlesContract = "0x71f5C328241fC3e03A8c79eDCD510037802D369c";
 
   useEffect(async () => {
     if (readContracts && readContracts.Wands) {
@@ -51,7 +51,7 @@ export default function WandsUI({
     update();
 
     const balance = await readContracts.Wands.balanceOfPartner(castlesContract, address);
-    // console.log({ balance });
+    console.log(balance.toNumber());
     if (balance > 0) {
       setIsOwnCastle(true);
     }

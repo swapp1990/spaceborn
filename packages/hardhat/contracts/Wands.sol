@@ -226,6 +226,19 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		"Hydrokinesis"
 	];
 
+	string[] private spellSymbols = [
+		unicode"Θ",
+		unicode"δ",
+		unicode"λ",
+		unicode"ɜ",
+		unicode"ʓ",
+		unicode"Ψ",
+		unicode"Ϯ",
+		unicode"Ϡ",
+		unicode"Ѩ",
+		unicode"֍"
+	];
+
 	event WandMinted(uint256 tokenId, address sender);
 
 	function pluck(uint256 tokenId, uint size) internal view returns (string[] memory) {
@@ -246,12 +259,12 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		string memory part = parts[rand%parts.length];
 		uint idx = (rand % (end-start))+ start;
 		string memory creature = creatures[idx];
-		if(rand < 50) {
+		if(rand < 10) {
 			creature = string(abi.encodePacked("'", rareBreeds[idx], "' ", creature));
 		}
-		string memory coreType = "Birthstone";
+		string memory coreType = unicode"Birthstone";
 		if(idx < 9 && rand < 40) {
-			coreType = "Synthetic";
+			coreType = unicode"Synthetic";
 		}
 		if(rand > 90) {
 			start = 12;
@@ -266,6 +279,7 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		}
 
 		string memory specialtyStr = specialty[rand%specialty.length];
+		string memory symbolStr = spellSymbols[rand%spellSymbols.length];
 		
 		uint woodIdx = (rand % (end-start))+ start;
 		results[0] = string(abi.encodePacked(pre,part," of ", creature));
@@ -274,6 +288,7 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 		results[3] = wandMakers[rand%wandMakers.length];
 		results[4] = length;
 		results[5] = specialtyStr;
+		results[6] = symbolStr;
 		return results;
 	}
 
@@ -308,13 +323,13 @@ contract Wands is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
-		string[] memory results = pluck(id, 6);
+		string[] memory results = pluck(id, 7);
 		return WandMetadataSvg.tokenURI( address(this), id, results);
 	}
 
 	function getTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
-		string[] memory results = pluck(id, 6);
+		string[] memory results = pluck(id, 7);
 		return WandMetadataSvg.tokenURI( address(this), id, results);
 	}
 

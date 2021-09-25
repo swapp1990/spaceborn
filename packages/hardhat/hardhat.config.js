@@ -4,8 +4,10 @@ const chalk = require("chalk");
 
 require("@nomiclabs/hardhat-waffle");
 require("@tenderly/hardhat-tenderly");
+require("@nomiclabs/hardhat-etherscan");
 
 require("hardhat-deploy");
+require("hardhat-gas-reporter");
 
 require("@eth-optimism/hardhat-ovm");
 require("@nomiclabs/hardhat-ethers");
@@ -25,7 +27,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 // Select the network you want to deploy to here:
 //
 // const defaultNetwork = "rinkeby";
-const defaultNetwork = "rinkebyArbitrum";
+const defaultNetwork = "arbitrum";
 // const defaultNetwork = "localhost";
 
 function mnemonic() {
@@ -112,7 +114,15 @@ module.exports = {
         l1: "rinkeby",
       },
     },
-
+    arbitrum: {
+      url: "https://arb1.arbitrum.io/rpc",
+      gas: 174395496,
+      gasPrice: 8000000000,
+      chainId: 42161,
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+    },
     localArbitrum: {
       url: "http://localhost:8547",
       gasPrice: 0,
@@ -181,14 +191,6 @@ module.exports = {
         mnemonic: mnemonic(),
       },
     },
-    arbitrum: {
-      url: "https://arb1.arbitrum.io/rpc",
-      gasPrice: 225000000000,
-      chainId: 42161,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
     mainnetAvalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       gasPrice: 225000000000,
@@ -227,6 +229,9 @@ module.exports = {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
+  },
+  etherscan: {
+    apiKey: "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8",
   },
 };
 

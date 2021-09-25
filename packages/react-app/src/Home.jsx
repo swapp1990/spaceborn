@@ -25,8 +25,23 @@ export default function Home() {
   return (
     <>
       <div className="home">
+        <div
+          id="box"
+          style={{
+            height: 50,
+            width: 150,
+            borderRadius: 10,
+            display: "flex",
+            alignContent: "space-around",
+            columnGap: "120px",
+          }}
+        >
+          <span style={{ fontSize: 50, color: "red" }}>Θ</span>
+          <span style={{ fontSize: 50, color: "red" }}>Ϡ</span>
+          <span style={{ fontSize: 50, color: "red" }}>ʓ</span>
+        </div>
         <h1>Wands for Wizards</h1>
-        <div id="box" style={{ height: 50, width: 50, borderRadius: 10, backgroundColor: "yellow" }}></div>
+
         <Button type={"primary"}>
           <Link
             onClick={() => {
@@ -37,6 +52,18 @@ export default function Home() {
             ENTER GAME
           </Link>
         </Button>
+
+        <div
+          id="box"
+          style={{
+            height: 50,
+            width: 150,
+            borderRadius: 10,
+            display: "flex",
+            alignContent: "space-around",
+            columnGap: "120px",
+          }}
+        ></div>
       </div>
     </>
   );
