@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  Carousel,
   DatePicker,
   Divider,
   Input,
@@ -21,6 +22,7 @@ import React, { useEffect, useState } from "react";
 import { ReactComponent as CardEx } from "../card_ex.svg";
 import { useContractReader } from "../hooks";
 import namesJson from "../randomNames.json";
+import "./main.css";
 
 const { Text, Link, Title } = Typography;
 
@@ -606,78 +608,87 @@ export default function MVPUI({
     </Card>
   );
 
-  return (
-    <>
-      {!playerNft && (
-        <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
-          <>
-            <Space>
-              <Input
-                placeholder="Player Name"
-                onChange={e => {
-                  e.target.value ? setPlayerName(e.target.value) : null;
-                }}
-              />
-              <Button
-                type={"primary"}
-                onClick={() => {
-                  createPlayer();
-                }}
-              >
-                CREATE PLAYER
-              </Button>
+  const [balanceTokens, setBalanceTokens] = useState(0);
+  const [ownedNfts, setOwnedNfts] = useState([]);
 
-              {/* <Button
-                type={"primary"}
-                onClick={() => {
-                  getRandom();
-                }}
-              >
-                Random
-              </Button>
-              <span> Won: {randRes[0]}</span>
-              <span> Loss: {randRes[1]}</span>
-              <span> Total: {randRes[2]}</span> */}
-              {/* <Button
-                type={"primary"}
-                onClick={() => {
-                  testConditionalMint();
-                }}
-              >
-                MINT
-              </Button> */}
-            </Space>
-          </>
-        </div>
-      )}
-      {lootItemModal}
-      {playerNft && (
-        <div style={{ width: 820, paddingBottom: 256, marginLeft: 64 }}>
-          <>
-            <Space align="start">
-              <Space direction="vertical">
-                <Card
-                  style={{ width: 450 }}
-                  title={
-                    <div>
-                      <span style={{ fontSize: 18, marginRight: 8 }}>{playerNft.name}</span>
-                    </div>
-                  }
-                >
-                  {/* <a href={"https://opensea.io/assets/"+(readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address)+"/"+item.id} target="_blank">
-                        	
-                        </a> */}
-                  <img src={playerNft.image} style={{ width: 300 }} />
-                  {/* <div>{item.description}</div> */}
-                </Card>
-                {walletComp}
-              </Space>
-              <Space>{gameScreen}</Space>
-              <Space align="baseline">{logsScreen}</Space>
-            </Space>
-          </>
-        </div>
-      )}
-    </>
+  const getMetadataFromTokenUri = tokenUri => {
+    return fetch(tokenUri)
+      .then(res => res.json())
+      .then(
+        result => {
+          return result;
+        },
+        err => {
+          console.log(err);
+          return null;
+        },
+      );
+  };
+
+  const getImgFromToken = token => {
+    return fetch(token.image)
+      .then(res => res.blob())
+      .then(
+        resultImg => {
+          return URL.createObjectURL(resultImg);
+        },
+        err => {
+          console.log(err);
+          return null;
+        },
+      );
+  };
+
+  const pfpGallery = (
+    <Card
+      title="Wallet"
+      extra={<Button type="dashed">Claim a free loot</Button>}
+      style={{ overflowY: "auto", overflowX: "hidden", height: 400 }}
+    >
+      <List
+        grid={{ gutter: 16, column: 4 }}
+        dataSource={ownedNfts}
+        style={{ overflowY: "hidden", overflowX: "auto" }}
+        renderItem={item => (
+          <List.Item>
+            <div onClick={() => console.log(item)}>
+              <Card hoverable bordered title={item.name}>
+                <img style={{ height: 100 }} src={item.imgSrc} />
+              </Card>
+            </div>
+          </List.Item>
+        )}
+      ></List>
+    </Card>
   );
+
+  const loadOwnedNFTs = async () => {
+    const balance = await readContracts.BadKidsAlley.balanceOf(address);
+    console.log(balance.toNumber());
+    setBalanceTokens(balance.toNumber());
+    let nfts = [];
+    for (let i = 0; i < balance; i++) {
+      const tokenUri = await readContracts.BadKidsAlley.tokenURI(i);
+      let result = await getMetadataFromTokenUri(tokenUri);
+      console.log(result);
+      let imgSrc = await getImgFromToken(result);
+      nfts.push({ name: result.name, imgSrc: imgSrc });
+    }
+    setOwnedNfts(nfts);
+  };
+
+  const createPlayerScreen = (
+    <div className="create">
+      <Card style={{ width: 800 }} title="Create Player">
+        <div>Choose a PFP NFT that you want to set your player to</div>
+        <div>
+          <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
+        </div>
+        <div>You own {balanceTokens} NFTs</div>
+        <div>{pfpGallery}</div>
+      </Card>
+    </div>
+  );
+
+  return <>{createPlayerScreen}</>;
 }

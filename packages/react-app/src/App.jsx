@@ -469,8 +469,7 @@ function App(props) {
 
         <Switch>
           <Route exact path="/app">
-            {/* <MVPUI */}
-            <BadKidsTest
+            <MVPUI
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
