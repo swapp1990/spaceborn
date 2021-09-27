@@ -26,33 +26,19 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   //   const names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
   //   const baseProbs = [10, 10, 10, 10, 15, 45];
 
-  //   await alienContract.mintMultipleAliens(names, baseProbs);
-  //   await alienContract.mintAlien("Allen", 10);
-  //   await alienContract.mintAlien("Bernard", 20);
-  //   await alienContract.mintAlien("Lucy", 30);
-  //   await alienContract.mintAlien("Karen", 40);
-  //   await alienContract.mintAlien("Betty", 50);
-  //   await alienContract.mintAlien("Chad", 90);
-  //   await alienContract.mintAlien("Britney", 30);
-  //   await alienContract.mintAlien("Phil", 30);
-  //   await alienContract.mintAlien("Peter", 30);
-  //   await alienContract.mintAlien("Robert", 50);
-  //   await alienContract.mintAlien("Steven", 40);
-  //   await alienContract.mintAlien("Kyle", 70);
-  //   await alienContract.mintAlien("Brad", 80);
-  //   await alienContract.mintAlien("Kevin", 90);
-  //   await alienContract.mintAlien("Mark", 95);
-
   await deploy("ScifiLoot", {
     from: deployer,
     args: [alienContract.address],
     log: true,
   });
-  //   await yourContract.mintYourPlayer("swapp");
-  //   const url = "https://austingriffith.com/portfolio/paintings/?id=zebra";
-  //   await yourContract.mintCitizen(url, "CitizenRed1", 0);
-  //   await yourContract.mintCitizen(url, "CitizenBlue1", 2);
-  //   await yourContract.mintCitizen(url, "CitizenBlue2", 2);
+
+  const baseUri =
+    "https://gateway.pinata.cloud/ipfs/QmTV8L1G1D4ow9SA5Bnw3XZw7mdLkHo5uYfDsPbRqZqNm2/";
+  await deploy("BadKidsAlley", {
+    from: deployer,
+    args: [baseUri],
+    log: true,
+  });
 
   //   const yourContract = await ethers.getContract("Loot", deployer);
   /*

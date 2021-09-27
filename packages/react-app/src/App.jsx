@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, LootUI, TreasureHuntUI, Hints, Subgraph } from "./views";
+import { MVPUI, LootUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -47,7 +47,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = false;
@@ -445,7 +445,7 @@ function App(props) {
               Contract
             </Link>
           </Menu.Item>
-          <Menu.Item key="/app/testLoot">
+          {/* <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {
                 setRoute("/app/testLoot");
@@ -454,19 +454,23 @@ function App(props) {
             >
               Test Loot Mints
             </Link>
+          </Menu.Item> */}
+          <Menu.Item key="/app/randomMint">
+            <Link
+              onClick={() => {
+                setRoute("/app/randomMint");
+              }}
+              to="/app/randomMint"
+            >
+              Mint Random NFT
+            </Link>
           </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/app">
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
             {/* <MVPUI */}
-            <MVPUI
+            <BadKidsTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
@@ -491,6 +495,19 @@ function App(props) {
 
           <Route path="/app/testLoot">
             <LootUI
+              address={address}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              yourLocalBalance={yourLocalBalance}
+              price={price}
+              tx={tx}
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+            />
+          </Route>
+          <Route path="/app/randomMint">
+            <BadKidsTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
