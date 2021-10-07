@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, LootUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest } from "./views";
+import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -492,8 +492,8 @@ function App(props) {
             />
           </Route>
 
-          <Route path="/app/testLoot">
-            <LootUI
+          <Route path="/testLoot">
+            <LootTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}

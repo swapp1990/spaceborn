@@ -226,11 +226,11 @@ contract ScifiLoot is ERC721Enumerable, Ownable {
 		return LootMetadataSvg.tokenURI( ownerOf(id), id, results[0], results[1], a.rarityLevel, results[2], lores, a.alienName );
 	}
 
-	function randomTokenURI(uint256 id, string memory alienName, string memory cat, uint256 rarity) public view returns (string memory) {
+	function randomTokenURI(uint256 id) public view returns (string memory) {
 		// require(_exists(id), "not exist");
 		string[4] memory results = pluck(id);
 		string[] memory lores = pluck_lore(id, results[3]);
-		return LootMetadataSvg.tokenURI( address(this), id, results[0], results[1], 0, results[2], lores, "Moloch" );
+		return LootMetadataSvg.tokenURI( address(this), id, results[0], results[1], 0, results[2], lores, "Thoniun" );
 	}
 
 	function transferFrom(

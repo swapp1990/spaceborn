@@ -4,9 +4,11 @@ import {
   Carousel,
   DatePicker,
   Divider,
+  Form,
   Input,
   List,
   Progress,
+  Select,
   Slider,
   Spin,
   Switch,
@@ -23,6 +25,9 @@ import { ReactComponent as CardEx } from "../card_ex.svg";
 import { useContractReader } from "../hooks";
 import namesJson from "../randomNames.json";
 import "./main.css";
+import { default as CreatePlayer } from "./game/CreatePlayer";
+import { default as GameScreen } from "./game/GameScreen";
+import { default as PlayerWindow } from "./game/PlayerWindow";
 
 const { Text, Link, Title } = Typography;
 
@@ -39,19 +44,15 @@ export default function MVPUI({
   const balance = useContractReader(readContracts, "Player", "balanceOf", [address]);
   const [imgSrc, setImgSrc] = useState(null);
   const [tokenIdx, setTokenIdx] = useState(0);
-  const [playerName, setPlayerName] = useState("");
-  const [playerNft, setPlayerNft] = useState(null);
-  const [walletLoot, setWalletLoot] = useState([]);
-  const [aliens, setAliens] = useState([]);
-  const [alienSelected, setAlienSelected] = useState(null);
-  const [gameScreenUpdating, setGameScreenUpdating] = useState(false);
-  const [disableHuntMore, setDisableHuntMore] = useState(false);
   const [canMint, setCanMint] = useState(null);
-  const [aliensDefeated, setAliensDefeated] = useState(0);
+  const [walletLoot, setWalletLoot] = useState([]);
+  const [gameScreenUpdating, setGameScreenUpdating] = useState(false);
   const [equipped, setEquipped] = useState([]);
-  const [alienWon, setAlienWon] = useState(false);
+  const [playerNft, setPlayerNft] = useState(null);
+  const [aliensDefeated, setAliensDefeated] = useState(0);
   const [fightFinalProb, setFightFinalProb] = useState(0);
-  const [playerLostLoot, setPlayerLostLoot] = useState(false);
+  const [disableHuntMore, setDisableHuntMore] = useState(false);
+  const [aliens, setAliens] = useState([]);
   const [logs, setLogs] = useState([]);
 
   const [randRes, setRandRes] = useState([0, 0, 0]);
@@ -86,12 +87,22 @@ export default function MVPUI({
     updateProfile();
     updateWallet();
 
-    addEventListener("ScifiLoot", "LootMinted", onLootMinted);
+    // addEventListener("ScifiLoot", "LootMinted", onLootMinted);
     addEventListener("Player", "PlayerCreated", onPlayerCreated);
-    addEventListener("Alien", "PlayerLostLoot", onPlayerLostLoot);
-    addEventListener("Alien", "MintedAliens", onMintedAliens);
-    initEmptyEquip();
+    // addEventListener("Alien", "PlayerLostLoot", onPlayerLostLoot);
+    // addEventListener("Alien", "MintedAliens", onMintedAliens);
+    // initEmptyEquip();
   };
+
+  async function updateProfile() {
+    const tokenId = await readContracts.Player.getTokenId(address);
+    if (tokenId.toNumber() == 0) {
+      console.log("tokenId is not set");
+      return;
+    }
+    const player = await readContracts.Player.getPlayer(tokenId);
+    setPlayerNft(player);
+  }
 
   function updatePrevLogs() {
     let contractName = "Alien";
@@ -138,23 +149,6 @@ export default function MVPUI({
   async function testConditionalMint() {
     const result = await tx(writeContracts.ScifiLoot.mintLoot(2, "testing"));
     console.log(result);
-  }
-
-  async function updateProfile() {
-    const tokenId = await readContracts.Player.getTokenId(address);
-    if (tokenId.toNumber() == 0) {
-      console.log("tokenId is not set");
-      return;
-    }
-    const tokenURI = await readContracts.Player.tokenURI(tokenId);
-    const jsonManifestString = atob(tokenURI.substring(29));
-    try {
-      const jsonManifest = JSON.parse(jsonManifestString);
-      console.log("jsonManifest", jsonManifest);
-      setPlayerNft({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   async function updateWallet() {
@@ -271,6 +265,7 @@ export default function MVPUI({
 
   function onPlayerCreated(msg) {
     console.log("onPlayerCreated", msg);
+    updateProfile();
   }
 
   async function onPlayerWon(msg) {
@@ -340,56 +335,14 @@ export default function MVPUI({
     return output;
   };
 
-  const createPlayer = async () => {
-    console.log({ playerName });
-    if (playerName == "") return;
-    const result = await tx(writeContracts.Player.mint(playerName));
-    updateProfile();
-  };
-
-  function alienChosen(idx) {
-    console.log("alienChosen ", idx);
-    let foundAlien = aliens.find(a => a.id == idx);
-    if (foundAlien) {
-      setAlienSelected(foundAlien);
-      setAlienWon(false);
-      setPlayerLostLoot(false);
-    }
-  }
-
   function getSelectedAlienName() {
     return alienSelected.name;
-  }
-
-  async function fightAlien() {
-    const clientRandom = Math.floor(Math.random() * 100);
-    // console.log({ equipped });
-    let lootsSelected = equipped.filter(e => e.id != 0).map(e => e.id.toNumber());
-    // console.log({ lootsSelected });
-    const result = await tx(writeContracts.Alien.fightAlien(alienSelected.id, clientRandom, lootsSelected));
-    initEmptyEquip();
-  }
-
-  async function mintLoot() {
-    if (!alienSelected) {
-      console.log("No alien selected!");
-      return;
-    }
-    const result = await tx(writeContracts.ScifiLoot.mintLoot(alienSelected.id));
-    console.log(result);
   }
 
   function getWalletItemBgColor(idx) {
     let equippedFound = equipped.find(loot => loot.id == idx);
     if (equippedFound) {
       return { backgroundColor: "lightgreen" };
-    }
-    return { backgroundColor: "white" };
-  }
-
-  function getAlienBgColor(idx) {
-    if (alienSelected && alienSelected.id == idx) {
-      return { backgroundColor: "pink" };
     }
     return { backgroundColor: "white" };
   }
@@ -422,28 +375,6 @@ export default function MVPUI({
 
   async function claimFree() {
     const result = await tx(writeContracts.ScifiLoot.mintFreeLoot());
-  }
-
-  async function huntMore() {
-    // const result = await tx(writeContracts.Alien.hunt());
-    // console.log(namesJson);
-    var randomNamesIdxList = [];
-    var maxNum = 5;
-    while (randomNamesIdxList.length < maxNum) {
-      var r = Math.floor(Math.random() * namesJson.data.length) + 1;
-      if (randomNamesIdxList.indexOf(r) === -1) randomNamesIdxList.push(r);
-    }
-    let pickedNames = namesJson.data.filter((name, idx) => {
-      if (randomNamesIdxList.includes(idx)) {
-        return name;
-      }
-    });
-    // console.log(randomNamesIdxList);
-    let randomBaseProbs = randomNamesIdxList.map(i => {
-      return Math.floor((i / namesJson.data.length) * 100);
-    });
-    // console.log(randomBaseProbs);
-    const result = await tx(writeContracts.Alien.mintMultipleAliens(pickedNames, randomBaseProbs));
   }
 
   const walletComp = (
@@ -509,88 +440,6 @@ export default function MVPUI({
     </Modal>
   );
 
-  const gameScreen = (
-    <Card style={{ width: 800 }} title="Game Screen">
-      <div style={{ maxWidth: 820, margin: "auto", paddingBottom: 32 }}>
-        <>
-          {!canMint && (
-            <Card
-              title="Which alien do you choose to fight?"
-              extra={
-                <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
-                  Hunt for more aliens
-                </Button>
-              }
-            >
-              <div>
-                <Title level={3}>Aliens Defeated: {aliensDefeated}</Title>
-              </div>
-              {alienSelected && <Title level={4}>Chosen Alien: {alienSelected.alienName}</Title>}
-              <List
-                grid={{ gutter: 16, column: 3 }}
-                dataSource={aliens}
-                loading={gameScreenUpdating}
-                style={{ overflow: "auto", height: "400px" }}
-                renderItem={(item, idx) => (
-                  <List.Item>
-                    <div onClick={() => alienChosen(item.id)}>
-                      <Card hoverable bordered title={item.name} style={getAlienBgColor(item.id)}>
-                        <img style={{ width: 150 }} src={item.image} />
-                      </Card>
-                    </div>
-                  </List.Item>
-                )}
-              />
-              <div style={{ marginTop: 16 }}>
-                {alienSelected && (
-                  <div>
-                    <div>Fill Slots</div>
-                    <div style={{ marginBottom: 10 }}>
-                      <Text mark>
-                        Note: If you lose the fight, there is a chance your NFT is lost and transferred to the Alien.
-                      </Text>
-                    </div>
-                    <List
-                      grid={{ gutter: 16, column: 3 }}
-                      dataSource={equipped}
-                      renderItem={(item, idx) => (
-                        <List.Item>
-                          <div onClick={() => console.log("equipped")}>
-                            <Card hoverable bordered title={item.name}>
-                              <img style={{ width: 100 }} src={item.image} />
-                            </Card>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
-                    {!alienWon && (
-                      <Button type={"primary"} onClick={() => fightAlien()}>
-                        Fight Alien
-                      </Button>
-                    )}
-                  </div>
-                )}
-                {alienWon && (
-                  <Text mark>
-                    Alien won the fight! It has become stronger. Final Probability of alien was {fightFinalProb}
-                  </Text>
-                )}
-                <div>{playerLostLoot && <Text mark>Sorry you lost your NFT loot to the alien!</Text>}</div>
-              </div>
-            </Card>
-          )}
-          {canMint && (
-            <Card title="You won the fight! Grab your loot!">
-              <Button type={"primary"} onClick={() => mintLoot()}>
-                Mint Loot
-              </Button>
-            </Card>
-          )}
-        </>
-      </div>
-    </Card>
-  );
-
   const logsScreen = (
     <Card style={{ width: 400 }} title="Logs">
       <List
@@ -608,87 +457,27 @@ export default function MVPUI({
     </Card>
   );
 
-  const [balanceTokens, setBalanceTokens] = useState(0);
-  const [ownedNfts, setOwnedNfts] = useState([]);
-
-  const getMetadataFromTokenUri = tokenUri => {
-    return fetch(tokenUri)
-      .then(res => res.json())
-      .then(
-        result => {
-          return result;
-        },
-        err => {
-          console.log(err);
-          return null;
-        },
-      );
-  };
-
-  const getImgFromToken = token => {
-    return fetch(token.image)
-      .then(res => res.blob())
-      .then(
-        resultImg => {
-          return URL.createObjectURL(resultImg);
-        },
-        err => {
-          console.log(err);
-          return null;
-        },
-      );
-  };
-
-  const pfpGallery = (
-    <Card
-      title="Wallet"
-      extra={<Button type="dashed">Claim a free loot</Button>}
-      style={{ overflowY: "auto", overflowX: "hidden", height: 400 }}
-    >
-      <List
-        grid={{ gutter: 16, column: 4 }}
-        dataSource={ownedNfts}
-        style={{ overflowY: "hidden", overflowX: "auto" }}
-        renderItem={item => (
-          <List.Item>
-            <div onClick={() => console.log(item)}>
-              <Card hoverable bordered title={item.name}>
-                <img style={{ height: 100 }} src={item.imgSrc} />
-              </Card>
-            </div>
-          </List.Item>
-        )}
-      ></List>
-    </Card>
-  );
-
-  const loadOwnedNFTs = async () => {
-    const balance = await readContracts.BadKidsAlley.balanceOf(address);
-    console.log(balance.toNumber());
-    setBalanceTokens(balance.toNumber());
-    let nfts = [];
-    for (let i = 0; i < balance; i++) {
-      const tokenUri = await readContracts.BadKidsAlley.tokenURI(i);
-      let result = await getMetadataFromTokenUri(tokenUri);
-      console.log(result);
-      let imgSrc = await getImgFromToken(result);
-      nfts.push({ name: result.name, imgSrc: imgSrc });
-    }
-    setOwnedNfts(nfts);
-  };
-
-  const createPlayerScreen = (
-    <div className="create">
-      <Card style={{ width: 800 }} title="Create Player">
-        <div>Choose a PFP NFT that you want to set your player to</div>
-        <div>
-          <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
+  return (
+    <>
+      {!playerNft && (
+        <CreatePlayer address={address} tx={tx} writeContracts={writeContracts} readContracts={readContracts} />
+      )}
+      {playerNft && (
+        <div style={{ width: 820, paddingBottom: 256, marginLeft: 64 }}>
+          <>
+            <Space align="start">
+              <Space direction="vertical">
+                <PlayerWindow address={address} tx={tx} writeContracts={writeContracts} readContracts={readContracts} />
+                {/* {walletComp} */}
+              </Space>
+              <Space>
+                <GameScreen />
+              </Space>
+              {/* <Space align="baseline">{logsScreen}</Space> */}
+            </Space>
+          </>
         </div>
-        <div>You own {balanceTokens} NFTs</div>
-        <div>{pfpGallery}</div>
-      </Card>
-    </div>
+      )}
+    </>
   );
-
-  return <>{createPlayerScreen}</>;
 }
