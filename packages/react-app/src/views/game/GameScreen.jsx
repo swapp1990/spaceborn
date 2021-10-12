@@ -20,17 +20,72 @@ import {
   Modal,
 } from "antd";
 const { Text, Link, Title } = Typography;
-export default function GameScreen({ address, tx, readContracts, writeContracts }) {
+export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider }) {
   const [canMint, setCanMint] = useState(null);
   const [disableHuntMore, setDisableHuntMore] = useState(false);
 
   const [gameScreenUpdating, setGameScreenUpdating] = useState(false);
 
   const [aliens, setAliens] = useState([]);
+  const [deadAliens, setdeadAliens] = useState([]);
+
   const [aliensDefeated, setAliensDefeated] = useState(0);
   const [alienSelected, setAlienSelected] = useState(null);
   const [alienWon, setAlienWon] = useState(false);
   const [playerLostLoot, setPlayerLostLoot] = useState(false);
+
+  useEffect(() => {
+    if (readContracts && readContracts.Alien) {
+      console.log("init");
+      init();
+    }
+    if (readContracts && readContracts.GameManager) {
+      addEventListener("GameManager", "PlayerWon", onPlayerWon);
+      addEventListener("GameManager", "AlienWon", onAlienWon);
+    }
+  }, [readContracts, address]);
+
+  const addEventListener = async (contractName, eventName, callback) => {
+    await readContracts[contractName].removeListener(eventName);
+    readContracts[contractName].on(eventName, (...args) => {
+      let eventBlockNum = args[args.length - 1].blockNumber;
+      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
+        let msg = args.pop().args;
+        callback(msg);
+      }
+    });
+  };
+
+  const init = async () => {
+    updateGameScreen();
+  };
+
+  async function onPlayerWon(msg) {
+    console.log({ onPlayerWon: msg });
+    updateGameScreen();
+  }
+
+  async function onAlienWon(msg) {
+    console.log({ onAlienWon: msg });
+  }
+
+  async function updateGameScreen() {
+    const aliensMinted = await readContracts.Alien.lastTokenId();
+    console.log({ aliensMinted });
+    const aliensUpdate = [];
+    const deadaliensUpdate = [];
+    for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
+      const alien = await readContracts.Alien.aliens(tokenId);
+      if (!alien.isDead) {
+        aliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
+      } else {
+        deadaliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
+      }
+    }
+    setAliens(aliensUpdate);
+    setdeadAliens(deadaliensUpdate);
+  }
 
   async function huntMore() {
     // const result = await tx(writeContracts.Alien.hunt());
@@ -68,16 +123,16 @@ export default function GameScreen({ address, tx, readContracts, writeContracts 
     if (alienSelected && alienSelected.id == idx) {
       return { backgroundColor: "pink" };
     }
-    return { backgroundColor: "white" };
+    return { backgroundColor: "black" };
   }
 
   async function fightAlien() {
     const clientRandom = Math.floor(Math.random() * 100);
     // console.log({ equipped });
-    let lootsSelected = equipped.filter(e => e.id != 0).map(e => e.id.toNumber());
+    // let lootsSelected = equipped.filter(e => e.id != 0).map(e => e.id.toNumber());
     // console.log({ lootsSelected });
-    const result = await tx(writeContracts.Alien.fightAlien(alienSelected.id, clientRandom, lootsSelected));
-    initEmptyEquip();
+    const result = await tx(writeContracts.Player.takeAction(alienSelected.id, clientRandom));
+    // initEmptyEquip();
   }
 
   async function mintLoot() {
@@ -96,25 +151,51 @@ export default function GameScreen({ address, tx, readContracts, writeContracts 
           {!canMint && (
             <Card
               title="Which alien do you choose to fight?"
-              extra={
-                <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
-                  Hunt for more aliens
-                </Button>
-              }
+              //   extra={
+              //     <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
+              //       Hunt for more aliens
+              //     </Button>
+              //   }
             >
               <div>
                 <Title level={3}>Aliens Defeated: {aliensDefeated}</Title>
               </div>
-              {alienSelected && <Title level={4}>Chosen Alien: {alienSelected.alienName}</Title>}
+              {alienSelected && <Title level={4}>Chosen Alien: {alienSelected.name}</Title>}
               <List
                 grid={{ gutter: 16, column: 3 }}
                 dataSource={aliens}
                 loading={gameScreenUpdating}
-                style={{ overflow: "auto", height: "400px" }}
+                style={{ overflowY: "auto", overflowX: "hidden", height: "200px" }}
                 renderItem={(item, idx) => (
                   <List.Item>
                     <div onClick={() => alienChosen(item.id)}>
-                      <Card hoverable bordered title={item.name} style={getAlienBgColor(item.id)}>
+                      <Card
+                        hoverable
+                        bordered
+                        title={item.name + " (base: " + item.base + ")"}
+                        style={getAlienBgColor(item.id)}
+                      >
+                        <img style={{ width: 150 }} src={item.image} />
+                      </Card>
+                    </div>
+                  </List.Item>
+                )}
+              />
+              <Divider />
+              <List
+                grid={{ gutter: 16, column: 3 }}
+                dataSource={deadAliens}
+                loading={gameScreenUpdating}
+                style={{ overflowY: "auto", overflowX: "hidden", height: "200px" }}
+                renderItem={(item, idx) => (
+                  <List.Item>
+                    <div>
+                      <Card
+                        hoverable
+                        bordered
+                        title={item.name + " (base: " + item.base + ")"}
+                        style={getAlienBgColor(item.id)}
+                      >
                         <img style={{ width: 150 }} src={item.image} />
                       </Card>
                     </div>
@@ -124,13 +205,13 @@ export default function GameScreen({ address, tx, readContracts, writeContracts 
               <div style={{ marginTop: 16 }}>
                 {alienSelected && (
                   <div>
-                    <div>Fill Slots</div>
+                    {/* <div>Fill Slots</div>
                     <div style={{ marginBottom: 10 }}>
                       <Text mark>
                         Note: If you lose the fight, there is a chance your NFT is lost and transferred to the Alien.
                       </Text>
-                    </div>
-                    <List
+                    </div> */}
+                    {/* <List
                       grid={{ gutter: 16, column: 3 }}
                       dataSource={equipped}
                       renderItem={(item, idx) => (
@@ -142,7 +223,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts 
                           </div>
                         </List.Item>
                       )}
-                    />
+                    /> */}
                     {!alienWon && (
                       <Button type={"primary"} onClick={() => fightAlien()}>
                         Fight Alien

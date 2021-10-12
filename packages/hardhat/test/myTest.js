@@ -4,20 +4,56 @@ const { solidity } = require("ethereum-waffle");
 
 use(solidity);
 
-describe("Bad Kids", function () {
-  describe("BadKids", function () {
-    it("Should deploy BadKids", async function () {
-      const BadKids = await ethers.getContractFactory("BadKidsAlley");
-      const baseUri =
-        "https://gateway.pinata.cloud/ipfs/QmTV8L1G1D4ow9SA5Bnw3XZw7mdLkHo5uYfDsPbRqZqNm2/";
-      let badKidsContract = await BadKids.deploy(baseUri);
+describe("My NFT Game", function () {
+  let firstPlayer;
+  let alienContract;
+  let playerContract;
+  let gameManagerContract;
+  describe("Alien", function () {
+    it("Should deploy contracts", async function () {
       const [owner] = await ethers.getSigners();
-      await badKidsContract.mint(owner.address, 1);
-      const tokenUri = await badKidsContract.tokenURI(0);
-      console.log({ tokenUri });
+      firstPlayer = owner;
+      const Alien = await ethers.getContractFactory("Alien");
+      alienContract = await Alien.deploy();
+      const gameManager = await ethers.getContractFactory("GameManager");
+      gameManagerContract = await gameManager.deploy(alienContract.address);
+      const Player = await ethers.getContractFactory("Player");
+      playerContract = await Player.deploy(gameManagerContract.address);
+      await playerContract.mint({ name: "Swap" });
+      //   await playerContract.mint({ name: "Alex" });
+    });
+
+    it("Mint 5 tokens", async function () {
+      await alienContract.mintMultipleAliens(["a1", "a2"], [30, 45]);
+      let balance = await alienContract.balanceOf(firstPlayer.address);
+      console.log({ balance: balance.toNumber() });
+    });
+
+    it("Game manager", async function () {
+      const canFightB4 = await alienContract.canFight(0);
+      console.log({ canFightB4 });
+      let random = Math.floor(Math.random() * (100 - 0 + 1) + 0);
+      console.log({ random });
+      await playerContract.takeAction(0, random);
+      const canFight = await alienContract.canFight(0);
+      console.log({ canFight });
     });
   });
 });
+// describe("Bad Kids", function () {
+//   describe("BadKids", function () {
+//     it("Should deploy BadKids", async function () {
+//       const BadKids = await ethers.getContractFactory("BadKidsAlley");
+//       const baseUri =
+//         "https://gateway.pinata.cloud/ipfs/QmTV8L1G1D4ow9SA5Bnw3XZw7mdLkHo5uYfDsPbRqZqNm2/";
+//       let badKidsContract = await BadKids.deploy(baseUri);
+//       const [owner] = await ethers.getSigners();
+//       await badKidsContract.mint(owner.address, 1);
+//       const tokenUri = await badKidsContract.tokenURI(0);
+//       console.log({ tokenUri });
+//     });
+//   });
+// });
 
 // describe("My NFT Game", function () {
 //   let alienContract;

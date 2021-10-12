@@ -83,10 +83,11 @@ export default function CreatePlayer({ address, tx, readContracts, writeContract
   }
 
   async function confirmCreate() {
-    let playerInfoNew = { ...playerInfo, ...selectedPfp };
+    // let playerInfoNew = { ...playerInfo, ...selectedPfp };
+    let playerInfoNew = {};
     playerInfoNew.name = playerInfo.name;
-    playerInfoNew.pfp_name = selectedPfp.name;
-    playerInfoNew.pfp_url = selectedPfp.pfp_url;
+    // playerInfoNew.pfp_name = selectedPfp.name;
+    // playerInfoNew.pfp_url = selectedPfp.pfp_url;
     const result = await tx(writeContracts.Player.mint(playerInfoNew));
   }
 
@@ -134,16 +135,14 @@ export default function CreatePlayer({ address, tx, readContracts, writeContract
         {playerInfo && (
           <>
             <div>Choose a PFP NFT that you want to set your player to</div>
-            <div>
+            {/* <div>
               <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
             </div>
             <div>You own {balanceTokens} NFTs</div>
             <div>{pfpGallery}</div>
-            <div>Selected PFP: {selectedPfp.name}</div>
+            <div>Selected PFP: {selectedPfp.name}</div> */}
             <div>
-              <Button onClick={confirmCreate} disabled={!selectedPfp.name}>
-                Confirm Create Player
-              </Button>
+              <Button onClick={confirmCreate}>Confirm Create Player</Button>
             </div>
           </>
         )}
@@ -153,13 +152,13 @@ export default function CreatePlayer({ address, tx, readContracts, writeContract
             <Form.Item name="name" label="Player Name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item name="gender" label="Player Gender" rules={[{ required: true }]}>
+            {/* <Form.Item name="gender" label="Player Gender" rules={[{ required: true }]}>
               <Select placeholder="Select a option and change input text above" onChange={onGenderChange} allowClear>
                 <Option value="male">male</Option>
                 <Option value="female">female</Option>
                 <Option value="other">other</Option>
               </Select>
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item>
               <Button type="primary" htmlType="submit">
                 Submit

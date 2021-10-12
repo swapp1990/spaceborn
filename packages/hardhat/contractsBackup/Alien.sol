@@ -12,12 +12,10 @@ contract Alien is ERC721, Ownable  {
 	using SafeMath for uint256;
 	using Counters for Counters.Counter;
   	Counters.Counter private _tokenIds;
-	uint public lastTokenId;
 
 	struct Alien {
 		uint256 tokenId;
 		string name;
-		uint256 baseProb;
 		bool exists;
 		bool isDead;
 	}
@@ -28,30 +26,15 @@ contract Alien is ERC721, Ownable  {
 
   	}
 
-	function mintMultipleAliens(string[] memory names, uint256[] memory baseProbs) public {
+	function mintMultipleAliens(string[] memory names) public {
 		for(uint i=0; i<names.length; i++) {
+			_tokenIds.increment();
 			uint256 id = _tokenIds.current();
      		_mint(msg.sender, id);
-			lastTokenId = id;
 			Alien storage alien = aliens[id];
 			alien.tokenId = id;
 			alien.name = names[i];
-			alien.baseProb = baseProbs[i];
 			alien.exists = true;
-			_tokenIds.increment();
 		}
-	}
-
-	function canFight(uint256 tokenId) public view returns (bool) {
-		return aliens[tokenId].exists && !aliens[tokenId].isDead;
-	}
-
-	function getAlienBaseProb(uint256 tokenId) public view returns (uint256) {
-		return aliens[tokenId].baseProb;
-	}
-
-	function setAlienDead(uint256 tokenId) public {
-		Alien storage alien = aliens[tokenId];
-		alien.isDead = true;
 	}
 }

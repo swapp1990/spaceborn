@@ -56,14 +56,12 @@ export default function PlayerWindow({ address, tx, readContracts, writeContract
     console.log({ tokenId: tokenId.toNumber() });
     const player = await readContracts.Player.getPlayer(tokenId);
     console.log(player);
-    let imgSrc = await getImgFromUrl(player.pfp_url);
+    // let imgSrc = await getImgFromUrl(player.pfp_url);
     setPlayerNft({
       id: tokenId,
       name: player.name,
-      image: imgSrc,
+      image: null,
       owner: address,
-      level: player.level,
-      xp: player.xp.toNumber(),
     });
   }
 
@@ -78,12 +76,12 @@ export default function PlayerWindow({ address, tx, readContracts, writeContract
             </div>
           }
         >
-          <img style={{ width: 200 }} src={playerNft.image} />
+          {/* <img style={{ width: 200 }} src={playerNft.image} />
           <div>
             <span>
               Level: {playerNft.level}, XP: {playerNft.xp}
             </span>
-          </div>
+          </div> */}
         </Card>
       )}
       {!playerNft && (

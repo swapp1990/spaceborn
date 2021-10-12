@@ -68,10 +68,10 @@ export default function MVPUI({
       console.log("set player nft ");
     }
     if (readContracts && readContracts.Alien) {
-      updateGameScreen();
-      addEventListener("Alien", "PlayerWon", onPlayerWon);
-      addEventListener("Alien", "AlienWon", onAlienWon);
-      updatePrevLogs();
+      //   updateGameScreen();
+      //   addEventListener("Alien", "PlayerWon", onPlayerWon);
+      //   addEventListener("Alien", "AlienWon", onAlienWon);
+      //   updatePrevLogs();
     }
   }, [readContracts, playerNft]);
 
@@ -85,7 +85,7 @@ export default function MVPUI({
 
   const init = async () => {
     updateProfile();
-    updateWallet();
+    // updateWallet();
 
     // addEventListener("ScifiLoot", "LootMinted", onLootMinted);
     addEventListener("Player", "PlayerCreated", onPlayerCreated);
@@ -102,6 +102,7 @@ export default function MVPUI({
     }
     const player = await readContracts.Player.getPlayer(tokenId);
     setPlayerNft(player);
+    console.log("found player nft ", player.name);
   }
 
   function updatePrevLogs() {
@@ -471,7 +472,13 @@ export default function MVPUI({
                 {/* {walletComp} */}
               </Space>
               <Space>
-                <GameScreen />
+                <GameScreen
+                  address={address}
+                  tx={tx}
+                  writeContracts={writeContracts}
+                  readContracts={readContracts}
+                  localProvider={localProvider}
+                />
               </Space>
               {/* <Space align="baseline">{logsScreen}</Space> */}
             </Space>
