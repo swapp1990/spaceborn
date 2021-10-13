@@ -19,6 +19,7 @@ contract Player is ERC721("Player", "PLR") {
 		uint256 tokenId;
 		bool exists;
 		string name;
+		bool joined;
 	}
 
 	struct PlayerInp {
@@ -27,7 +28,7 @@ contract Player is ERC721("Player", "PLR") {
 
 	mapping (address => Player) public players;
 	mapping (address => uint256) public addr2token;
-
+	
 	event PlayerCreated(uint256 tokenId, Player player);
 
 	modifier onlyOwner() {
@@ -49,8 +50,19 @@ contract Player is ERC721("Player", "PLR") {
 		player.tokenId = id;
 		player.name = playerInp.name;
 		player.exists = true;
+		player.joined = false;
 		addr2token[msg.sender] = id;
 		emit PlayerCreated(_tokenIds.current(), player);
+	}
+
+	function joinGame() external {
+		require(!players[msg.sender].joined, "Player already joined");
+		players[msg.sender].joined = true;
+	}
+
+	function leaveGame() external {
+		require(players[msg.sender].joined, "Player already left");
+		players[msg.sender].joined = false;
 	}
 
 	function getPlayer(uint256 id) public view returns (Player memory) {
@@ -63,7 +75,7 @@ contract Player is ERC721("Player", "PLR") {
 		return addr2token[addr];
 	}
 
-	function takeAction(uint256 alien_id, uint256 clientRandom) public {
-		gameManager.fightAlien(alien_id, clientRandom);
-	}
+	// function takeAction(uint256 alien_id, uint256 clientRandom) public {
+	// 	gameManager.fightAlien(alien_id, clientRandom);
+	// }
 }

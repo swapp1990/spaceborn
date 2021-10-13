@@ -28,6 +28,7 @@ import "./main.css";
 import { default as CreatePlayer } from "./game/CreatePlayer";
 import { default as GameScreen } from "./game/GameScreen";
 import { default as PlayerWindow } from "./game/PlayerWindow";
+import { default as WalletWindow } from "./game/WalletWindow";
 
 const { Text, Link, Title } = Typography;
 
@@ -469,7 +470,13 @@ export default function MVPUI({
             <Space align="start">
               <Space direction="vertical">
                 <PlayerWindow address={address} tx={tx} writeContracts={writeContracts} readContracts={readContracts} />
-                {/* {walletComp} */}
+                <WalletWindow
+                  address={address}
+                  tx={tx}
+                  writeContracts={writeContracts}
+                  readContracts={readContracts}
+                  localProvider={localProvider}
+                />
               </Space>
               <Space>
                 <GameScreen

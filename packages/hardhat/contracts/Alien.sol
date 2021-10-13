@@ -50,6 +50,10 @@ contract Alien is ERC721, Ownable  {
 		return aliens[tokenId].baseProb;
 	}
 
+	function getAlienName(uint256 tokenId) public view returns (string memory) {
+		return aliens[tokenId].name;
+	}
+
 	function setAlienDead(uint256 tokenId) public {
 		Alien storage alien = aliens[tokenId];
 		alien.isDead = true;

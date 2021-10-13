@@ -2,14 +2,17 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Alien.sol";
+import "./Gears.sol";
 
 pragma experimental ABIEncoderV2;
 
 contract GameManager {
 	Alien alienContract;
+	Gears gearsContract;
 
-	constructor(address alienContractAddress) public {
-		alienContract = Alien(alienContractAddress);
+	constructor(address alienAddress, address gearsAddress) public {
+		alienContract = Alien(alienAddress);
+		gearsContract = Gears(gearsAddress);
 	}
 
 	event PlayerWon(uint256 tokenId, uint256 finalProbs, address sender);
@@ -37,6 +40,7 @@ contract GameManager {
 		if(rand100 > finalProb) {
 			alienContract.setAlienDead(alien_id);
 			emit PlayerWon(alien_id, finalProb, msg.sender);
+			gearsContract.dropGear(alienContract.getAlienName(alien_id), alienContract.getAlienBaseProb(alien_id), msg.sender);
 		} else {
 			emit AlienWon(alien_id, finalProb, msg.sender);
 		}

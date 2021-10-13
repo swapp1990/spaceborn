@@ -17,9 +17,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const baseProbs = [10, 10, 10, 10, 15, 45];
   await alienContract.mintMultipleAliens(names, baseProbs);
 
+  await deploy("Gears", {
+    from: deployer,
+    log: true,
+  });
+  const gearsContract = await ethers.getContract("Gears", deployer);
+
   await deploy("GameManager", {
     from: deployer,
-    args: [alienContract.address],
+    args: [alienContract.address, gearsContract.address],
     log: true,
   });
 
