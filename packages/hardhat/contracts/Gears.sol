@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
+import "./GearsMetadataSvg.sol";
+
 pragma experimental ABIEncoderV2;
 
 contract Gears is ERC721Enumerable, Ownable  {
@@ -17,7 +19,7 @@ contract Gears is ERC721Enumerable, Ownable  {
 	struct Gear {
 		uint256 tokenId;
 		string name;
-		string rarity;
+		uint256 rarity;
 		address playerWonAddr;
 		bool exists;
 	}
@@ -30,17 +32,27 @@ contract Gears is ERC721Enumerable, Ownable  {
 
   	}
 
-	function dropGear(string memory alienName, uint256 baseProb, address playerWonAddr) external {
+	function dropGear(string memory alienName, uint256 rarity, address playerWonAddr) external {
 		uint256 id = _tokenIds.current();
 		_mint(playerWonAddr, id);
 		lastTokenId = id;
 		Gear storage gear = gears[id];
 		gear.tokenId = id;
 		gear.name = string(abi.encodePacked("Dropped by ",  alienName));
-		gear.rarity = "Common";
+		gear.rarity = rarity;
 		gear.exists = true;
 		gear.playerWonAddr = playerWonAddr;
 		_tokenIds.increment();
 		emit GearDropped(gear);
+	}
+
+	function tokenURI(uint256 id) public view override returns (string memory) {
+		require(_exists(id), "not exist");
+		Gear storage gear = gears[id];
+		return GearsMetadataSvg.tokenURI(id, gear.rarity);
+	}
+
+	function randomTokenURI(uint256 id, uint256 rarityLevel) public view returns (string memory) {
+		return GearsMetadataSvg.tokenURI(id, rarityLevel);
 	}
 }

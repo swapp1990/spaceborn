@@ -15,7 +15,7 @@ export default function Home() {
     <>
       <div className="menu">
         <div className="menuLeft">
-          <a href="/">Moonshot Gears</a>
+          <a href="/">Home</a>
         </div>
         <div className="menuRight">
           <ul>
@@ -34,21 +34,27 @@ export default function Home() {
           <span style={{ fontSize: 50, color: "red" }}>◈</span>
           <span style={{ fontSize: 50, color: "blue" }}>⚟</span>
         </div>
-        <h1>Moonshot Gears</h1>
-        <Button type={"primary"}>
-          <Link
-            onClick={() => {
-              setRoute("/app");
-            }}
-            to="/app"
-          >
-            ENTER GAME
-          </Link>
-        </Button>
+        <h1>Spaceborn</h1>
+        <div>
+          <Button type={"primary"}>
+            <Link
+              onClick={() => {
+                setRoute("/app");
+              }}
+              to="/app"
+            >
+              ENTER GAME
+            </Link>
+          </Button>
+        </div>
+        <div>(Note: Currently the game is WIP and runs on Rinkeby testnet)</div>
         <div className="description">
           <p>
-            Moonshot Gears are randomized & unique loot items minted and stored on blockchain and will be used
-            throughout the Moonshot Sci-fi Metaverse created by the Moonshot community.
+            <b>Spaceborn</b> is the first game using open-source game engine being built to create open, forkable smart
+            contracts enabling rapid development and experimentation when it comes to crypto-based next-gen games. The
+            first game lets you create a Player NFT and claim randomized & unique "loot" inspired single gears which are
+            minted and stored on blockchain and will be used throughout the Moonshot Sci-fi Metaverse games created by
+            devs from the open-source community.
           </p>
           <p className="warning">
             Moonshot Gears are not easy to mint. You need to play the game and win them. Careful! You might even lose
@@ -62,18 +68,19 @@ export default function Home() {
             </a>
           </a>
           <a>
-            <a href="https://t.me/arbiwands" target="_blank" rel="noopener noreferrer">
+            <a href="https://t.me/joinchat/1jxXX8Fj6hwwZDgx" target="_blank" rel="noopener noreferrer">
               Telegram
             </a>
           </a>
           <a>
-            <a
+            Contract
+            {/* <a
               href="https://arbiscan.io/address/0x991866c101521355153dec646a767246784c87af#code"
               target="_blank"
               rel="noopener noreferrer"
             >
               Contract
-            </a>
+            </a> */}
           </a>
         </div>
         <div className="examplesTitle">

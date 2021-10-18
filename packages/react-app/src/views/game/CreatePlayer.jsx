@@ -88,7 +88,10 @@ export default function CreatePlayer({ address, tx, readContracts, writeContract
     playerInfoNew.name = playerInfo.name;
     // playerInfoNew.pfp_name = selectedPfp.name;
     // playerInfoNew.pfp_url = selectedPfp.pfp_url;
-    const result = await tx(writeContracts.Player.mint(playerInfoNew));
+    await tx(writeContracts.Player.mint(playerInfoNew)),
+      update => {
+        console.log({ update });
+      };
   }
 
   const loadOwnedNFTs = async () => {

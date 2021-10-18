@@ -40,7 +40,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
     await readContracts[contractName].removeListener(eventName);
     readContracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      //   console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
       if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
@@ -66,7 +66,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
       try {
         const tokenId = await readContracts.Gears.tokenOfOwnerByIndex(address, tokenIndex);
         const gearObj = await readContracts.Gears.gears(tokenId);
-        console.log({ gearObj });
+        // console.log({ gearObj });
         walletLootUpdate.push({ ...gearObj });
       } catch (e) {
         console.log(e);

@@ -29,6 +29,7 @@ import { default as CreatePlayer } from "./game/CreatePlayer";
 import { default as GameScreen } from "./game/GameScreen";
 import { default as PlayerWindow } from "./game/PlayerWindow";
 import { default as WalletWindow } from "./game/WalletWindow";
+import { default as LogsScreen } from "./game/LogsScreen";
 
 const { Text, Link, Title } = Typography;
 
@@ -465,7 +466,7 @@ export default function MVPUI({
         <CreatePlayer address={address} tx={tx} writeContracts={writeContracts} readContracts={readContracts} />
       )}
       {playerNft && (
-        <div style={{ width: 820, paddingBottom: 256, marginLeft: 64 }}>
+        <div style={{ width: "full", paddingBottom: 256, marginLeft: 64 }}>
           <>
             <Space align="start">
               <Space direction="vertical">
@@ -487,7 +488,15 @@ export default function MVPUI({
                   localProvider={localProvider}
                 />
               </Space>
-              {/* <Space align="baseline">{logsScreen}</Space> */}
+              <Space align="baseline">
+                <LogsScreen
+                  address={address}
+                  tx={tx}
+                  writeContracts={writeContracts}
+                  readContracts={readContracts}
+                  localProvider={localProvider}
+                />
+              </Space>
             </Space>
           </>
         </div>

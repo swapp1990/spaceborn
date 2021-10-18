@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ReactComponent as CardEx } from "../card_ex.svg";
 import * as svgUtils from "../helpers/svgUtils";
 
-export default function LootTest({
+export default function CombatTest({
   address,
   mainnetProvider,
   localProvider,
@@ -14,25 +14,18 @@ export default function LootTest({
   writeContracts,
 }) {
   const [imgSrc, setImgSrc] = useState(null);
-  const [tokenIdx, setTokenIdx] = useState(0);
   const init = async () => {};
-
-  const update = async () => {};
   useEffect(() => {
-    if (readContracts && readContracts.Gears) {
+    if (readContracts && readContracts.Alien) {
       init();
     }
   }, [readContracts]);
-
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
-  const mintLoot = async () => {
+  const showAlien = async () => {
     const token_idx = getRandomInt(1000);
-    const rarityLevel = getRandomInt(4);
-    const result = await readContracts.Gears.randomTokenURI(token_idx, rarityLevel);
-    setTokenIdx(token_idx);
-
+    const result = await readContracts.Alien.randomTokenURI(token_idx);
     const base64_data = result.split("base64,")[1];
     const decoded_str = svgUtils.atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
@@ -43,8 +36,8 @@ export default function LootTest({
 
   return (
     <div style={{ maxWidth: 1024, margin: "auto", paddingBottom: 56 }}>
-      <Button onClick={mintLoot} style={{ marginBottom: "5px", marginTop: "25px" }}>
-        Show Random Loot Item Card
+      <Button onClick={showAlien} style={{ marginBottom: "5px", marginTop: "25px" }}>
+        Show Random Alien Card
       </Button>
       <Divider />
 

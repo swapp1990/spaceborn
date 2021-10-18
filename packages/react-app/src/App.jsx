@@ -21,7 +21,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest } from "./views";
+import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -465,6 +465,17 @@ function App(props) {
               Mint Random NFT
             </Link>
           </Menu.Item>
+
+          <Menu.Item key="/app/combatTest">
+            <Link
+              onClick={() => {
+                setRoute("/app/combatTest");
+              }}
+              to="/app/combatTest"
+            >
+              Combat Test
+            </Link>
+          </Menu.Item>
         </Menu>
 
         <Switch>
@@ -506,7 +517,20 @@ function App(props) {
             />
           </Route>
           <Route path="/app/randomMint">
-            <BadKidsTest
+            <LootTest
+              address={address}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              yourLocalBalance={yourLocalBalance}
+              price={price}
+              tx={tx}
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+            />
+          </Route>
+          <Route path="/app/combatTest">
+            <CombatTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
@@ -520,8 +544,6 @@ function App(props) {
           </Route>
         </Switch>
       </BrowserRouter>
-
-      <ThemeSwitch />
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>

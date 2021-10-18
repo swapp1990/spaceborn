@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./AlienMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
 
@@ -57,5 +58,15 @@ contract Alien is ERC721, Ownable  {
 	function setAlienDead(uint256 tokenId) public {
 		Alien storage alien = aliens[tokenId];
 		alien.isDead = true;
+	}
+
+	function tokenURI(uint256 id) public view override returns (string memory) {
+		require(_exists(id), "not exist");
+		Alien storage alien = aliens[id];
+		return AlienMetadataSvg.tokenURI(id);
+	}
+
+	function randomTokenURI(uint256 id) public view returns (string memory) {
+		return AlienMetadataSvg.tokenURI(id);
 	}
 }

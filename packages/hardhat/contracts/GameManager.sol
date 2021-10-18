@@ -32,6 +32,16 @@ contract GameManager {
 		return base;
 	}
 
+	function getGearRarity(uint256 baseProb) public view returns (uint256) {
+		// string memory rarity = "Common";
+		// if(baseProb >=50 && baseProb <= 80) {
+		// 	rarity = "Uncommon";
+		// } else if(baseProb > 80) {
+		// 	rarity = "Rare";
+		// }
+		return 0;
+	}
+
 	function fightAlien(uint256 alien_id, uint256 clientRandom) public {
 		require(alienContract.canFight(alien_id), "Alien not exist/dead");
 		uint256 rand100 = getRandom(clientRandom);
@@ -40,7 +50,8 @@ contract GameManager {
 		if(rand100 > finalProb) {
 			alienContract.setAlienDead(alien_id);
 			emit PlayerWon(alien_id, finalProb, msg.sender);
-			gearsContract.dropGear(alienContract.getAlienName(alien_id), alienContract.getAlienBaseProb(alien_id), msg.sender);
+			uint256 rarity = getGearRarity(alienContract.getAlienBaseProb(alien_id));
+			gearsContract.dropGear(alienContract.getAlienName(alien_id), rarity, msg.sender);
 		} else {
 			emit AlienWon(alien_id, finalProb, msg.sender);
 		}
