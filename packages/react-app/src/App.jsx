@@ -480,7 +480,7 @@ function App(props) {
 
         <Switch>
           <Route exact path="/app">
-            <MVPUI
+            <CombatTest
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}

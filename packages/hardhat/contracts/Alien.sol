@@ -63,10 +63,14 @@ contract Alien is ERC721, Ownable  {
 	function tokenURI(uint256 id) public view override returns (string memory) {
 		require(_exists(id), "not exist");
 		Alien storage alien = aliens[id];
-		return AlienMetadataSvg.tokenURI(id);
+		return AlienMetadataSvg.tokenURI(id, 0);
 	}
 
 	function randomTokenURI(uint256 id) public view returns (string memory) {
-		return AlienMetadataSvg.tokenURI(id);
+		return AlienMetadataSvg.tokenURI(id, 0);
+	}
+
+	function fixedAlien(uint256 id, uint256 baseProbs) public view returns (string memory) {
+		return AlienMetadataSvg.tokenURI(id, baseProbs);
 	}
 }
