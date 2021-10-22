@@ -28,12 +28,24 @@ contract GameManager {
 		return catIdx;
 	}
 
-	function getFinalProbs(uint256 baseProbs, uint256 equippedCount) public view returns (uint256) {
+	function getFinalProbs(uint256 baseProbs, uint256[] memory rarity_idxs) public view returns (uint256) {
 		uint256 remainProbs = 100 - baseProbs;
-		uint256 rarityBuff = 33;
-		rarityBuff = rarityBuff * equippedCount;
+		uint256 additionalBuffAlien = 0;
 		uint256 totalRarityBuff = 0;
-		totalRarityBuff = totalRarityBuff+rarityBuff;
+		for(uint i=0; i<rarity_idxs.length; i++) {
+			uint256 rarityBuff = 33;
+			uint256 rarityLoot = rarity_idxs[i];
+			if(rarityLoot == 4) {
+				rarityBuff=rarityBuff*2;
+			} else if(rarityLoot == 0) {
+				rarityBuff = 10;
+			} else if(rarityLoot == 1) {
+				rarityBuff = 20;
+			}
+			// rarityBuff = rarityBuff * equippedCount;
+			
+			totalRarityBuff = totalRarityBuff+rarityBuff;
+		}
 		if(totalRarityBuff > 99) {
 			totalRarityBuff = 99;
 		}
@@ -52,11 +64,10 @@ contract GameManager {
 		return 0;
 	}
 
-	function fightAlien(uint256 alien_id, uint256 clientRandom) public {
+	function fightAlien(uint256 alien_id, uint256 clientRandom, uint256[] memory rarity_idxs) public {
 		require(alienContract.canFight(alien_id), "Alien not exist/dead");
 		uint256 rand100 = getRandom(clientRandom);
-
-		uint256 finalProb = getFinalProbs(alienContract.getAlienBaseProb(alien_id), 0);
+		uint256 finalProb = getFinalProbs(alienContract.getAlienBaseProb(alien_id), rarity_idxs);
 		if(rand100 > finalProb) {
 			alienContract.setAlienDead(alien_id);
 			emit PlayerWon(alien_id, finalProb, msg.sender);
@@ -67,10 +78,10 @@ contract GameManager {
 		}
 	}
 
-	function fightAlienTest(uint256 baseProbs, uint256 clientRandom, uint256 equippedCount) public {
+	function fightAlienTest(uint256 baseProbs, uint256 clientRandom, uint256[] memory rarities) public {
 		uint256 rand100 = getRandom(clientRandom);
 
-		uint256 finalProb = getFinalProbs(baseProbs, equippedCount);
+		uint256 finalProb = getFinalProbs(baseProbs, rarities);
 		if(rand100 > finalProb) {
 			// alienContract.setAlienDead(alien_id);
 			emit PlayerWon(0, finalProb, msg.sender);

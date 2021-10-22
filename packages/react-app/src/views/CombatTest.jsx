@@ -85,16 +85,13 @@ export default function CombatTest({
   const fightAlien = async () => {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
-    const equippedCount = equipped.filter(e => e.id != -1).length;
-    console.log({ equippedCount });
-    const result = await tx(
-      writeContracts.GameManager.fightAlienTest(baseProb, clientRandom, equippedCount),
-      update => {
-        if (update && (update.status === "confirmed" || update.status === 1)) {
-          console.log("fightAlien success");
-        }
-      },
-    );
+    const rarities = equipped.filter(e => e.id != -1).map(i => i.rarity);
+    console.log({ rarities: rarities });
+    const result = await tx(writeContracts.GameManager.fightAlienTest(baseProb, clientRandom, rarities), update => {
+      if (update && (update.status === "confirmed" || update.status === 1)) {
+        console.log("fightAlien success");
+      }
+    });
   };
   const updateAlien = async () => {
     renderAlien(alienIdx, baseProb);
@@ -129,7 +126,7 @@ export default function CombatTest({
       const decoded_str = svgUtils.atob(base64_data);
       const decoded_json = JSON.parse(decoded_str);
       const svg_img = decoded_json.image;
-      walletGears.push({ id: i, imgSrc: svg_img, name: decoded_json.name });
+      walletGears.push({ id: i, imgSrc: svg_img, name: decoded_json.name, rarity: 0 });
     }
 
     setWalletGears(walletGears);
@@ -156,6 +153,7 @@ export default function CombatTest({
         newState[emptySlotIdx].id = walletLootFound.id;
         newState[emptySlotIdx].name = walletLootFound.name;
         newState[emptySlotIdx].image = walletLootFound.image;
+        newState[emptySlotIdx].rarity = walletLootFound.rarity;
         setEquipped(newState);
       }
     }
@@ -167,6 +165,35 @@ export default function CombatTest({
       return { backgroundColor: "lightgreen" };
     }
     return { backgroundColor: "black" };
+  }
+
+  async function changeToUncommon(e, idx) {
+    e.stopPropagation();
+    const result = await readContracts.Gears.randomTokenURI(idx, 1);
+    const base64_data = result.split("base64,")[1];
+    const decoded_str = svgUtils.atob(base64_data);
+    const decoded_json = JSON.parse(decoded_str);
+    const svg_img = decoded_json.image;
+    let walletGearIdx = walletGears.findIndex(loot => loot.id == idx);
+    console.log({ walletGearIdx });
+    let updatedGear = walletGears[walletGearIdx];
+    updatedGear.imgSrc = svg_img;
+    updatedGear.rarity = 1;
+    setWalletGears([...walletGears.slice(0, walletGearIdx), updatedGear, ...walletGears.slice(walletGearIdx + 1)]);
+  }
+  async function changeToRare(e, idx) {
+    e.stopPropagation();
+    const result = await readContracts.Gears.randomTokenURI(idx, 2);
+    const base64_data = result.split("base64,")[1];
+    const decoded_str = svgUtils.atob(base64_data);
+    const decoded_json = JSON.parse(decoded_str);
+    const svg_img = decoded_json.image;
+    let walletGearIdx = walletGears.findIndex(loot => loot.id == idx);
+    console.log({ walletGearIdx });
+    let updatedGear = walletGears[walletGearIdx];
+    updatedGear.imgSrc = svg_img;
+    updatedGear.rarity = 2;
+    setWalletGears([...walletGears.slice(0, walletGearIdx), updatedGear, ...walletGears.slice(walletGearIdx + 1)]);
   }
 
   return (
@@ -184,6 +211,16 @@ export default function CombatTest({
                   hoverable
                   onClick={() => walletGearClicked(item)}
                   style={getWalletItemBgColor(item.id)}
+                  extra={
+                    <Space direction="vertical">
+                      <Button onClick={e => changeToUncommon(e, item.id)} type="dashed">
+                        Uncommon
+                      </Button>
+                      <Button onClick={e => changeToRare(e, item.id)} type="dashed">
+                        Rare
+                      </Button>
+                    </Space>
+                  }
                 >
                   <img src={item.imgSrc} style={{ width: 250 }}></img>
                   <div>{item.rarity}</div>
