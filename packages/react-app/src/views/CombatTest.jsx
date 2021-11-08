@@ -19,6 +19,42 @@ import { ReactComponent as CardEx } from "../card_ex.svg";
 const { Text, Link, Title } = Typography;
 import * as svgUtils from "../helpers/svgUtils";
 
+const GEAR_CATS = ["Weapon",
+  "Apparel",
+  "Vehicle",
+  "Pill",
+  "Gizmo"];
+
+const GEARS = {
+  "Weapon": ["Pistol",
+    "Cannon",
+    "Phaser",
+    "Sniper",
+    "Zapper"],
+  "Apparel": ["Exosuit",
+    "Power Armor",
+    "Biosuit",
+    "Gloves",
+    "Nnaosuit",
+    "Jacket"],
+  "Vehicle": ["Hoverboard",
+    "Superbike",
+    "Air-ship",
+    "Time Machine",
+    "Auto-Car",
+    "Hushicopter"],
+  "Gizmo": ["Neutralizer",
+    "Replicator",
+    "Battery",
+    "Fuel Canister",
+    "Supercomputer"],
+  "Pill": ["Soma",
+    "Nootropic",
+    "LSX",
+    "Regeneration",
+    "Food Replacement"]
+}
+
 export default function CombatTest({
   address,
   mainnetProvider,
@@ -33,7 +69,7 @@ export default function CombatTest({
   const [equipped, setEquipped] = useState([]);
   const [walletGears, setWalletGears] = useState([]);
   const [gameActionMsg, setgameActionMsg] = useState("");
-  const [baseProb, setBaseProb] = useState(0);
+  const [baseProb, setBaseProb] = useState(75);
   const [alienIdx, setAlienIdx] = useState(0);
 
   const init = async () => {
@@ -67,7 +103,8 @@ export default function CombatTest({
     return Math.floor(Math.random() * max);
   }
   const renderAlien = async (token_idx, base_probs) => {
-    const result = await readContracts.Alien.fixedAlien(token_idx, base_probs);
+    const alien_cat_idx = getRandomInt(5);
+    const result = await readContracts.Alien.fixedAlien(token_idx, base_probs, alien_cat_idx);
     const base64_data = result.split("base64,")[1];
     const decoded_str = svgUtils.atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
@@ -85,9 +122,10 @@ export default function CombatTest({
   const fightAlien = async () => {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
-    const rarities = equipped.filter(e => e.id != -1).map(i => i.rarity);
-    console.log({ rarities: rarities });
-    const result = await tx(writeContracts.GameManager.fightAlienTest(baseProb, clientRandom, rarities), update => {
+    console.log({ equipped });
+    const foundGears = equipped.filter(e => e.id != -1).map(i => i.usedGear);
+    console.log({ foundGears: foundGears });
+    const result = await tx(writeContracts.GameManager.fightAlienTest(baseProb, clientRandom, foundGears, 0), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("fightAlien success");
       }
@@ -98,7 +136,7 @@ export default function CombatTest({
   };
 
   async function onPlayerWon(msg) {
-    console.log({ onPlayerWon: msg });
+    console.log({ onPlayerWon: msg.finalProbs.toNumber() });
     const txt = "Player won with final prob of alien to be " + msg.finalProbs.toNumber();
     setgameActionMsg(txt);
   }
@@ -125,8 +163,14 @@ export default function CombatTest({
       const base64_data = result.split("base64,")[1];
       const decoded_str = svgUtils.atob(base64_data);
       const decoded_json = JSON.parse(decoded_str);
+      console.log({ decoded_json })
       const svg_img = decoded_json.image;
-      walletGears.push({ id: i, imgSrc: svg_img, name: decoded_json.name, rarity: 0 });
+      const gearCatIdx = GEAR_CATS.indexOf(decoded_json.category);
+      const gearIdx = GEARS[decoded_json.category].indexOf(decoded_json.item);
+      const usedGear = {
+        rarityIdx: parseInt(decoded_json.rarityLevel), catIdx: gearCatIdx, gearIdx: gearIdx
+      }
+      walletGears.push({ id: i, imgSrc: svg_img, name: decoded_json.name, usedGear: usedGear });
     }
 
     setWalletGears(walletGears);
@@ -138,7 +182,7 @@ export default function CombatTest({
     if (equippedFound) {
       console.log("equippedFound");
       let selEquippedSlotIdx = equipped.findIndex(loot => loot.id === item.id);
-      //   console.log("selEquippedSlotIdx");
+      // console.log({ selEquippedSlotIdx });
       let newState = [...equipped];
       newState[selEquippedSlotIdx].id = -1;
       newState[selEquippedSlotIdx].name = "Select from wallet";
@@ -153,7 +197,9 @@ export default function CombatTest({
         newState[emptySlotIdx].id = walletLootFound.id;
         newState[emptySlotIdx].name = walletLootFound.name;
         newState[emptySlotIdx].image = walletLootFound.image;
-        newState[emptySlotIdx].rarity = walletLootFound.rarity;
+        newState[emptySlotIdx].usedGear = walletLootFound.usedGear;
+        // newState[emptySlotIdx] = walletLootFound;
+        // console.log({ newState });
         setEquipped(newState);
       }
     }
@@ -161,6 +207,7 @@ export default function CombatTest({
 
   function getWalletItemBgColor(idx) {
     let equippedFound = equipped.find(loot => loot.id == idx);
+    // console.log({ equippedFound });
     if (equippedFound) {
       return { backgroundColor: "lightgreen" };
     }
@@ -178,7 +225,7 @@ export default function CombatTest({
     console.log({ walletGearIdx });
     let updatedGear = walletGears[walletGearIdx];
     updatedGear.imgSrc = svg_img;
-    updatedGear.rarity = 1;
+    updatedGear.usedGear.rarityIdx = 1;
     setWalletGears([...walletGears.slice(0, walletGearIdx), updatedGear, ...walletGears.slice(walletGearIdx + 1)]);
   }
   async function changeToRare(e, idx) {
@@ -192,7 +239,7 @@ export default function CombatTest({
     console.log({ walletGearIdx });
     let updatedGear = walletGears[walletGearIdx];
     updatedGear.imgSrc = svg_img;
-    updatedGear.rarity = 2;
+    updatedGear.usedGear.rarityIdx = 2;
     setWalletGears([...walletGears.slice(0, walletGearIdx), updatedGear, ...walletGears.slice(walletGearIdx + 1)]);
   }
 
@@ -223,7 +270,7 @@ export default function CombatTest({
                   }
                 >
                   <img src={item.imgSrc} style={{ width: 250 }}></img>
-                  <div>{item.rarity}</div>
+                  {/* <div>{item.rarity}</div> */}
                 </Card>
               </List.Item>
             )}

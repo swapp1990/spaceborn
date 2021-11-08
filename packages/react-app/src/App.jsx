@@ -65,8 +65,8 @@ const scaffoldEthProvider = navigator.onLine
   : null;
 const poktMainnetProvider = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(
-      "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-    )
+    "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  )
   : null;
 const mainnetInfura = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
@@ -167,8 +167,8 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+        ? scaffoldEthProvider
+        : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -432,10 +432,10 @@ function App(props) {
               }}
               to="/app"
             >
-              Scifi Loot
+              Combat Test
             </Link>
           </Menu.Item>
-          <Menu.Item key="/app/contract">
+          {/* <Menu.Item key="/app/contract">
             <Link
               onClick={() => {
                 setRoute("/app/contract");
@@ -444,7 +444,7 @@ function App(props) {
             >
               Contract
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
           {/* <Menu.Item key="/app/testLoot">
             <Link
               onClick={() => {
@@ -455,7 +455,7 @@ function App(props) {
               Test Loot Mints
             </Link>
           </Menu.Item> */}
-          <Menu.Item key="/app/randomMint">
+          {/* <Menu.Item key="/app/randomMint">
             <Link
               onClick={() => {
                 setRoute("/app/randomMint");
@@ -464,9 +464,9 @@ function App(props) {
             >
               Mint Random NFT
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
 
-          <Menu.Item key="/app/combatTest">
+          {/* <Menu.Item key="/app/combatTest">
             <Link
               onClick={() => {
                 setRoute("/app/combatTest");
@@ -475,7 +475,7 @@ function App(props) {
             >
               Combat Test
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
 
         <Switch>
@@ -495,7 +495,7 @@ function App(props) {
 
           <Route path="/app/contract">
             <Contract
-              name="Alien"
+              name="GameManager"
               signer={userSigner}
               provider={localProvider}
               address={address}

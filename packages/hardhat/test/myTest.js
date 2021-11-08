@@ -7,6 +7,7 @@ use(solidity);
 describe("My NFT Game", function () {
   let firstPlayer;
   let alienContract;
+  let gearsContract;
   let playerContract;
   let gameManagerContract;
   describe("Alien", function () {
@@ -16,7 +17,9 @@ describe("My NFT Game", function () {
       const Alien = await ethers.getContractFactory("Alien");
       alienContract = await Alien.deploy();
       const gameManager = await ethers.getContractFactory("GameManager");
-      gameManagerContract = await gameManager.deploy(alienContract.address);
+      const Gears = await ethers.getContractFactory("Gears");
+      gearsContract = await Gears.deploy();
+      gameManagerContract = await gameManager.deploy(alienContract.address, gearsContract.address);
       const Player = await ethers.getContractFactory("Player");
       playerContract = await Player.deploy(gameManagerContract.address);
       await playerContract.mint({ name: "Swap" });
@@ -32,12 +35,23 @@ describe("My NFT Game", function () {
     it("Game manager", async function () {
       const canFightB4 = await alienContract.canFight(0);
       console.log({ canFightB4 });
-      let random = Math.floor(Math.random() * (100 - 0 + 1) + 0);
-      console.log({ random });
-      await playerContract.takeAction(0, random);
-      const canFight = await alienContract.canFight(0);
-      console.log({ canFight });
-    });
+      const alienBuff = await gameManagerContract.getCat2AlienBuff(0, 0);
+      console.log({ alienBuff: alienBuff.toNumber() });
+      // const buffs = await gameManagerContract.gearCat2AlienBuffs;
+      // console.log({ buffs })
+      let alienBuff2 = await gameManagerContract.getCat2AlienBuff(1, 1);
+      console.log({ alienBuff2: alienBuff2.toNumber() });
+      alienBuff2 = await gameManagerContract.getCat2AlienBuff(2, 3);
+      console.log({ alienBuff2: alienBuff2.toNumber() });
+
+      const finalProb = await gameManagerContract.getFinalProbs(95, [{ rarityIdx: 0, catIdx: 0, gearIdx: 4 }, { rarityIdx: 0, catIdx: 0, gearIdx: 2 }], 0);
+      console.log({ finalProb: finalProb.toNumber() });
+    })
+    // let random = Math.floor(Math.random() * (100 - 0 + 1) + 0);
+    // console.log({ random });
+    // await playerContract.takeAction(0, random);
+    // const canFight = await alienContract.canFight(0);
+    // console.log({ canFight });
   });
 });
 // describe("Bad Kids", function () {

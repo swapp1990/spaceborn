@@ -9,68 +9,131 @@ import "./AlienMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
 
-contract Alien is ERC721, Ownable  {
-	using SafeMath for uint256;
-	using Counters for Counters.Counter;
-  	Counters.Counter private _tokenIds;
-	uint public lastTokenId;
+contract Alien is ERC721, Ownable {
+    using SafeMath for uint256;
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+    uint256 public lastTokenId;
 
-	struct Alien {
-		uint256 tokenId;
-		string name;
-		uint256 baseProb;
-		bool exists;
-		bool isDead;
-	}
+    struct Alien {
+        uint256 tokenId;
+        string name;
+        uint256 baseProb;
+        bool exists;
+        bool isDead;
+    }
 
-	mapping (uint256 => Alien) public aliens;
+    mapping(uint256 => Alien) public aliens;
 
-	constructor() public ERC721("Alien", "ALN") {
+    string[] private categories = [
+        "Agility",
+        "Powerful",
+        "Mind Control",
+        "Charm",
+        "Replication",
+        "Mimic",
+        "Superintelligent",
+        "NPC"
+    ];
 
-  	}
+    constructor() public ERC721("Alien", "ALN") {}
 
-	function mintMultipleAliens(string[] memory names, uint256[] memory baseProbs) public {
-		for(uint i=0; i<names.length; i++) {
-			uint256 id = _tokenIds.current();
-     		_mint(msg.sender, id);
-			lastTokenId = id;
-			Alien storage alien = aliens[id];
-			alien.tokenId = id;
-			alien.name = names[i];
-			alien.baseProb = baseProbs[i];
-			alien.exists = true;
-			_tokenIds.increment();
-		}
-	}
+    function mintMultipleAliens(
+        string[] memory names,
+        uint256[] memory baseProbs
+    ) public {
+        for (uint256 i = 0; i < names.length; i++) {
+            uint256 id = _tokenIds.current();
+            _mint(msg.sender, id);
+            lastTokenId = id;
+            Alien storage alien = aliens[id];
+            alien.tokenId = id;
+            alien.name = names[i];
+            alien.baseProb = baseProbs[i];
+            alien.exists = true;
+            _tokenIds.increment();
+        }
+    }
 
-	function canFight(uint256 tokenId) public view returns (bool) {
-		return aliens[tokenId].exists && !aliens[tokenId].isDead;
-	}
+    function canFight(uint256 tokenId) public view returns (bool) {
+        return aliens[tokenId].exists && !aliens[tokenId].isDead;
+    }
 
-	function getAlienBaseProb(uint256 tokenId) public view returns (uint256) {
-		return aliens[tokenId].baseProb;
-	}
+    function getAlienBaseProb(uint256 tokenId) public view returns (uint256) {
+        return aliens[tokenId].baseProb;
+    }
 
-	function getAlienName(uint256 tokenId) public view returns (string memory) {
-		return aliens[tokenId].name;
-	}
+    function getAlienName(uint256 tokenId) public view returns (string memory) {
+        return aliens[tokenId].name;
+    }
 
-	function setAlienDead(uint256 tokenId) public {
-		Alien storage alien = aliens[tokenId];
-		alien.isDead = true;
-	}
+    function getAlienCats() public view returns (string[] memory) {
+        return categories;
+    }
 
-	function tokenURI(uint256 id) public view override returns (string memory) {
-		require(_exists(id), "not exist");
-		Alien storage alien = aliens[id];
-		return AlienMetadataSvg.tokenURI(id, 0);
-	}
+    function setAlienDead(uint256 tokenId) public {
+        Alien storage alien = aliens[tokenId];
+        alien.isDead = true;
+    }
 
-	function randomTokenURI(uint256 id) public view returns (string memory) {
-		return AlienMetadataSvg.tokenURI(id, 0);
-	}
+    function toString(uint256 value) internal pure returns (string memory) {
+        // Inspired by OraclizeAPI's implementation - MIT license
+        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
 
-	function fixedAlien(uint256 id, uint256 baseProbs) public view returns (string memory) {
-		return AlienMetadataSvg.tokenURI(id, baseProbs);
-	}
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
+
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        require(_exists(id), "not exist");
+        Alien storage alien = aliens[id];
+        return AlienMetadataSvg.tokenURI(id, 0, "");
+    }
+
+    function randomTokenURI(uint256 id) public view returns (string memory) {
+        return AlienMetadataSvg.tokenURI(id, 0, "");
+    }
+
+    function random(string memory input) internal pure returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(input)));
+    }
+
+    function getRandom(uint256 tokenId) public view returns (uint256) {
+        uint256 rand = random(
+            string(
+                abi.encodePacked(
+                    blockhash(block.number - 1),
+                    msg.sender,
+                    address(this),
+                    toString(tokenId)
+                )
+            )
+        );
+        return rand % 100;
+    }
+
+    function fixedAlien(
+        uint256 id,
+        uint256 baseProbs,
+        uint256 catIdx
+    ) public view returns (string memory) {
+        uint256 rand = getRandom(id);
+        // string memory cat = categories[rand % categories.length];
+        string memory cat = categories[catIdx];
+        return AlienMetadataSvg.tokenURI(id, baseProbs, cat);
+    }
 }
