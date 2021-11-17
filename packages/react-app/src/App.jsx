@@ -432,7 +432,7 @@ function App(props) {
               }}
               to="/app"
             >
-              Combat Test
+              Game
             </Link>
           </Menu.Item>
           {/* <Menu.Item key="/app/contract">
@@ -466,7 +466,7 @@ function App(props) {
             </Link>
           </Menu.Item> */}
 
-          {/* <Menu.Item key="/app/combatTest">
+          <Menu.Item key="/app/combatTest">
             <Link
               onClick={() => {
                 setRoute("/app/combatTest");
@@ -475,12 +475,12 @@ function App(props) {
             >
               Combat Test
             </Link>
-          </Menu.Item> */}
+          </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/app">
-            <CombatTest
+            <MVPUI
               address={address}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}

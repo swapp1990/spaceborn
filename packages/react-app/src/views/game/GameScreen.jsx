@@ -19,6 +19,8 @@ import {
   Typography,
   Modal,
 } from "antd";
+import * as svgUtils from "../../helpers/svgUtils";
+
 const { Text, Link, Title } = Typography;
 export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider }) {
   const [canMint, setCanMint] = useState(null);
@@ -34,6 +36,8 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   const [alienSelected, setAlienSelected] = useState(null);
   const [alienWon, setAlienWon] = useState(false);
   const [playerLostLoot, setPlayerLostLoot] = useState(false);
+
+  const [equipped, setEquipped] = useState([]);
 
   const [gameActionMsg, setgameActionMsg] = useState("");
 
@@ -95,6 +99,15 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     setPlayerState({ ...player });
   }
 
+  async function getSvgImg(tokenId) {
+    let tokenUri = await readContracts.Alien.tokenURI(tokenId);
+    const base64_data = tokenUri.split("base64,")[1];
+    const decoded_str = svgUtils.atob(base64_data);
+    const decoded_json = JSON.parse(decoded_str);
+    // console.log(decoded_json);
+    return decoded_json.image;
+  }
+
   async function updateGameScreen() {
     const aliensMinted = await readContracts.Alien.lastTokenId();
     console.log({ aliensMinted });
@@ -103,7 +116,8 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
       const alien = await readContracts.Alien.aliens(tokenId);
       if (!alien.isDead) {
-        aliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
+        let svgImg = await getSvgImg(tokenId);
+        aliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb, image: svgImg });
       } else {
         deadaliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
       }
@@ -165,10 +179,10 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   async function fightAlien() {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
-    // console.log({ equipped });
-    // let lootsSelected = equipped.filter(e => e.id != 0).map(e => e.id.toNumber());
-    // console.log({ lootsSelected });
-    const result = await tx(writeContracts.GameManager.fightAlien(alienSelected.id, clientRandom), update => {
+    console.log({ equipped });
+    const foundGears = equipped.filter(e => e.id != -1).map(i => i.usedGear);
+    console.log({ foundGears });
+    const result = await tx(writeContracts.GameManager.fightAlien(alienSelected.id, clientRandom, foundGears), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("fightAlien success");
       }
@@ -243,11 +257,11 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       {!canMint && (
         <Card
           title="Which alien do you choose to fight?"
-          //   extra={
-          //     <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
-          //       Hunt for more aliens
-          //     </Button>
-          //   }
+        //   extra={
+        //     <Button onClick={huntMore} type="dashed" disabled={disableHuntMore}>
+        //       Hunt for more aliens
+        //     </Button>
+        //   }
         >
           <div>
             <Title level={3}>Aliens Defeated: {aliensDefeated}</Title>

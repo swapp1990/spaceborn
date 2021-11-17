@@ -19,6 +19,7 @@ contract Alien is ERC721, Ownable {
         uint256 tokenId;
         string name;
         uint256 baseProb;
+        uint256 catIdx;
         bool exists;
         bool isDead;
     }
@@ -44,12 +45,15 @@ contract Alien is ERC721, Ownable {
     ) public {
         for (uint256 i = 0; i < names.length; i++) {
             uint256 id = _tokenIds.current();
+            uint256 rand = getRandom(id);
             _mint(msg.sender, id);
             lastTokenId = id;
             Alien storage alien = aliens[id];
             alien.tokenId = id;
             alien.name = names[i];
             alien.baseProb = baseProbs[i];
+            uint256 alienCatIdx = rand % categories.length;
+            alien.catIdx = alienCatIdx;
             alien.exists = true;
             _tokenIds.increment();
         }
@@ -61,6 +65,10 @@ contract Alien is ERC721, Ownable {
 
     function getAlienBaseProb(uint256 tokenId) public view returns (uint256) {
         return aliens[tokenId].baseProb;
+    }
+
+    function getAlienCatIdx(uint256 tokenId) public view returns (uint256) {
+        return aliens[tokenId].catIdx;
     }
 
     function getAlienName(uint256 tokenId) public view returns (string memory) {
@@ -101,7 +109,8 @@ contract Alien is ERC721, Ownable {
     function tokenURI(uint256 id) public view override returns (string memory) {
         require(_exists(id), "not exist");
         Alien storage alien = aliens[id];
-        return AlienMetadataSvg.tokenURI(id, 0, "");
+        string memory cat = categories[alien.catIdx];
+        return AlienMetadataSvg.tokenURI(id, alien.baseProb, cat);
     }
 
     function randomTokenURI(uint256 id) public view returns (string memory) {

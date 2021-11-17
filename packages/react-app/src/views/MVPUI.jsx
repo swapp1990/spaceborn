@@ -87,6 +87,7 @@ export default function MVPUI({
 
   const init = async () => {
     updateProfile();
+    // setPlayerNft({ "name": "swap" });
     // updateWallet();
 
     // addEventListener("ScifiLoot", "LootMinted", onLootMinted);

@@ -32,7 +32,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
       var options = null;
       var notify = null;
-      if(navigator.onLine){
+      if (navigator.onLine) {
         options = {
           dappId: BLOCKNATIVE_DAPPID, // GET YOUR OWN KEY AT https://account.blocknative.com
           system: "ethereum",
@@ -113,7 +113,8 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         }
 
         if (typeof result.wait === "function") {
-          await result.wait();
+          const receipt = await result.wait();
+          console.log({ receipt });
         }
 
         return result;
@@ -121,20 +122,20 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         if (DEBUG) console.log(e);
         // Accounts for Metamask and default signer on all networks
         let message = e.data && e.data.message ? e.data.message : e.error && JSON.parse(JSON.stringify(e.error)).body ? JSON.parse(JSON.parse(JSON.stringify(e.error)).body).error.message : e.data ? e.data : JSON.stringify(e);
-        if(!e.error && e.message){
+        if (!e.error && e.message) {
           message = e.message
         }
 
         console.log("Attempt to clean up:", message);
-        try{
+        try {
           let obj = JSON.parse(message)
-          if(obj && obj.body){
+          if (obj && obj.body) {
             let errorObj = JSON.parse(obj.body)
-            if(errorObj && errorObj.error && errorObj.error.message){
+            if (errorObj && errorObj.error && errorObj.error.message) {
               message = errorObj.error.message
             }
           }
-        }catch(e){
+        } catch (e) {
           //ignore
         }
 

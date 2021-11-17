@@ -19,6 +19,8 @@ import {
   Typography,
   Modal,
 } from "antd";
+import * as svgUtils from "../../helpers/svgUtils";
+
 const { Text, Link, Title } = Typography;
 export default function WalletWindow({ address, tx, readContracts, writeContracts, localProvider }) {
   const [walletLoot, setWalletLoot] = useState([]);
@@ -52,7 +54,22 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
     updateWallet();
   }
 
-  const claimFree = () => {};
+  const claimFree = async () => {
+    const result = await tx(writeContracts.GameManager.claimRandomGear(), update => {
+      if (update && (update.status === "confirmed" || update.status === 1)) {
+        console.log("claimed gear");
+      }
+    });
+  };
+
+  async function getSvgImg(tokenId) {
+    let tokenUri = await readContracts.Gears.tokenURI(tokenId);
+    const base64_data = tokenUri.split("base64,")[1];
+    const decoded_str = svgUtils.atob(base64_data);
+    const decoded_json = JSON.parse(decoded_str);
+    // console.log(decoded_json);
+    return decoded_json.image;
+  }
 
   async function updateWallet() {
     const balanceLoot = await readContracts.Gears.balanceOf(address);
@@ -66,12 +83,23 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
       try {
         const tokenId = await readContracts.Gears.tokenOfOwnerByIndex(address, tokenIndex);
         const gearObj = await readContracts.Gears.gears(tokenId);
-        // console.log({ gearObj });
-        walletLootUpdate.push({ ...gearObj });
+        console.log({ gearObj });
+        if (gearObj.playerWonAddr == address) {
+          let gearJsObj = {};
+          gearJsObj.note = gearObj.name;
+          gearJsObj.rarity = gearObj.rarity.toNumber();
+          gearJsObj.tokenId = gearObj.tokenId.toNumber();
+          let svgImg = await getSvgImg(gearJsObj.tokenId);
+          gearJsObj.image = svgImg;
+          // console.log(svgImg);
+          walletLootUpdate.push(gearJsObj);
+        }
+
       } catch (e) {
         console.log(e);
       }
     }
+    console.log(walletLootUpdate);
     setWalletLoot(walletLootUpdate.reverse());
   }
 
@@ -93,6 +121,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
             <List.Item>
               <Card title={item.name} hoverable>
                 <div>{item.rarity}</div>
+                <img src={item.image} style={{ width: 150 }}></img>
                 <a href={"https://opensea.io/assets/"} target="_blank">
                   View on OpenSea
                 </a>

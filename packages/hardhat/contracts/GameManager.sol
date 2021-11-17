@@ -229,6 +229,10 @@ contract GameManager {
         return 0;
     }
 
+    function claimRandomGear() public {
+        gearsContract.dropGear("Moloch", 0, msg.sender);
+    }
+
     function fightAlien(
         uint256 alien_id,
         uint256 clientRandom,
@@ -236,14 +240,15 @@ contract GameManager {
     ) public {
         require(alienContract.canFight(alien_id), "Alien not exist/dead");
         uint256 rand100 = getRandom(clientRandom);
+
         uint256 finalProb = getFinalProbs(
             alienContract.getAlienBaseProb(alien_id),
             usedGears,
-            0
+            alienContract.getAlienCatIdx(alien_id)
         );
         if (rand100 > finalProb) {
-            alienContract.setAlienDead(alien_id);
-            emit PlayerWon(alien_id, finalProb, msg.sender);
+            // alienContract.setAlienDead(alien_id);
+            emit PlayerWon(0, finalProb, msg.sender);
             uint256 rarity = getGearRarity(
                 alienContract.getAlienBaseProb(alien_id)
             );
@@ -253,8 +258,29 @@ contract GameManager {
                 msg.sender
             );
         } else {
-            emit AlienWon(alien_id, finalProb, msg.sender);
+            emit AlienWon(0, finalProb, msg.sender);
         }
+
+        // uint256 rand100 = getRandom(clientRandom);
+        // uint256 finalProb = getFinalProbs(
+        //     alienContract.getAlienBaseProb(alien_id),
+        //     usedGears,
+        //     0
+        // );
+        // if (rand100 > finalProb) {
+        //     alienContract.setAlienDead(alien_id);
+        //     emit PlayerWon(alien_id, finalProb, msg.sender);
+        //     uint256 rarity = getGearRarity(
+        //         alienContract.getAlienBaseProb(alien_id)
+        //     );
+        //     gearsContract.dropGear(
+        //         alienContract.getAlienName(alien_id),
+        //         rarity,
+        //         msg.sender
+        //     );
+        // } else {
+        //     emit AlienWon(alien_id, finalProb, msg.sender);
+        // }
     }
 
     function fightAlienTest(

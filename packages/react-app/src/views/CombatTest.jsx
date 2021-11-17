@@ -122,9 +122,9 @@ export default function CombatTest({
   const fightAlien = async () => {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
-    console.log({ equipped });
+    // console.log({ equipped });
     const foundGears = equipped.filter(e => e.id != -1).map(i => i.usedGear);
-    console.log({ foundGears: foundGears });
+    // console.log({ foundGears: foundGears });
     const result = await tx(writeContracts.GameManager.fightAlienTest(baseProb, clientRandom, foundGears, 0), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("fightAlien success");
