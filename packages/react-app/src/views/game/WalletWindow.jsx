@@ -103,6 +103,19 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
     setWalletLoot(walletLootUpdate.reverse());
   }
 
+  async function walletGearClicked(item) {
+    console.log("walletGearClicked ", item);
+  }
+
+  function getWalletItemBgColor(idx) {
+    // let equippedFound = equipped.find(loot => loot.id == idx);
+    // // console.log({ equippedFound });
+    // if (equippedFound) {
+    //   return { backgroundColor: "lightgreen" };
+    // }
+    return { backgroundColor: "black" };
+  }
+
   const walletWindow = (
     <>
       <Card
@@ -119,7 +132,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
           style={{ overflowY: "auto", overflowX: "hidden", height: "400px" }}
           renderItem={item => (
             <List.Item>
-              <Card title={item.name} hoverable>
+              <Card title={item.name} hoverable onClick={() => walletGearClicked(item)} style={getWalletItemBgColor(item.id)}>
                 <div>{item.rarity}</div>
                 <img src={item.image} style={{ width: 150 }}></img>
                 <a href={"https://opensea.io/assets/"} target="_blank">

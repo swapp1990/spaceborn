@@ -44,13 +44,48 @@ export default function Account({
   userSigner,
   localProvider,
   mainnetProvider,
+  price,
+  minimized,
+  web3Modal,
+  loadWeb3Modal,
+  logoutOfWeb3Modal,
   blockExplorer,
-  price
 }) {
   const modalButtons = [];
+  if (web3Modal) {
+    if (web3Modal.cachedProvider) {
+      modalButtons.push(
+        <Button
+          key="logoutbutton"
+          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+          shape="round"
+          size="large"
+          onClick={logoutOfWeb3Modal}
+        >
+          logout
+        </Button>,
+      );
+    } else {
+      modalButtons.push(
+        <Button
+          key="loginbutton"
+          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+          shape="round"
+          size="large"
+          /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
+          onClick={loadWeb3Modal}
+        >
+          connect
+        </Button>,
+      );
+    }
+  }
 
+  const { currentTheme } = useThemeSwitcher();
 
-  const display =
+  const display = minimized ? (
+    ""
+  ) : (
     <span>
       {address ? (
         <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
@@ -58,16 +93,16 @@ export default function Account({
         "Connecting..."
       )}
       <Balance address={address} provider={localProvider} price={price} />
-
-      {/* <Wallet
+      <Wallet
         address={address}
         provider={localProvider}
         signer={userSigner}
         ensProvider={mainnetProvider}
         price={price}
-        color="#1890ff"
-      /> */}
+        color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
+      />
     </span>
+  );
 
   return (
     <div>

@@ -20,17 +20,17 @@ import {
   Modal,
 } from "antd";
 const { Text, Link, Title } = Typography;
-export default function PlayerWindow({ address, tx, readContracts, writeContracts }) {
-  const [playerNft, setPlayerNft] = useState(null);
+export default function PlayerWindow({ address, tx, readContracts, writeContracts, playerNft }) {
 
   useEffect(async () => {
     if (readContracts && readContracts.Player) {
       init();
+      // console.log("init");
     }
   }, [readContracts, address]);
 
   const init = async () => {
-    updateProfile();
+    // updateProfile();
   };
 
   const getImgFromUrl = url => {
@@ -46,24 +46,6 @@ export default function PlayerWindow({ address, tx, readContracts, writeContract
         },
       );
   };
-
-  async function updateProfile() {
-    const tokenId = await readContracts.Player.getTokenId(address);
-    if (tokenId.toNumber() == 0) {
-      console.log("tokenId is not set");
-      return;
-    }
-    console.log({ tokenId: tokenId.toNumber() });
-    const player = await readContracts.Player.getPlayer(tokenId);
-    console.log(player);
-    // let imgSrc = await getImgFromUrl(player.pfp_url);
-    setPlayerNft({
-      id: tokenId,
-      name: player.name,
-      image: null,
-      owner: address,
-    });
-  }
 
   const playerWindow = (
     <>

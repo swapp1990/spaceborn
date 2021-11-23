@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -22,7 +22,9 @@ import {
 import * as svgUtils from "../../helpers/svgUtils";
 
 const { Text, Link, Title } = Typography;
-export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider }) {
+export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider, context }) {
+  //Global use context
+  const { state, dispatch } = useContext(context);
   const [canMint, setCanMint] = useState(null);
   const [disableHuntMore, setDisableHuntMore] = useState(false);
 
@@ -68,6 +70,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   };
 
   const init = async () => {
+    initEmptyEquip();
     updatePlayerState();
     updateGameScreen();
   };
@@ -187,7 +190,43 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
         console.log("fightAlien success");
       }
     });
-    // initEmptyEquip();
+  }
+
+  function initEmptyEquip() {
+    let emptyEquipped = [];
+    emptyEquipped.push({ id: -1, name: "Select from wallet" });
+    emptyEquipped.push({ id: -1, name: "Select from wallet" });
+    emptyEquipped.push({ id: -1, name: "Select from wallet" });
+    setEquipped(emptyEquipped);
+  }
+
+  async function walletGearClicked(item) {
+    console.log("walletGearClicked ", item);
+    let equippedFound = equipped.find(loot => loot.id == item.id);
+    if (equippedFound) {
+      console.log("equippedFound");
+      let selEquippedSlotIdx = equipped.findIndex(loot => loot.id === item.id);
+      // console.log({ selEquippedSlotIdx });
+      let newState = [...equipped];
+      newState[selEquippedSlotIdx].id = -1;
+      newState[selEquippedSlotIdx].name = "Select from wallet";
+      newState[selEquippedSlotIdx].image = null;
+      setEquipped(newState);
+    } else {
+      let newState = [...equipped];
+      let walletLootFound = walletGears.find(loot => loot.id == item.id);
+      let emptySlotIdx = equipped.findIndex(loot => loot.id === -1);
+      console.log({ emptySlotIdx });
+      if (walletLootFound) {
+        newState[emptySlotIdx].id = walletLootFound.id;
+        newState[emptySlotIdx].name = walletLootFound.name;
+        newState[emptySlotIdx].image = walletLootFound.image;
+        newState[emptySlotIdx].usedGear = walletLootFound.usedGear;
+        // newState[emptySlotIdx] = walletLootFound;
+        // console.log({ newState });
+        setEquipped(newState);
+      }
+    }
   }
 
   async function mintLoot() {
@@ -252,6 +291,30 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     </>
   );
 
+  const equippedWindow = (
+    <>
+      <div>Fill Slots</div>
+      <div style={{ marginBottom: 10 }}>
+        <Text mark>
+          Note: If you lose the fight, there is a chance your NFT is lost and transferred to the Alien.
+        </Text>
+      </div>
+      <List
+        grid={{ gutter: 16, column: 3 }}
+        dataSource={equipped}
+        renderItem={(item, idx) => (
+          <List.Item>
+            <div onClick={() => console.log("equipped")}>
+              <Card hoverable bordered title={item.name}>
+                <img style={{ width: 100 }} src={item.image} />
+              </Card>
+            </div>
+          </List.Item>
+        )}
+      />
+    </>
+  )
+
   const combatWindow = (
     <>
       {!canMint && (
@@ -270,36 +333,19 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
           <Divider />
           {aliensToFight}
           <Divider />
-          {deadAlienView}
+          {/* {deadAlienView} */}
           <Divider />
           <div style={{ marginTop: 16 }}>
             {alienSelected && (
-              <div>
-                {/* <div>Fill Slots</div>
-			<div style={{ marginBottom: 10 }}>
-			  <Text mark>
-				Note: If you lose the fight, there is a chance your NFT is lost and transferred to the Alien.
-			  </Text>
-			</div> */}
-                {/* <List
-			  grid={{ gutter: 16, column: 3 }}
-			  dataSource={equipped}
-			  renderItem={(item, idx) => (
-				<List.Item>
-				  <div onClick={() => console.log("equipped")}>
-					<Card hoverable bordered title={item.name}>
-					  <img style={{ width: 100 }} src={item.image} />
-					</Card>
-				  </div>
-				</List.Item>
-			  )}
-			/> */}
-                {!alienWon && (
-                  <Button type={"primary"} onClick={() => fightAlien()}>
-                    Fight Alien
-                  </Button>
-                )}
-              </div>
+              <>{equippedWindow}
+                <div>
+                  {!alienWon && (
+                    <Button type={"primary"} onClick={() => fightAlien()}>
+                      Fight Alien
+                    </Button>
+                  )}
+                </div>
+              </>
             )}
             {alienWon && (
               <Text mark>
