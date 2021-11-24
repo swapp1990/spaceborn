@@ -20,7 +20,7 @@ import {
   Modal,
 } from "antd";
 
-export default function CreatePlayer({ address, tx, readContracts, writeContracts }) {
+export default function CreatePlayer({ address, tx, contracts }) {
   const [ownedNfts, setOwnedNfts] = useState([]);
   const [balanceTokens, setBalanceTokens] = useState(0);
   const [playerInfo, setplayerInfo] = useState();
@@ -88,19 +88,19 @@ export default function CreatePlayer({ address, tx, readContracts, writeContract
     playerInfoNew.name = playerInfo.name;
     // playerInfoNew.pfp_name = selectedPfp.name;
     // playerInfoNew.pfp_url = selectedPfp.pfp_url;
-    await tx(writeContracts.Player.mint(playerInfoNew)),
+    await tx(contracts.Player.mint(playerInfoNew)),
       update => {
         console.log({ update });
       };
   }
 
   const loadOwnedNFTs = async () => {
-    const balance = await readContracts.BadKidsAlley.balanceOf(address);
+    const balance = await contracts.BadKidsAlley.balanceOf(address);
     console.log(balance.toNumber());
     setBalanceTokens(balance.toNumber());
     let nfts = [];
     for (let i = 0; i < balance; i++) {
-      const tokenUri = await readContracts.BadKidsAlley.tokenURI(i);
+      const tokenUri = await contracts.BadKidsAlley.tokenURI(i);
       let result = await getMetadataFromTokenUri(tokenUri);
       console.log(result);
       let imgSrc = await getImgFromToken(result);

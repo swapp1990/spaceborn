@@ -109,16 +109,22 @@ const web3Modal = new Web3Modal({
 
 const targetNetwork = NETWORKS.localhost;
 const NETWORKCHECK = true;
+let chainId = null;
+const blockExplorer = targetNetwork.blockExplorer;
 
 let localProvider = null;
-if (targetNetwork.name == "localhost") {
-    //Local provider
+async function setChainid() {
     const localProviderUrl = targetNetwork.rpcUrl;
     const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
     localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
+    await localProvider.getNetwork();
+    chainId = localProvider && localProvider._network && localProvider._network.chainId;
 }
-const blockExplorer = targetNetwork.blockExplorer;
-const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
+console.log(targetNetwork.name)
+if (targetNetwork.name == "localhost") {
+    //Local provider
+    setChainid();
+}
 
 const mainnetInfura = navigator.onLine
     ? new ethers.providers.StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
@@ -128,18 +134,19 @@ function App(props) {
     const [route, setRoute] = useState();
     //Wallet provider
     const [injectedProvider, setInjectedProvider] = useState(null);
+    const [provider, setProvider] = useState(localProvider);
     const [address, setAddress] = useState();
     const [faucetClicked, setFaucetClicked] = useState(false);
+    const [networkSelected, setNetworkSelected] = useState();
 
     //Load contracts and signer
     const mainnetProvider = mainnetInfura;
     const userSigner = useUserSigner(injectedProvider, localProvider);
-    const readContracts = useContractLoader(localProvider);
-    const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
+    const contracts = useContractLoader(userSigner, { chainId: chainId });
+    // const contracts = useContractLoader(localProvider);
     const gasPrice = useGasPrice(targetNetwork, "fast");
     const price = useExchangePrice(targetNetwork, mainnetProvider);
     const tx = Transactor(userSigner, gasPrice);
-    const faucetTx = Transactor(localProvider, gasPrice);
 
     ///////////////////// Effects
     useEffect(() => {
@@ -151,28 +158,46 @@ function App(props) {
     }, [setRoute]);
 
     useEffect(() => {
-        async function getAddress() {
+        async function getNetwork() {
             if (userSigner) {
+                if (targetNetwork.name != "localhost") {
+                    chainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+                    console.log(chainId);
+                }
+                // const network = await userSigner.provider.getNetwork()
+                // console.log(network);
                 const newAddress = await userSigner.getAddress();
                 setAddress(newAddress);
-                console.log({ newAddress })
+                // console.log({ newAddress });
+                setNetworkSelected(NETWORK(chainId));
             }
         }
-        getAddress();
+        getNetwork();
     }, [userSigner]);
+
+    useEffect(() => {
+        if (injectedProvider) {
+            // console.log(injectedProvider.network);
+            setProvider(injectedProvider);
+        }
+    }, [injectedProvider])
 
     ///////////////////// Functions
     const loadWeb3Modal = useCallback(async () => {
         console.log("loadWeb3Modal")
-        // const provider = await web3Modal.connect();
+        const provider = await web3Modal.connect();
+        setInjectedProvider(new ethers.providers.Web3Provider(provider));
+        provider.on("chainChanged", chainId => {
+            console.log(`chain changed to ${chainId}! updating providers`);
+            setInjectedProvider(new ethers.providers.Web3Provider(provider));
+        });
     }, [setInjectedProvider]);
 
     function init() {
-        loadWeb3Modal();
+        if (targetNetwork.name != "localhost") {
+            loadWeb3Modal();
+        }
     }
-    // const loadWeb3Modal = useCallback(async () => {
-    //     console.log("loadWeb3Modal");
-    // }, [setInjectedProvider]);
 
     //////////////////// Global context
     const initialState = {
@@ -203,33 +228,79 @@ function App(props) {
     }, [state, dispatch]);
 
     ////////////////////////// Methods
-    function getDisplay() {
-
+    async function switchNetwork() {
+        try {
+            const ethereum = window.ethereum;
+            let chainId = "0x" + targetNetwork.chainId.toString(16);
+            await ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: chainId }],
+            });
+        } catch (switchError) {
+            // This error code indicates that the chain has not been added to MetaMask.
+            if (switchError.code === 4902) {
+                try {
+                    await ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{ chainId: chainId, rpcUrl: 'https://...' }],
+                    });
+                } catch (addError) {
+                    // handle "add" error
+                }
+            }
+        }
     }
 
     ////////////////////////// Render
-    let networkDisplay = (
-        <div style={{ zIndex: 0, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
-            {targetNetwork.name}
-        </div>
-    );
+    let networkDisplay = "";
+    // console.log({ chainId })
+    if (chainId !== targetNetwork.chainId) {
+        networkDisplay = (
+            <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+                <Alert
+                    message="⚠️ Wrong Network"
+                    description={
+                        <div>
+                            You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
+                            <Button
+                                onClick={() => switchNetwork()}>
+                                <b>{targetNetwork && targetNetwork.name}</b>
+                            </Button>
+                        </div>
+                    }
+                    type="error"
+                    closable={false}
+                />
+            </div>);
+    } else {
+        networkDisplay = (
+            <div style={{ zIndex: 0, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
+                {targetNetwork.name}
+            </div>
+        );
+    }
 
-    let faucetHint = (
-        <div style={{ padding: 16 }}>
-            <Button
-                type="primary"
-                onClick={() => {
-                    faucetTx({
-                        to: address,
-                        value: ethers.utils.parseEther("1"),
-                    });
-                    setFaucetClicked(true);
-                }}
-            >
-                💰 Grab funds from the faucet ⛽️
-            </Button>
-        </div>
-    );
+    let faucetHint = "";
+    const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
+    if (faucetAvailable) {
+        const faucetTx = Transactor(localProvider, gasPrice);
+        faucetHint = (
+            <div style={{ padding: 16 }}>
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        faucetTx({
+                            to: address,
+                            value: ethers.utils.parseEther("1"),
+                        });
+                        setFaucetClicked(true);
+                    }}
+                >
+                    💰 Grab funds from the faucet ⛽️
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <GContext.Provider value={contextValue}>
@@ -251,16 +322,17 @@ function App(props) {
                     </Menu>
                     <Switch>
                         <Route exact path="/app">
-                            <MVPUI address={address} localProvider={localProvider} tx={tx} writeContracts={writeContracts} readContracts={readContracts} price={price} context={GContext} />
+                            <MVPUI address={address} provider={provider} tx={tx} contracts={contracts} price={price} context={GContext} />
                         </Route>
                     </Switch>
                 </BrowserRouter>
                 <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
                     <Account
                         address={address}
-                        localProvider={localProvider}
+                        provider={provider}
                         mainnetProvider={mainnetProvider}
                         blockExplorer={blockExplorer}
+                        price={price}
                     />
                     {faucetHint}
                 </div>

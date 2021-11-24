@@ -59,30 +59,30 @@ const GEARS = {
     "Food Replacement"]
 }
 
-export default function WalletWindow({ address, tx, readContracts, writeContracts, localProvider, context }) {
+export default function WalletWindow({ address, tx, contracts, provider, context }) {
   //Global state
   const { state, dispatch } = useContext(context);
   const [walletLoot, setWalletLoot] = useState([]);
 
   useEffect(async () => {
-    if (readContracts && readContracts.Gears) {
+    if (contracts && contracts.Gears) {
       init();
     }
-  }, [readContracts, address]);
+  }, [contracts, address]);
 
   const init = async () => {
     updateWallet();
-    if (readContracts && readContracts.Gears) {
+    if (contracts && contracts.Gears) {
       addEventListener("Gears", "GearDropped", onGearDropped);
     }
   };
 
   const addEventListener = async (contractName, eventName, callback) => {
-    await readContracts[contractName].removeListener(eventName);
-    readContracts[contractName].on(eventName, (...args) => {
+    await contracts[contractName].removeListener(eventName);
+    contracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      //   console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
-      if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
+      //   console.log(eventName, eventBlockNum, provider._lastBlockNumber);
+      if (eventBlockNum >= provider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
       }
@@ -94,7 +94,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
   }
 
   const claimFree = async () => {
-    const result = await tx(writeContracts.GameManager.claimRandomGear(), update => {
+    const result = await tx(contracts.GameManager.claimRandomGear(), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("claimed gear");
       }
@@ -102,7 +102,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
   };
 
   async function getSvgJson(tokenId) {
-    let tokenUri = await readContracts.Gears.tokenURI(tokenId);
+    let tokenUri = await contracts.Gears.tokenURI(tokenId);
     const base64_data = tokenUri.split("base64,")[1];
     const decoded_str = svgUtils.atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
@@ -111,7 +111,7 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
   }
 
   async function updateWallet() {
-    const balanceLoot = await readContracts.Gears.balanceOf(address);
+    const balanceLoot = await contracts.Gears.balanceOf(address);
     console.log({ balanceLoot: balanceLoot.toNumber() });
     if (balanceLoot.toNumber() == walletLoot.length) {
       console.log("wallet is updated!");
@@ -120,8 +120,8 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
     const walletLootUpdate = [];
     for (let tokenIndex = 0; tokenIndex < balanceLoot; tokenIndex++) {
       try {
-        const tokenId = await readContracts.Gears.tokenOfOwnerByIndex(address, tokenIndex);
-        const gearObj = await readContracts.Gears.gears(tokenId);
+        const tokenId = await contracts.Gears.tokenOfOwnerByIndex(address, tokenIndex);
+        const gearObj = await contracts.Gears.gears(tokenId);
         console.log({ gearObj });
         if (gearObj.playerWonAddr == address) {
           let gearJsObj = {};

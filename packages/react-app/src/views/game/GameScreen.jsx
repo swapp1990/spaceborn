@@ -22,7 +22,7 @@ import {
 import * as svgUtils from "../../helpers/svgUtils";
 
 const { Text, Link, Title } = Typography;
-export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider, context }) {
+export default function GameScreen({ address, tx, contracts, provider, context }) {
   //Global use context
   const { state, dispatch } = useContext(context);
 
@@ -46,18 +46,18 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   const [gameActionMsg, setgameActionMsg] = useState("");
 
   useEffect(() => {
-    if (readContracts && readContracts.Alien) {
+    if (contracts && contracts.Alien) {
       console.log("init");
       init();
     }
-    if (readContracts && readContracts.GameManager) {
+    if (contracts && contracts.GameManager) {
       addEventListener("GameManager", "PlayerWon", onPlayerWon);
       addEventListener("GameManager", "AlienWon", onAlienWon);
     }
-    if (readContracts && readContracts.Gears) {
+    if (contracts && contracts.Gears) {
       addEventListener("Gears", "GearDropped", onGearDropped);
     }
-  }, [readContracts, address]);
+  }, [contracts, address]);
 
   useEffect(() => {
     // console.log({ state });
@@ -69,11 +69,11 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
 
 
   const addEventListener = async (contractName, eventName, callback) => {
-    await readContracts[contractName].removeListener(eventName);
-    readContracts[contractName].on(eventName, (...args) => {
+    await contracts[contractName].removeListener(eventName);
+    contracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      // console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
-      if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
+      console.log(eventName, eventBlockNum, provider._lastBlockNumber);
+      if (eventBlockNum >= provider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
       }
@@ -101,19 +101,19 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   }
 
   async function updatePlayerState() {
-    const tokenId = await readContracts.Player.getTokenId(address);
+    const tokenId = await contracts.Player.getTokenId(address);
     if (tokenId.toNumber() == 0) {
       console.log("tokenId is not set");
       return;
     }
-    // console.log({ tokenId: tokenId.toNumber() });
-    const player = await readContracts.Player.getPlayer(tokenId);
+    console.log({ tokenId: tokenId.toNumber() });
+    const player = await contracts.Player.getPlayer(tokenId);
     // console.log(player);
     setPlayerState({ ...player });
   }
 
   async function getSvgImg(tokenId) {
-    let tokenUri = await readContracts.Alien.tokenURI(tokenId);
+    let tokenUri = await contracts.Alien.tokenURI(tokenId);
     const base64_data = tokenUri.split("base64,")[1];
     const decoded_str = svgUtils.atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
@@ -122,7 +122,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   }
 
   async function updateGameScreen() {
-    const aliensMinted = await readContracts.Alien.lastTokenId();
+    const aliensMinted = await contracts.Alien.lastTokenId();
     console.log({ aliensMinted });
     // console.log({ playerState });
     if (!playerState) return;
@@ -135,7 +135,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     const aliensUpdate = [];
     const deadaliensUpdate = [];
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
-      const alien = await readContracts.Alien.aliens(tokenId);
+      const alien = await contracts.Alien.aliens(tokenId);
       if (alien.roundId == joinedRoundId) {
         if (!alien.isDead) {
           let svgImg = await getSvgImg(tokenId);
@@ -151,7 +151,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
 
   //contract action
   async function joinGame(roundId) {
-    const result = await tx(writeContracts.Player.joinGame(roundId), update => {
+    const result = await tx(contracts.Player.joinGame(roundId), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("Player joined game");
         updatePlayerState();
@@ -160,7 +160,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   }
 
   async function leaveGame(roundId) {
-    const result = await tx(writeContracts.Player.leaveGame(), update => {
+    const result = await tx(contracts.Player.leaveGame(), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("Player left game");
         updatePlayerState();
@@ -169,7 +169,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   }
 
   async function huntMore() {
-    // const result = await tx(writeContracts.Alien.hunt());
+    // const result = await tx(contracts.Alien.hunt());
     // console.log(namesJson);
     var randomNamesIdxList = [];
     var maxNum = 5;
@@ -187,7 +187,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       return Math.floor((i / namesJson.data.length) * 100);
     });
     // console.log(randomBaseProbs);
-    const result = await tx(writeContracts.Alien.mintMultipleAliens(pickedNames, randomBaseProbs));
+    const result = await tx(contracts.Alien.mintMultipleAliens(pickedNames, randomBaseProbs));
   }
 
   function alienChosen(idx) {
@@ -213,7 +213,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     const clientRandom = Math.floor(Math.random() * 100);
     const foundGears = state.equippedGears.filter(e => e.id != -1).map(i => i.usedGear);
     console.log({ foundGears });
-    const result = await tx(writeContracts.GameManager.fightAlien(alienSelected.id, clientRandom, foundGears), update => {
+    const result = await tx(contracts.GameManager.fightAlien(alienSelected.id, clientRandom, foundGears), update => {
       if (update) {
         if (update.status === "confirmed" || update.status === 1) {
           console.log("fightAlien success");
@@ -247,7 +247,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       console.log("No alien selected!");
       return;
     }
-    const result = await tx(writeContracts.ScifiLoot.mintLoot(alienSelected.id));
+    const result = await tx(contracts.ScifiLoot.mintLoot(alienSelected.id));
     console.log(result);
   }
 
