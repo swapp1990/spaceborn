@@ -20,14 +20,14 @@ import {
   Modal,
 } from "antd";
 const { Text, Link, Title } = Typography;
-export default function PlayerWindow({ address, tx, readContracts, writeContracts, playerNft }) {
+export default function PlayerWindow({ address, tx, contracts, playerNft }) {
 
   useEffect(async () => {
-    if (readContracts && readContracts.Player) {
+    if (contracts && contracts.Player) {
       init();
       // console.log("init");
     }
-  }, [readContracts, address]);
+  }, [contracts, address]);
 
   const init = async () => {
     // updateProfile();

@@ -23,6 +23,7 @@ const useUserSigner = (injectedProvider, localProvider) => {
   const burnerSigner = useBurnerSigner(localProvider);
 
   useMemo(() => {
+    console.log({ injectedProvider })
     if (injectedProvider) {
       console.log("🦊 Using injected provider");
       const injectedSigner = injectedProvider._isProvider ? injectedProvider.getSigner() : injectedProvider;

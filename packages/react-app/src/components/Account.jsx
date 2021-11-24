@@ -42,13 +42,12 @@ import Wallet from "./Wallet";
 export default function Account({
   address,
   userSigner,
-  localProvider,
+  provider,
   mainnetProvider,
   blockExplorer,
   price
 }) {
   const modalButtons = [];
-
 
   const display =
     <span>
@@ -57,7 +56,7 @@ export default function Account({
       ) : (
         "Connecting..."
       )}
-      <Balance address={address} provider={localProvider} price={price} />
+      <Balance address={address} provider={provider} price={price} />
 
       {/* <Wallet
         address={address}
