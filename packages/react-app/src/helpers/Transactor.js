@@ -28,7 +28,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         network = await providerOrSigner.getNetwork();
       }
 
-      console.log("network", network);
+      // console.log("network", network);
 
       var options = null;
       var notify = null;
@@ -114,7 +114,12 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
         if (typeof result.wait === "function") {
           const receipt = await result.wait();
-          console.log({ receipt });
+          // console.log({ receipt });
+          if (receipt.events) {
+            if (callback) {
+              callback({ "events": receipt.events });
+            }
+          }
         }
 
         return result;

@@ -22,6 +22,8 @@ contract Alien is ERC721, Ownable {
         uint256 catIdx;
         bool exists;
         bool isDead;
+        uint256 roundId;
+        uint256 dropGearRarity;
     }
 
     mapping(uint256 => Alien) public aliens;
@@ -41,7 +43,9 @@ contract Alien is ERC721, Ownable {
 
     function mintMultipleAliens(
         string[] memory names,
-        uint256[] memory baseProbs
+        uint256[] memory baseProbs,
+        uint256[] memory dropGearRarity,
+        uint256 roundId
     ) public {
         for (uint256 i = 0; i < names.length; i++) {
             uint256 id = _tokenIds.current();
@@ -52,6 +56,8 @@ contract Alien is ERC721, Ownable {
             alien.tokenId = id;
             alien.name = names[i];
             alien.baseProb = baseProbs[i];
+            alien.dropGearRarity = dropGearRarity[i];
+            alien.roundId = roundId;
             uint256 alienCatIdx = rand % categories.length;
             alien.catIdx = alienCatIdx;
             alien.exists = true;
@@ -65,6 +71,10 @@ contract Alien is ERC721, Ownable {
 
     function getAlienBaseProb(uint256 tokenId) public view returns (uint256) {
         return aliens[tokenId].baseProb;
+    }
+
+    function getAlienGearRarity(uint256 tokenId) public view returns (uint256) {
+        return aliens[tokenId].dropGearRarity;
     }
 
     function getAlienCatIdx(uint256 tokenId) public view returns (uint256) {

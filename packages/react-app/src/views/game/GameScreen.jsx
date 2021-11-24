@@ -25,7 +25,9 @@ const { Text, Link, Title } = Typography;
 export default function GameScreen({ address, tx, readContracts, writeContracts, localProvider, context }) {
   //Global use context
   const { state, dispatch } = useContext(context);
+
   const [canMint, setCanMint] = useState(null);
+  const [roundId, setRoundId] = useState();
   const [disableHuntMore, setDisableHuntMore] = useState(false);
 
   const [playerState, setPlayerState] = useState();
@@ -39,7 +41,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   const [alienWon, setAlienWon] = useState(false);
   const [playerLostLoot, setPlayerLostLoot] = useState(false);
 
-  const [equipped, setEquipped] = useState([]);
+  // const [equipped, setEquipped] = useState([]);
 
   const [gameActionMsg, setgameActionMsg] = useState("");
 
@@ -57,11 +59,20 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     }
   }, [readContracts, address]);
 
+  useEffect(() => {
+    // console.log({ state });
+  }, [state])
+
+  useEffect(() => {
+    updateGameScreen();
+  }, [playerState])
+
+
   const addEventListener = async (contractName, eventName, callback) => {
     await readContracts[contractName].removeListener(eventName);
     readContracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
+      // console.log(eventName, eventBlockNum, localProvider._lastBlockNumber);
       if (eventBlockNum >= localProvider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
@@ -72,22 +83,21 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   const init = async () => {
     initEmptyEquip();
     updatePlayerState();
-    updateGameScreen();
   };
 
   async function onPlayerWon(msg) {
-    console.log({ onPlayerWon: msg });
-    setgameActionMsg("Player Won");
-    updateGameScreen();
+    // console.log({ onPlayerWon: msg });
+    // setgameActionMsg("Player Won");
+    // updateGameScreen();
   }
 
   async function onAlienWon(msg) {
-    console.log({ onAlienWon: msg });
-    setgameActionMsg("Alein Won");
+    // console.log({ onAlienWon: msg });
+    // setgameActionMsg("Alein Won");
   }
 
   async function onGearDropped(msg) {
-    console.log({ onGearDropped: msg });
+    // console.log({ onGearDropped: msg });
   }
 
   async function updatePlayerState() {
@@ -96,9 +106,9 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       console.log("tokenId is not set");
       return;
     }
-    console.log({ tokenId: tokenId.toNumber() });
+    // console.log({ tokenId: tokenId.toNumber() });
     const player = await readContracts.Player.getPlayer(tokenId);
-    console.log(player);
+    // console.log(player);
     setPlayerState({ ...player });
   }
 
@@ -114,15 +124,25 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   async function updateGameScreen() {
     const aliensMinted = await readContracts.Alien.lastTokenId();
     console.log({ aliensMinted });
+    // console.log({ playerState });
+    if (!playerState) return;
+    if (playerState.joined == false) {
+      setAliens([]);
+      setdeadAliens([]);
+      return;
+    }
+    let joinedRoundId = playerState.joinedRoundId.toNumber();
     const aliensUpdate = [];
     const deadaliensUpdate = [];
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
       const alien = await readContracts.Alien.aliens(tokenId);
-      if (!alien.isDead) {
-        let svgImg = await getSvgImg(tokenId);
-        aliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb, image: svgImg });
-      } else {
-        deadaliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
+      if (alien.roundId == joinedRoundId) {
+        if (!alien.isDead) {
+          let svgImg = await getSvgImg(tokenId);
+          aliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb, image: svgImg });
+        } else {
+          deadaliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
+        }
       }
     }
     setAliens(aliensUpdate);
@@ -130,10 +150,19 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   }
 
   //contract action
-  async function joinGame() {
-    const result = await tx(writeContracts.Player.joinGame(), update => {
+  async function joinGame(roundId) {
+    const result = await tx(writeContracts.Player.joinGame(roundId), update => {
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("Player joined game");
+        updatePlayerState();
+      }
+    });
+  }
+
+  async function leaveGame(roundId) {
+    const result = await tx(writeContracts.Player.leaveGame(), update => {
+      if (update && (update.status === "confirmed" || update.status === 1)) {
+        console.log("Player left game");
         updatePlayerState();
       }
     });
@@ -182,12 +211,24 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
   async function fightAlien() {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
-    console.log({ equipped });
-    const foundGears = equipped.filter(e => e.id != -1).map(i => i.usedGear);
+    const foundGears = state.equippedGears.filter(e => e.id != -1).map(i => i.usedGear);
     console.log({ foundGears });
     const result = await tx(writeContracts.GameManager.fightAlien(alienSelected.id, clientRandom, foundGears), update => {
-      if (update && (update.status === "confirmed" || update.status === 1)) {
-        console.log("fightAlien success");
+      if (update) {
+        if (update.status === "confirmed" || update.status === 1) {
+          console.log("fightAlien success");
+        }
+        if (update.events) {
+          console.log({ "event": update.events[0] });
+          let eventInfo = update.events[0];
+          if (eventInfo.event == "AlienWon") {
+            const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
+            setgameActionMsg(txt);
+          } else if (eventInfo.event == "PlayerWon") {
+            const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
+            setgameActionMsg(txt);
+          }
+        }
       }
     });
   }
@@ -197,36 +238,8 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
     emptyEquipped.push({ id: -1, name: "Select from wallet" });
     emptyEquipped.push({ id: -1, name: "Select from wallet" });
     emptyEquipped.push({ id: -1, name: "Select from wallet" });
-    setEquipped(emptyEquipped);
-  }
-
-  async function walletGearClicked(item) {
-    console.log("walletGearClicked ", item);
-    let equippedFound = equipped.find(loot => loot.id == item.id);
-    if (equippedFound) {
-      console.log("equippedFound");
-      let selEquippedSlotIdx = equipped.findIndex(loot => loot.id === item.id);
-      // console.log({ selEquippedSlotIdx });
-      let newState = [...equipped];
-      newState[selEquippedSlotIdx].id = -1;
-      newState[selEquippedSlotIdx].name = "Select from wallet";
-      newState[selEquippedSlotIdx].image = null;
-      setEquipped(newState);
-    } else {
-      let newState = [...equipped];
-      let walletLootFound = walletGears.find(loot => loot.id == item.id);
-      let emptySlotIdx = equipped.findIndex(loot => loot.id === -1);
-      console.log({ emptySlotIdx });
-      if (walletLootFound) {
-        newState[emptySlotIdx].id = walletLootFound.id;
-        newState[emptySlotIdx].name = walletLootFound.name;
-        newState[emptySlotIdx].image = walletLootFound.image;
-        newState[emptySlotIdx].usedGear = walletLootFound.usedGear;
-        // newState[emptySlotIdx] = walletLootFound;
-        // console.log({ newState });
-        setEquipped(newState);
-      }
-    }
+    // setEquipped(emptyEquipped);
+    dispatch({ type: "setEquippedGears", payload: emptyEquipped, fieldName: "equippedGears" })
   }
 
   async function mintLoot() {
@@ -301,7 +314,7 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       </div>
       <List
         grid={{ gutter: 16, column: 3 }}
-        dataSource={equipped}
+        dataSource={state.equippedGears}
         renderItem={(item, idx) => (
           <List.Item>
             <div onClick={() => console.log("equipped")}>
@@ -317,6 +330,9 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
 
   const combatWindow = (
     <>
+      <Button type={"primary"} onClick={() => leaveGame()}>
+        Leave Game
+      </Button>
       {!canMint && (
         <Card
           title="Which alien do you choose to fight?"
@@ -332,8 +348,6 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
           </div>
           <Divider />
           {aliensToFight}
-          <Divider />
-          {/* {deadAlienView} */}
           <Divider />
           <div style={{ marginTop: 16 }}>
             {alienSelected && (
@@ -354,6 +368,8 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
             )}
             <div>{playerLostLoot && <Text mark>Sorry you lost your NFT loot to the alien!</Text>}</div>
           </div>
+          <Divider />
+          {deadAlienView}
         </Card>
       )}
     </>
@@ -364,9 +380,17 @@ export default function GameScreen({ address, tx, readContracts, writeContracts,
       <div style={{ maxWidth: 820, margin: "auto", paddingBottom: 32 }}>
         {playerState && playerState.joined && combatWindow}
         {playerState && !playerState.joined && (
-          <Button type={"primary"} onClick={() => joinGame()}>
-            Join Game
-          </Button>
+          <Space>
+            <Button type={"primary"} onClick={() => joinGame(1)}>
+              Join Game: ROUND 1
+            </Button>
+            <Button type={"primary"} onClick={() => joinGame(2)}>
+              Join Game: ROUND 2
+            </Button>
+            <Button type={"primary"} onClick={() => joinGame(3)}>
+              Join Game: ROUND 3
+            </Button>
+          </Space>
         )}
       </div>
     </Card>

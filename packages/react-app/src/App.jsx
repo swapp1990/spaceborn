@@ -176,11 +176,18 @@ function App(props) {
 
     //////////////////// Global context
     const initialState = {
-        name: "Test"
+        name: "Test",
+        equippedGears: []
     }
     function globalReducer(state, action) {
         switch (action.type) {
             case 'setName': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setEquippedGears': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload

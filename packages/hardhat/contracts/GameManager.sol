@@ -247,11 +247,9 @@ contract GameManager {
             alienContract.getAlienCatIdx(alien_id)
         );
         if (rand100 > finalProb) {
-            // alienContract.setAlienDead(alien_id);
+            alienContract.setAlienDead(alien_id);
             emit PlayerWon(0, finalProb, msg.sender);
-            uint256 rarity = getGearRarity(
-                alienContract.getAlienBaseProb(alien_id)
-            );
+            uint256 rarity = alienContract.getAlienGearRarity(alien_id);
             gearsContract.dropGear(
                 alienContract.getAlienName(alien_id),
                 rarity,
@@ -260,27 +258,6 @@ contract GameManager {
         } else {
             emit AlienWon(0, finalProb, msg.sender);
         }
-
-        // uint256 rand100 = getRandom(clientRandom);
-        // uint256 finalProb = getFinalProbs(
-        //     alienContract.getAlienBaseProb(alien_id),
-        //     usedGears,
-        //     0
-        // );
-        // if (rand100 > finalProb) {
-        //     alienContract.setAlienDead(alien_id);
-        //     emit PlayerWon(alien_id, finalProb, msg.sender);
-        //     uint256 rarity = getGearRarity(
-        //         alienContract.getAlienBaseProb(alien_id)
-        //     );
-        //     gearsContract.dropGear(
-        //         alienContract.getAlienName(alien_id),
-        //         rarity,
-        //         msg.sender
-        //     );
-        // } else {
-        //     emit AlienWon(alien_id, finalProb, msg.sender);
-        // }
     }
 
     function fightAlienTest(

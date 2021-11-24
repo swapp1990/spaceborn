@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -22,7 +22,46 @@ import {
 import * as svgUtils from "../../helpers/svgUtils";
 
 const { Text, Link, Title } = Typography;
-export default function WalletWindow({ address, tx, readContracts, writeContracts, localProvider }) {
+
+const GEAR_CATS = ["Weapon",
+  "Apparel",
+  "Vehicle",
+  "Pill",
+  "Gizmo"];
+
+const GEARS = {
+  "Weapon": ["Pistol",
+    "Cannon",
+    "Phaser",
+    "Sniper",
+    "Zapper"],
+  "Apparel": ["Exosuit",
+    "Power Armor",
+    "Biosuit",
+    "Gloves",
+    "Nnaosuit",
+    "Jacket"],
+  "Vehicle": ["Hoverboard",
+    "Superbike",
+    "Air-ship",
+    "Time Machine",
+    "Auto-Car",
+    "Hushicopter"],
+  "Gizmo": ["Neutralizer",
+    "Replicator",
+    "Battery",
+    "Fuel Canister",
+    "Supercomputer"],
+  "Pill": ["Soma",
+    "Nootropic",
+    "LSX",
+    "Regeneration",
+    "Food Replacement"]
+}
+
+export default function WalletWindow({ address, tx, readContracts, writeContracts, localProvider, context }) {
+  //Global state
+  const { state, dispatch } = useContext(context);
   const [walletLoot, setWalletLoot] = useState([]);
 
   useEffect(async () => {
@@ -62,13 +101,13 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
     });
   };
 
-  async function getSvgImg(tokenId) {
+  async function getSvgJson(tokenId) {
     let tokenUri = await readContracts.Gears.tokenURI(tokenId);
     const base64_data = tokenUri.split("base64,")[1];
     const decoded_str = svgUtils.atob(base64_data);
     const decoded_json = JSON.parse(decoded_str);
     // console.log(decoded_json);
-    return decoded_json.image;
+    return decoded_json;
   }
 
   async function updateWallet() {
@@ -89,8 +128,9 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
           gearJsObj.note = gearObj.name;
           gearJsObj.rarity = gearObj.rarity.toNumber();
           gearJsObj.tokenId = gearObj.tokenId.toNumber();
-          let svgImg = await getSvgImg(gearJsObj.tokenId);
-          gearJsObj.image = svgImg;
+          let svgJson = await getSvgJson(gearJsObj.tokenId);
+          // gearJsObj.image = svgJson.image;
+          gearJsObj.gearJson = svgJson;
           // console.log(svgImg);
           walletLootUpdate.push(gearJsObj);
         }
@@ -105,14 +145,46 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
 
   async function walletGearClicked(item) {
     console.log("walletGearClicked ", item);
+    let equippedFound = state.equippedGears.find(loot => loot.id == item.tokenId);
+    // console.log({ equippedFound });
+    if (equippedFound) {
+      let selEquippedSlotIdx = state.equippedGears.findIndex(loot => loot.id === item.tokenId);
+      // console.log({ selEquippedSlotIdx });
+      let newState = [...state.equippedGears];
+      newState[selEquippedSlotIdx].id = -1;
+      newState[selEquippedSlotIdx].name = "Select from wallet";
+      newState[selEquippedSlotIdx].image = null;
+      dispatch({ type: "setEquippedGears", payload: newState, fieldName: "equippedGears" })
+    } else {
+      let newState = [...state.equippedGears];
+      let emptySlotIdx = state.equippedGears.findIndex(loot => loot.id === -1);
+      // console.log({ emptySlotIdx });
+      if (emptySlotIdx == -1) {
+        return;
+      }
+      let walletLootFound = walletLoot.find(loot => loot.tokenId == item.tokenId);
+      // console.log({ walletLootFound })
+      if (walletLootFound) {
+        newState[emptySlotIdx].id = walletLootFound.tokenId;
+        newState[emptySlotIdx].name = walletLootFound.note;
+        newState[emptySlotIdx].image = walletLootFound.gearJson.image;
+        const gearCatIdx = GEAR_CATS.indexOf(walletLootFound.gearJson.category);
+        const gearIdx = GEARS[walletLootFound.gearJson.category].indexOf(walletLootFound.gearJson.item);
+        newState[emptySlotIdx].usedGear = {
+          rarityIdx: parseInt(walletLootFound.gearJson.rarityLevel), catIdx: gearCatIdx, gearIdx: gearIdx
+        };
+        // console.log({ newState });
+        dispatch({ type: "setEquippedGears", payload: newState, fieldName: "equippedGears" })
+      }
+    }
   }
 
   function getWalletItemBgColor(idx) {
-    // let equippedFound = equipped.find(loot => loot.id == idx);
-    // // console.log({ equippedFound });
-    // if (equippedFound) {
-    //   return { backgroundColor: "lightgreen" };
-    // }
+    let equippedFound = state.equippedGears.find(loot => loot.id == idx);
+    // console.log({ "gears": state.equippedGears }, idx);
+    if (equippedFound) {
+      return { backgroundColor: "lightgreen" };
+    }
     return { backgroundColor: "black" };
   }
 
@@ -132,12 +204,14 @@ export default function WalletWindow({ address, tx, readContracts, writeContract
           style={{ overflowY: "auto", overflowX: "hidden", height: "400px" }}
           renderItem={item => (
             <List.Item>
-              <Card title={item.name} hoverable onClick={() => walletGearClicked(item)} style={getWalletItemBgColor(item.id)}>
-                <div>{item.rarity}</div>
-                <img src={item.image} style={{ width: 150 }}></img>
-                <a href={"https://opensea.io/assets/"} target="_blank">
-                  View on OpenSea
-                </a>
+              <Card title={item.name} hoverable onClick={() => walletGearClicked(item)} style={getWalletItemBgColor(item.tokenId)}>
+                <Space direction="vertical">
+                  <div>{item.tokenId}</div>
+                  <img src={item.gearJson.image} style={{ width: 150 }}></img>
+                  <a href={"https://opensea.io/assets/"} target="_blank">
+                    View on OpenSea
+                  </a>
+                </Space>
               </Card>
             </List.Item>
           )}

@@ -293,6 +293,17 @@ export default function MVPUI({
                 writeContracts={writeContracts}
                 readContracts={readContracts}
                 localProvider={localProvider}
+                context={context}
+              />
+            </Space>
+            <Space>
+              <GameScreen
+                address={address}
+                tx={tx}
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+                localProvider={localProvider}
+                context={context}
               />
             </Space>
           </Space>
@@ -311,16 +322,7 @@ export default function MVPUI({
   //             
 
   //           </Space>
-  //           <Space>
-  //             {/* <GameScreen
-  //                 address={address}
-  //                 tx={tx}
-  //                 writeContracts={writeContracts}
-  //                 readContracts={readContracts}
-  //                 localProvider={localProvider}
-  //                 context={GContext}
-  //               /> */}
-  //           </Space>
+
   //           <Space align="baseline">
   //             {/* <LogsScreen
   //                 address={address}
