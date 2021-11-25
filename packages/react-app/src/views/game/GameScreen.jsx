@@ -108,7 +108,7 @@ export default function GameScreen({ address, tx, contracts, provider, context }
     }
     console.log({ tokenId: tokenId.toNumber() });
     const player = await contracts.Player.getPlayer(tokenId);
-    // console.log(player);
+    console.log(player);
     setPlayerState({ ...player });
   }
 
@@ -152,43 +152,53 @@ export default function GameScreen({ address, tx, contracts, provider, context }
   //contract action
   async function joinGame(roundId) {
     const result = await tx(contracts.Player.joinGame(roundId), update => {
-      if (update && (update.status === "confirmed" || update.status === 1)) {
-        console.log("Player joined game");
-        updatePlayerState();
+      if (update) {
+        if (update.status === "confirmed" || update.status === 1) {
+          console.log("Player joined game");
+        }
+        if (update.events) {
+          console.log({ "event": update.events.length });
+          updatePlayerState();
+        }
       }
     });
   }
 
   async function leaveGame(roundId) {
     const result = await tx(contracts.Player.leaveGame(), update => {
-      if (update && (update.status === "confirmed" || update.status === 1)) {
-        console.log("Player left game");
-        updatePlayerState();
+      if (update) {
+        if (update.status === "confirmed" || update.status === 1) {
+          console.log("Player left game");
+        }
+        if (update.events) {
+          console.log({ "event": update.events.length });
+          updatePlayerState();
+        }
       }
     });
   }
 
-  async function huntMore() {
-    // const result = await tx(contracts.Alien.hunt());
-    // console.log(namesJson);
-    var randomNamesIdxList = [];
-    var maxNum = 5;
-    while (randomNamesIdxList.length < maxNum) {
-      var r = Math.floor(Math.random() * namesJson.data.length) + 1;
-      if (randomNamesIdxList.indexOf(r) === -1) randomNamesIdxList.push(r);
-    }
-    let pickedNames = namesJson.data.filter((name, idx) => {
-      if (randomNamesIdxList.includes(idx)) {
-        return name;
-      }
-    });
-    // console.log(randomNamesIdxList);
-    let randomBaseProbs = randomNamesIdxList.map(i => {
-      return Math.floor((i / namesJson.data.length) * 100);
-    });
-    // console.log(randomBaseProbs);
-    const result = await tx(contracts.Alien.mintMultipleAliens(pickedNames, randomBaseProbs));
-  }
+  // async function huntMore() {
+  //   // const result = await tx(contracts.Alien.hunt());
+  //   // console.log(namesJson);
+  //   var randomNamesIdxList = [];
+  //   var maxNum = 5;
+  //   while (randomNamesIdxList.length < maxNum) {
+  //     var r = Math.floor(Math.random() * namesJson.data.length) + 1;
+  //     if (randomNamesIdxList.indexOf(r) === -1) randomNamesIdxList.push(r);
+  //   }
+  //   let pickedNames = namesJson.data.filter((name, idx) => {
+  //     if (randomNamesIdxList.includes(idx)) {
+  //       return name;
+  //     }
+  //   });
+  //   // console.log(randomNamesIdxList);
+  //   let randomBaseProbs = randomNamesIdxList.map(i => {
+  //     return Math.floor((i / namesJson.data.length) * 100);
+  //   });
+  //   // console.log(randomBaseProbs);
+  //   const result = await tx(contracts.Alien.mintMultipleAliens(pickedNames, randomBaseProbs));
+  // }
 
   function alienChosen(idx) {
     console.log("alienChosen ", idx);

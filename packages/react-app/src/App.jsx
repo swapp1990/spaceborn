@@ -107,7 +107,7 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.localhost;
+const targetNetwork = NETWORKS.kovan;
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -120,7 +120,7 @@ async function setChainid() {
     await localProvider.getNetwork();
     chainId = localProvider && localProvider._network && localProvider._network.chainId;
 }
-console.log(targetNetwork.name)
+console.log("NETWORK: ", targetNetwork.name)
 if (targetNetwork.name == "localhost") {
     //Local provider
     setChainid();
@@ -161,11 +161,10 @@ function App(props) {
         async function getNetwork() {
             if (userSigner) {
                 if (targetNetwork.name != "localhost") {
+                    const network = await userSigner.provider._networkPromise;
                     chainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
                     console.log(chainId);
                 }
-                // const network = await userSigner.provider.getNetwork()
-                // console.log(network);
                 const newAddress = await userSigner.getAddress();
                 setAddress(newAddress);
                 // console.log({ newAddress });
@@ -319,10 +318,29 @@ function App(props) {
                                 Game
                             </Link>
                         </Menu.Item>
+                        <Menu.Item key="/contract">
+                            <Link
+                                onClick={() => {
+                                    setRoute("/contract");
+                                }}
+                                to="/contract"
+                            >
+                                Contract
+                            </Link>
+                        </Menu.Item>
                     </Menu>
                     <Switch>
                         <Route exact path="/app">
                             <MVPUI address={address} provider={provider} tx={tx} contracts={contracts} price={price} context={GContext} />
+                        </Route>
+                        <Route path="/contract">
+                            <Contract
+                                name="Alien"
+                                signer={userSigner}
+                                provider={provider}
+                                address={address}
+                                blockExplorer={blockExplorer}
+                            />
                         </Route>
                     </Switch>
                 </BrowserRouter>

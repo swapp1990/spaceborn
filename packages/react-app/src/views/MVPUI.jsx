@@ -61,7 +61,7 @@ export default function MVPUI({
   // const [randRes, setRandRes] = useState([0, 0, 0]);
 
   useEffect(async () => {
-    console.log("init", state.name);
+    // console.log("init", state.name);
 
   }, []);
   useEffect(async () => {

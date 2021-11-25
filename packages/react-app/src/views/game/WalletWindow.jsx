@@ -98,6 +98,9 @@ export default function WalletWindow({ address, tx, contracts, provider, context
       if (update && (update.status === "confirmed" || update.status === 1)) {
         console.log("claimed gear");
       }
+      if (update.events) {
+        console.log({ "event": update.events[0] });
+      }
     });
   };
 
