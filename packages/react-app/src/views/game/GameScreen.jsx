@@ -72,7 +72,7 @@ export default function GameScreen({ address, tx, contracts, provider, context }
     await contracts[contractName].removeListener(eventName);
     contracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      console.log(eventName, eventBlockNum, provider._lastBlockNumber);
+      // console.log(eventName, eventBlockNum, provider._lastBlockNumber);
       if (eventBlockNum >= provider._lastBlockNumber - 1) {
         let msg = args.pop().args;
         callback(msg);
@@ -229,7 +229,7 @@ export default function GameScreen({ address, tx, contracts, provider, context }
           console.log("fightAlien success");
         }
         if (update.events) {
-          console.log({ "event": update.events[0] });
+          console.log({ "event": update.events });
           let eventInfo = update.events[0];
           if (eventInfo.event == "AlienWon") {
             const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
@@ -238,6 +238,7 @@ export default function GameScreen({ address, tx, contracts, provider, context }
             const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
             setgameActionMsg(txt);
           }
+          updateGameScreen();
         }
       }
     });

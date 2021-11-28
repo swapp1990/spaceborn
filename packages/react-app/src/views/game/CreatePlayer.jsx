@@ -90,7 +90,14 @@ export default function CreatePlayer({ address, tx, contracts }) {
     // playerInfoNew.pfp_url = selectedPfp.pfp_url;
     await tx(contracts.Player.mint(playerInfoNew)),
       update => {
-        console.log({ update });
+        if (update) {
+          if (update.status === "confirmed" || update.status === 1) {
+            console.log("player created");
+          }
+          if (update.events) {
+            console.log({ "event": update.events });
+          }
+        }
       };
   }
 

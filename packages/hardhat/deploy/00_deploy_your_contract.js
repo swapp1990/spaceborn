@@ -13,20 +13,20 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   let alienContract = await ethers.getContract("Alien", deployer);
-  // let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
-  // let baseProbs = [10, 10, 10, 10, 15, 45];
-  // let dropGearRarity = [0, 0, 0, 0, 0, 0];
-  // await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 1);
+  let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin"];
+  let baseProbs = [10, 10, 10, 10, 15, 45];
+  let dropGearRarity = [0, 0, 0, 0, 0, 0];
+  await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 1);
 
-  // names = ["Shila", "Chameli", "Champa", "Pushpa", "Rajji", "Rani"];
-  // baseProbs = [45, 67, 69, 35, 56, 35];
-  // dropGearRarity = [0, 1, 1, 0, 1, 0];
-  // await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 2);
+  names = ["Shila", "Roxanne", "Scarlet", "Paula", "Emma", "Rani"];
+  baseProbs = [45, 67, 69, 35, 56, 35];
+  dropGearRarity = [0, 1, 1, 0, 1, 0];
+  await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 2);
 
-  // names = ["Donald", "Rusfeld", "Anthony", "Alex", "King", "Elon"];
-  // baseProbs = [75, 85, 95, 58, 87, 70];
-  // dropGearRarity = [0, 1, 2, 2, 1, 0];
-  // await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 3);
+  names = ["Donald", "Rumsfeld", "Anthony", "King", "Jeffrey", "Elon"];
+  baseProbs = [75, 85, 95, 58, 87, 70];
+  dropGearRarity = [0, 1, 2, 2, 1, 0];
+  await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 3);
 
   await deploy("Gears", {
     from: deployer,

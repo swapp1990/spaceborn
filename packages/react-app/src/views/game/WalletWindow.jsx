@@ -81,8 +81,8 @@ export default function WalletWindow({ address, tx, contracts, provider, context
     await contracts[contractName].removeListener(eventName);
     contracts[contractName].on(eventName, (...args) => {
       let eventBlockNum = args[args.length - 1].blockNumber;
-      //   console.log(eventName, eventBlockNum, provider._lastBlockNumber);
-      if (eventBlockNum >= provider._lastBlockNumber - 1) {
+      // console.log(eventName, eventBlockNum, provider._lastBlockNumber);
+      if (eventBlockNum >= provider._lastBlockNumber - 10) {
         let msg = args.pop().args;
         callback(msg);
       }
@@ -95,11 +95,14 @@ export default function WalletWindow({ address, tx, contracts, provider, context
 
   const claimFree = async () => {
     const result = await tx(contracts.GameManager.claimRandomGear(), update => {
-      if (update && (update.status === "confirmed" || update.status === 1)) {
-        console.log("claimed gear");
-      }
-      if (update.events) {
-        console.log({ "event": update.events[0] });
+      if (update) {
+        if (update.status === "confirmed" || update.status === 1) {
+          console.log("claimed gear");
+        }
+        if (update.events) {
+          console.log({ "event": update.events });
+          updateWallet();
+        }
       }
     });
   };
@@ -115,7 +118,7 @@ export default function WalletWindow({ address, tx, contracts, provider, context
 
   async function updateWallet() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
-    console.log({ balanceLoot: balanceLoot.toNumber() });
+    // console.log({ "balanceLoot": balanceLoot.toNumber() });
     if (balanceLoot.toNumber() == walletLoot.length) {
       console.log("wallet is updated!");
       return;
@@ -125,7 +128,7 @@ export default function WalletWindow({ address, tx, contracts, provider, context
       try {
         const tokenId = await contracts.Gears.tokenOfOwnerByIndex(address, tokenIndex);
         const gearObj = await contracts.Gears.gears(tokenId);
-        console.log({ gearObj });
+        // console.log({ gearObj });
         if (gearObj.playerWonAddr == address) {
           let gearJsObj = {};
           gearJsObj.note = gearObj.name;
@@ -142,7 +145,7 @@ export default function WalletWindow({ address, tx, contracts, provider, context
         console.log(e);
       }
     }
-    console.log(walletLootUpdate);
+    // console.log(walletLootUpdate);
     setWalletLoot(walletLootUpdate.reverse());
   }
 
