@@ -21,7 +21,7 @@ import {
     useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
+import { WireframeUI, MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -107,7 +107,7 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.localhost;
+const targetNetwork = NETWORKS.kovan;
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -331,7 +331,7 @@ function App(props) {
                     </Menu>
                     <Switch>
                         <Route exact path="/app">
-                            <MVPUI address={address} provider={provider} tx={tx} contracts={contracts} price={price} context={GContext} />
+                            <WireframeUI />
                         </Route>
                         <Route path="/contract">
                             <Contract
