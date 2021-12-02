@@ -4,16 +4,27 @@ import "./game.css";
 import { ReactComponent as Gear1 } from "../../assets/loot1.svg"
 export default function Game() {
     const [stepIdx, setStepIdx] = useState(2);
+    const beginFight = () => {
+        console.log("begin")
+        setStepIdx(3);
+    }
+    const onNewFight = () => {
+        setStepIdx(1);
+    }
+
+    const onAlienSel = () => {
+        setStepIdx(2);
+    }
 
     const step1 = (
         <>
             <div className="main-title">Choose your alien</div>
             <div className="alien-cards">
-                <div className="cardObj"></div>
-                <div className="cardObj"></div>
-                <div className="cardObj"></div>
-                <div className="cardObj"></div>
-                <div className="cardObj"></div>
+                <div className="cardObj" onClick={onAlienSel}></div>
+                <div className="cardObj" onClick={onAlienSel}></div>
+                <div className="cardObj" onClick={onAlienSel}></div>
+                <div className="cardObj" onClick={onAlienSel}></div>
+                <div className="cardObj" onClick={onAlienSel}></div>
             </div>
         </>
     )
@@ -55,6 +66,20 @@ export default function Game() {
                             <div></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </>
+    )
+    const resultScreen = (
+        <>
+            <div className="screen">
+                <div className="result-title">You Won</div>
+                <div className="win-gear">
+                    <div className="gearTitle">Gears Earned</div>
+                    <div className="gearCard"></div>
+                </div>
+                <div className="next-btn" onClick={onNewFight}>
+                    Start a new fight
                 </div>
             </div>
         </>
@@ -105,6 +130,7 @@ export default function Game() {
                 <div className="main-body">
                     {stepIdx == 1 && step1}
                     {stepIdx == 2 && step2}
+                    {stepIdx == 3 && resultScreen}
                 </div>
                 <div className="main-footer">
                     {stepIdx == 1 && (<div className="logmsg">Beginning Battle ...</div>)}
@@ -112,7 +138,7 @@ export default function Game() {
                         <><div className="logmsg">
                             Preparing To Fight ...
                         </div>
-                            <button className="footerBtn">Begin Fight</button></>)}
+                            <button className="footerBtn" onClick={() => beginFight()}>Begin Fight</button></>)}
                 </div>
             </div>
         </div>

@@ -112,7 +112,9 @@
     padding: 10px;
     width: auto;
     height: 20%;
-    background-color:aliceblue;
+    background-color:#C4C4C4;
+
+    display: flex;
 }
 .profileImg img {
     border-radius: 50%;
@@ -304,4 +306,60 @@
     text-align: center;
     text-transform: uppercase;
     color: black;
+}
+.screen {
+    width: 100%;
+    height: 100%;
+    margin: 10px;
+    /* background-color: #FFD630; */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+.result-title {
+    font-size: 65px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 85px;
+    letter-spacing: 0em;
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 30px;
+    color:#298BFE
+}
+.win-gear {
+    height: 50%;
+    /* background-color: #E72D2D; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.gearTitle {
+    font-size: 28px;
+    color: black;
+    line-height: 40px;
+    text-transform: uppercase;
+}
+.gearCard {
+    height: 150px;
+    width: 150px;
+    border: 1px dashed black;
+    border-radius: 10px;
+}
+.next-btn {
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 56px;
+    letter-spacing: 0em;
+    text-align: center;
+    text-transform: uppercase;
+
+    background-color: #76D084;
+    color: black;
+    width: 450px;
+    cursor: pointer;
 }
