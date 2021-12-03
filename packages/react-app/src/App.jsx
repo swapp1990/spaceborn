@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState, useReducer, useMemo } from "re
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
+import GContext from "./GContext";
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -27,8 +28,6 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 
 const { ethers } = require("ethers");
-
-const GContext = React.createContext();
 
 // Coinbase walletLink init
 const walletLink = new WalletLink({
@@ -201,7 +200,7 @@ function App(props) {
     //////////////////// Global context
     const initialState = {
         name: "Test",
-        equippedGears: []
+        gearSlots: []
     }
     function globalReducer(state, action) {
         switch (action.type) {
@@ -211,7 +210,7 @@ function App(props) {
                     [action.fieldName]: action.payload
                 }
             }
-            case 'setEquippedGears': {
+            case 'setGearSlots': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload

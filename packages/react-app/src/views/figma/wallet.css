@@ -1,0 +1,107 @@
+.topMenu {
+    padding: 10px;
+    width: auto;
+    height: 5%;
+    /* background-color: aqua; */
+}
+.profileObj2 {
+    padding: 10px;
+    width: auto;
+    height: 20%;
+    background-color:#C4C4C4;
+    display: flex;
+    align-items: center;
+}
+.profileImg img {
+    border-radius: 50%;
+    width: 100px;
+    padding: 10px;
+}
+.profileInfo {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* background-color: aliceblue; */
+}
+.inventoryObj {
+    padding: 0px;
+    width: auto;
+    height: 75%;
+    /* background-color: aqua; */
+}
+.invTitle {
+    font-weight: 800;
+    font-size: 26px;
+    color: white;
+
+    display: flex;
+    justify-content: flex-start;
+}
+.invColl {
+    padding: 0px;
+    height: 90%;
+    background-color: black;
+}
+.gearWrapper {
+    max-height: 100%;
+    overflow-y: scroll;
+}
+.gearBox {
+    padding: 5px;
+    height: 150px;
+    width: 100%;
+    /* background-color:#C4C4C4; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border: 2px solid white;
+}
+.gearMain {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+.gearSide {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.gearImg {
+    width: 120px;
+    height: 120px;
+    background-color:#C4C4C4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.gearBtn {
+    width: 100px;
+    color: black;
+    cursor: pointer;
+}
+
+.gearSvg {
+    height: 100px;
+    width: 100px;
+}
+.gearIcons {
+    display: flex;
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+.gIcon {
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 25px;
+    background-color:#C4C4C4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
