@@ -22,7 +22,7 @@ import {
     useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { WireframeUI, MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
+import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -200,7 +200,8 @@ function App(props) {
     //////////////////// Global context
     const initialState = {
         name: "Test",
-        gearSlots: []
+        gearSlots: [],
+        alienIdx: -1
     }
     function globalReducer(state, action) {
         switch (action.type) {
@@ -211,6 +212,12 @@ function App(props) {
                 }
             }
             case 'setGearSlots': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setAlienIdx': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload
@@ -330,11 +337,20 @@ function App(props) {
                     </Menu>
                     <Switch>
                         <Route exact path="/app">
-                            <WireframeUI />
+                            {/* <WireframeUI contracts={contracts} /> */}
+                            <MVPUI
+                                address={address}
+                                userSigner={userSigner}
+                                mainnetProvider={mainnetProvider}
+                                provider={provider}
+                                price={price}
+                                tx={tx}
+                                contracts={contracts}
+                            />
                         </Route>
                         <Route path="/contract">
                             <Contract
-                                name="Alien"
+                                name="Gears"
                                 signer={userSigner}
                                 provider={provider}
                                 address={address}

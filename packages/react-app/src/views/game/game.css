@@ -273,7 +273,17 @@
     text-align: center;
     text-transform: uppercase;
     margin-top: 30px;
-    color:#298BFE
+}
+.lost-txt {
+    color: red !important;
+}
+.won-txt {
+    color:#298BFE;
+}
+.alien-info {
+    margin-top: 50px;
+    font-size: 30px;
+    color: black;
 }
 .win-gear {
     height: 50%;
@@ -290,10 +300,10 @@
     text-transform: uppercase;
 }
 .gearCard {
-    /* height: 150px;
-    width: 150px;
+    height: 250px;
+    width: 250px;
     border: 1px dashed black;
-    border-radius: 10px; */
+    border-radius: 10px;
 }
 .next-btn {
     font-size: 36px;
@@ -308,4 +318,8 @@
     color: black;
     width: 450px;
     cursor: pointer;
+}
+.refresh {
+    background-color: #FFD630;
+    color: black;
 }

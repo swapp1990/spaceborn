@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Row, Col, Progress } from 'antd';
+import { Row, Col, Progress, Spin } from 'antd';
 import { Wallet } from "./Wallet";
 
 import "./game.css";
@@ -16,7 +16,7 @@ import replication from "../../assets/replication.png";
 // "Vehicle",
 // "Pill",
 // "Gizmo"
-export default function Game() {
+export default function Game(contracts, address) {
     //Global use context
     const { state, dispatch } = useContext(GContext);
 
@@ -26,7 +26,8 @@ export default function Game() {
     const [totalProbsReduce, setTotalProbsReduce] = useState(0);
     // const [gearSlots, setGearSlots] = useState([]);
 
-    useEffect(() => {
+    //set random aliens ui
+    function uiSetAliens() {
         const aliens = [];
         aliens.push({
             name: "Dave",
@@ -64,14 +65,15 @@ export default function Game() {
             icon2: power
         });
         setRandomAliens(aliens);
-    }, [])
 
-    useEffect(() => {
         const slots = [];
         slots.push({ slotId: -1, type: "empty" });
         slots.push({ slotId: -1, type: "empty" });
         slots.push({ slotId: -1, type: "empty" });
         dispatch({ type: "setGearSlots", payload: slots, fieldName: "gearSlots" });
+    }
+    useEffect(() => {
+        // updateGameScreen();
     }, [])
 
     useEffect(() => {
@@ -92,9 +94,19 @@ export default function Game() {
         }
     }, [state.gearSlots]);
 
+    useEffect(() => {
+        if (contracts && contracts.Alien) {
+            console.log("init");
+            // init();
+        }
+    }, [contracts, address]);
+
     const beginFight = () => {
         // console.log("begin")
         setStepIdx(3);
+        setTimeout(() => {
+            setStepIdx(4);
+        }, 1000);
     }
     const onNewFight = () => {
         setStepIdx(1);
@@ -110,11 +122,17 @@ export default function Game() {
         setStepIdx(stepIdx - 1);
     }
 
-    const whichGearSlot = (gear) => {
+    ///contract functions
+    async function updateGameScreen() {
+        const aliensMinted = await contracts.Alien.lastTokenId();
+        console.log({ aliensMinted });
+    }
+
+    const whichGearSlot = (gear, i) => {
         if (gear.type == "empty") {
-            return emptyGear;
+            return null;
         } else if (gear.type == "set") {
-            return setGear(gear);
+            return setGear(gear, i);
         }
     }
 
@@ -127,9 +145,9 @@ export default function Game() {
         </div>
     )
 
-    const setGear = (gear) => {
+    const setGear = (gear, i) => {
         return (
-            < div className="gear-cardObj" >
+            < div className="gear-cardObj" key={i}>
                 <div className="gear-card">
                     <img src={gear.icon} width="50" height="50" />
                 </div>
@@ -140,8 +158,8 @@ export default function Game() {
         )
     };
 
-    const alienCard = (alien) => {
-        return (<div className="cardObj" onClick={() => onAlienSel(alien)}>
+    const alienCard = (alien, i) => {
+        return (<div className="cardObj" key={i} onClick={() => onAlienSel(alien)}>
             <div className="cardBox">
                 <img src={alien.icon} width="80" height="80" />
                 <div className="icon2">
@@ -156,7 +174,7 @@ export default function Game() {
         <>
             <div className="main-title">Choose your alien</div>
             <div className="alien-cards">
-                {randomAliens.map(alien => alienCard(alien))}
+                {randomAliens.map((alien, i) => alienCard(alien, i))}
             </div>
         </>
     )
@@ -189,8 +207,16 @@ export default function Game() {
                     Pick 3 gears from you wallet and prepare for battle
                 </div>
                 <div className="gear-cards">
-                    {state.gearSlots.map(slot => whichGearSlot(slot))}
+                    {state.gearSlots.map((slot, i) => whichGearSlot(slot, i))}
                 </div>
+            </div>
+        </>
+    )
+    const combatScreen = (
+        <>
+            <div className="screen">
+                <Spin size="large" />
+                <div className="gearTitle">Fighting Alien with your Gears ...</div>
             </div>
         </>
     )
@@ -199,7 +225,7 @@ export default function Game() {
             <div className="screen">
                 <div className="result-title">You Won</div>
                 <div className="win-gear">
-                    <div className="gearTitle">Gears Earned</div>
+                    <div className="gearTitle">Gear Earned</div>
                     <div className="gearCard"></div>
                 </div>
                 <div className="next-btn" onClick={onNewFight}>
@@ -216,13 +242,14 @@ export default function Game() {
             </div>
             <div className="game-main">
                 <div className="main-top">
-                    {stepIdx > 1 && <div className="main-btn" onClick={onBack}>Back</div>}
+                    {stepIdx == 2 && <div className="main-btn" onClick={onBack}>Back</div>}
                     <div className="main-btn">Round 1</div>
                 </div>
                 <div className="main-body">
                     {stepIdx == 1 && step1}
                     {stepIdx == 2 && step2}
-                    {stepIdx == 3 && resultScreen}
+                    {stepIdx == 3 && combatScreen}
+                    {stepIdx == 4 && resultScreen}
                 </div>
                 <div className="main-footer">
                     {stepIdx == 1 && (<div className="logmsg">Beginning Battle ...</div>)}

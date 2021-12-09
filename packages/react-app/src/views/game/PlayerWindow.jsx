@@ -19,6 +19,8 @@ import {
   Typography,
   Modal,
 } from "antd";
+import "./player.css";
+
 const { Text, Link, Title } = Typography;
 export default function PlayerWindow({ address, tx, contracts, playerNft }) {
 
@@ -47,25 +49,22 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
       );
   };
 
+  const playerWrapper = (
+    <div className="profile">
+      <div className="profileImg">
+        <img src="./img_avatar.png" alt="Avatar"></img>
+      </div>
+      <div className="profileInfo">
+        <div>swap</div>
+        <div>Faction: Warrior</div>
+      </div>
+    </div>
+  )
+
   const playerWindow = (
     <>
-      {playerNft && (
-        <Card
-          style={{ width: 450 }}
-          title={
-            <div>
-              <span style={{ fontSize: 18, marginRight: 8 }}>{playerNft.name}</span>
-            </div>
-          }
-        >
-          {/* <img style={{ width: 200 }} src={playerNft.image} />
-          <div>
-            <span>
-              Level: {playerNft.level}, XP: {playerNft.xp}
-            </span>
-          </div> */}
-        </Card>
-      )}
+      {playerWrapper}
+      {/* {playerNft && playerWrapper}
       {!playerNft && (
         <Card
           style={{ width: 450 }}
@@ -75,7 +74,7 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
             </div>
           }
         ></Card>
-      )}
+      )} */}
     </>
   );
   return (

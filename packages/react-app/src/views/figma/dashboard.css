@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
 
 .body {
     width: 100vw;
@@ -51,7 +51,6 @@
     background-color: beige;
 
     display: flex;
-    /* align-items: center; */
     justify-content: center;
 }
 .roundBox {
@@ -127,5 +126,4 @@ li {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* background-color: aliceblue; */
-}
+} */

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import "./wallet.css";
+// import "./wallet_figma.css";
 import GContext from "../../GContext";
 import speed from "../../assets/speed.png";
 import power from "../../assets/power.png";
@@ -127,7 +127,7 @@ export function Wallet() {
             <div className="inventoryObj">
                 <div className="invTitle">Gear Collected</div>
                 <div className="invColl">
-                    <div class="gearWrapper">
+                    <div className="gearWrapper">
                         {walletGears.map((gear, idx) => gearBox(gear, idx))}
                     </div>
                 </div>
