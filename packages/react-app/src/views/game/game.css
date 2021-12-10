@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
+
+.body {
+    width: 100vw;
+    height: 88vh;
+    background-color: beige;
+    padding: 5px;
+    font-family: 'Raleway', sans-serif;
+     display: flex;
+}
+
+.game-main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+    margin: 0
+}
+.loading-main {
+    position: absolute;
+    width: 75%;
+    height: 100%;
+    background-color: #FFD630;
+    opacity: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-top {
+    height: 10%;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.main-body {
+    height: 90%;
+    width: 100%;
+    background-color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.main-footer {
+    height: 10%;
+    width: 100%;
+    background-color: #1A1C48;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logmsg {
+    padding-left: 20px;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 46px;
+    letter-spacing: 0em;
+    text-align: center;
+}
+.main-btn {
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 91px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: black;
+}
+.leave-btn {
+    border: 1px solid red;
+    border-radius: 10px;
+    background-color:#f17f7f;
+    font-size: 20px;
+    cursor: pointer;
+}
+.main-title {
+    font-size: 65px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 85px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: black;
+    padding-top: 100px;
+    padding-bottom: 40px;
+}
+.alien-cards {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.cardObj {
+    width: 120px;
+    height: 150px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.cardBox {
+    width: 100px;
+    height: 110px;
+    border-radius: 10px;
+    background-color: #FFD630;
+}
+.cardTitle {
+    color: black;
+    font-size: 20px;
+}
+.icon2 {
+    display: flex;
+    justify-content: flex-end;
+}
+.side {
+    padding: 10px;
+    /* margin: auto; */
+
+    height: 100%;
+    width: 25%;
+
+    background-color:black;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.chosen-alien {
+    padding: 10px;
+    width: 100%;
+    height: 60%;
+    /* background-color: aqua; */
+
+    display: flex;
+    align-content: center;
+}
+.alien-obj {
+    margin: 10px;
+    width: 40%;
+    height: 100%;
+    /* background-color: #C4C4C4; */
+    
+    padding-left: 20px;
+
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 56px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: black;
+
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+}
+.alien-card {
+    padding: 10px;
+    width: 250px;
+    height: 250px;
+    border-radius: 10px;
+    background-color: #FFD630;
+}
+.alien-stats {
+    margin: 10px;
+    width: 50%;
+    height: 100%;
+    /* background-color: #C4C4C4; */
+
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+.stats-title {
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 56px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: black;
+}
+.stats-card {
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0em;
+    text-align: left;
+    color: black;
+}
+.reduceTxt {
+    color: green;
+    font-size: 18px;
+}
+.chosen-gears {
+    padding: 10px;
+    width: 100%;
+    height: 60%;
+    /* background-color:antiquewhite; */
+
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+.gear-title {
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 46px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: black;
+}
+.gear-cards {
+    padding: 10px;
+    width: 100%;
+    height: auto;
+    /* background-color: blueviolet;s */
+
+    display: flex;
+    justify-content: space-around;
+}
+.gear-cardObj {
+    padding: 10px;
+    /* background-color: brown; */
+    width: 150px;
+    height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+.gear-card {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    border: 1px dashed black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.gear-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: black;
+}
+.footerBtn {
+    height: 100%;
+    background-color: #E72D2D;
+    width: 320px;
+
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 56px;
+    letter-spacing: 0em;
+    text-align: center;
+    text-transform: uppercase;
+    color: black;
+}
+.screen {
+    width: 100%;
+    height: 100%;
+    margin: 10px;
+    /* background-color: #FFD630; */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+.result-title {
+    font-size: 65px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 85px;
+    letter-spacing: 0em;
+    text-align: center;
+    text-transform: uppercase;
+    margin-top: 30px;
+}
+.lost-txt {
+    color: red !important;
+}
+.won-txt {
+    color:#298BFE;
+}
+.alien-info {
+    margin-top: 50px;
+    font-size: 30px;
+    color: black;
+}
+.win-gear {
+    height: 50%;
+    /* background-color: #E72D2D; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.gearTitle {
+    font-size: 28px;
+    color: black;
+    line-height: 40px;
+    text-transform: uppercase;
+}
+.gearCard {
+    height: 250px;
+    width: 250px;
+    border: 1px dashed black;
+    border-radius: 10px;
+}
+.next-btn {
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 56px;
+    letter-spacing: 0em;
+    text-align: center;
+    text-transform: uppercase;
+
+    background-color: #76D084;
+    color: black;
+    width: 450px;
+    cursor: pointer;
+}
+.refresh {
+    background-color: #FFD630;
+    color: black;
+}

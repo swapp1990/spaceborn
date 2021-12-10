@@ -53,6 +53,7 @@ contract Player is ERC721("Player", "PLR") {
         player.name = playerInp.name;
         player.exists = true;
         player.joined = false;
+        // player.joinedRoundId = 1;
         addr2token[msg.sender] = id;
         emit PlayerCreated(_tokenIds.current(), player);
     }

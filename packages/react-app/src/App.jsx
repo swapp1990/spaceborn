@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState, useReducer, useMemo } from "re
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
+import GContext from "./GContext";
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -27,8 +28,6 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 
 const { ethers } = require("ethers");
-
-const GContext = React.createContext();
 
 // Coinbase walletLink init
 const walletLink = new WalletLink({
@@ -107,7 +106,7 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.localhost;
+const targetNetwork = NETWORKS.kovan;
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -201,7 +200,10 @@ function App(props) {
     //////////////////// Global context
     const initialState = {
         name: "Test",
-        equippedGears: []
+        gearSlots: [],
+        alienIdx: -1,
+        playerState: {},
+        gameStepIdx: 1
     }
     function globalReducer(state, action) {
         switch (action.type) {
@@ -211,7 +213,25 @@ function App(props) {
                     [action.fieldName]: action.payload
                 }
             }
-            case 'setEquippedGears': {
+            case 'setGearSlots': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setAlienIdx': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setPlayerState': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setGameStepIdx': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload
@@ -331,11 +351,20 @@ function App(props) {
                     </Menu>
                     <Switch>
                         <Route exact path="/app">
-                            <MVPUI address={address} provider={provider} tx={tx} contracts={contracts} price={price} context={GContext} />
+                            {/* <WireframeUI contracts={contracts} /> */}
+                            <MVPUI
+                                address={address}
+                                userSigner={userSigner}
+                                mainnetProvider={mainnetProvider}
+                                provider={provider}
+                                price={price}
+                                tx={tx}
+                                contracts={contracts}
+                            />
                         </Route>
                         <Route path="/contract">
                             <Contract
-                                name="Alien"
+                                name="Gears"
                                 signer={userSigner}
                                 provider={provider}
                                 address={address}
