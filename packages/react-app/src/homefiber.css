@@ -1,0 +1,85 @@
+/* .canvasbody {
+    height: 100vh;
+}
+
+.title {
+  position: absolute;
+  top: 120px;
+  left: 60px;
+  font-weight: 900;
+  font-size: 5em;
+  margin: 0;
+  color: peru;
+  line-height: 0.6em;
+  letter-spacing: -2px;
+  text-align: left;
+}
+
+a {
+  font-weight: 400;
+  font-size: 14px;
+  color: inherit;
+  position: absolute;
+  display: inline;
+  text-decoration: none;
+  z-index: 1;
+  color: white;
+}
+
+a.top-left {
+  top: 60px;
+  left: 60px;
+}
+
+a.top-right {
+  top: 60px;
+  right: 60px;
+}
+
+a.bottom-left {
+  bottom: 60px;
+  left: 60px;
+}
+
+.dot {
+  pointer-events: none;
+  position: absolute;
+  top: 110px;
+  display: inline-block;
+  max-width: 600px;
+  padding: 0;
+  padding: 80px;
+  color: #a0a0a0;
+  line-height: 1.6em;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+}
+.explore {
+    position: absolute;
+    top: 280px;
+    left: 70px;
+}
+.explore > button {
+    background-color: burlywood;
+    font-size: 30px;
+    text-transform: uppercase;
+    color: black;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.scrollContent {
+  margin: auto;
+  margin-top: 300px;
+  width: 600px;
+  height: 500px;
+  overflow-y: scroll;
+}
+.examples {
+  max-width: 1400px;
+  margin: 0px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 10px;
+} */

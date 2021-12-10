@@ -5,6 +5,7 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import ReactDOM from "react-dom";
 import App from "./App";
 import Home from "./Home";
+import HomeFiber from "./HomeFiber";
 import "./index.css";
 
 const themes = {
@@ -25,7 +26,8 @@ ReactDOM.render(
   <BrowserRouter>
     <Switch>
       <Route exact path="/">
-        <Home />
+        {/* <Home /> */}
+        <HomeFiber />
       </Route>
       <Route exact path="/app">
         <ApolloProvider client={client}>
