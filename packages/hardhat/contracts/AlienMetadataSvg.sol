@@ -58,6 +58,8 @@ library AlienMetadataSvg {
                                 name,
                                 '", "category": "',
                                 cat,
+                                '", "probs": "',
+                                baseProbs.toString(),
                                 '", "image": "',
                                 "data:image/svg+xml;base64,",
                                 image,

@@ -1,0 +1,129 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
+
+.body {
+    width: 100vw;
+    height: 100vh;
+    background-color: beige;
+    padding: 20px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.main {
+    padding: 10px;
+    margin: auto;
+
+    height: 100%;
+    width: auto;
+
+    background-color: beige;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.rounds {
+    width: 70%;
+    height: 100%;
+    background-color: beige;
+
+    display:flex;
+    -webkit-flex-direction:column;
+    flex-direction:column;
+    -webkit-justify-content:flex-end;
+    justify-content:flex-end;
+    -webkit-align-items:center;
+    align-items:center;
+}
+.title {
+    width: 100%;
+    background-color: beige;
+
+    display: flex;
+    justify-content: center;
+
+    font-weight: 800;
+    font-size: 56px;
+    color: black;
+}
+.roundsObj {
+    width: 100%;
+    height: 60%;
+    background-color: beige;
+
+    display: flex;
+    justify-content: center;
+}
+.roundBox {
+    width: 200px;
+    height: 200px;
+    background-color: white;
+    margin: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+    font-size: 48px;
+    color: black;
+    line-height: 40px;
+
+    border: 5px dashed #1A1C48;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.activity {
+    width: 30%;
+    height: 100%;
+    background-color: azure;
+}
+
+.act-title {
+    height: 60px;
+    background-color:black;
+
+    font-weight: 800;
+    font-size: 32px;
+    color: white;
+
+    display: flex;
+    padding-left: 10px;
+}
+
+.act-list {
+    height: 100%;
+    background-color: black;
+}
+ul {
+    padding-left: 10px;
+}
+li {
+    display: inline-block; 
+	text-align: left;
+ }
+
+.profile {
+    position: relative;
+}
+.profileObj {
+    position: absolute;
+    top: 0;
+    width: 300px;
+    height: 100px;
+    background-color: black;
+
+    display: flex;
+}
+.profileImg img {
+    border-radius: 50%;
+    width: 100px;
+    padding: 10px;
+}
+.profileInfo {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+} */

@@ -16,10 +16,12 @@ contract Gears is ERC721Enumerable, Ownable {
     Counters.Counter private _tokenIds;
     uint256 public lastTokenId;
 
-    mapping(string => string[]) loot2Names;
+    mapping(uint256 => string[]) loot2Names;
 
     struct Gear {
         uint256 tokenId;
+        uint256 catIdx;
+        uint256 titleIdx;
         string name;
         uint256 rarity;
         address playerWonAddr;
@@ -39,14 +41,8 @@ contract Gears is ERC721Enumerable, Ownable {
     event GearDropped(Gear gear);
 
     constructor() public ERC721("Gears", "GEAR") {
-        loot2Names["Weapon"] = [
-            "Pistol",
-            "Cannon",
-            "Phaser",
-            "Sniper",
-            "Zapper"
-        ];
-        loot2Names["Apparel"] = [
+        loot2Names[0] = ["Pistol", "Cannon", "Phaser", "Sniper", "Zapper"];
+        loot2Names[1] = [
             "Exosuit",
             "Power Armor",
             "Biosuit",
@@ -54,7 +50,7 @@ contract Gears is ERC721Enumerable, Ownable {
             "Nnaosuit",
             "Jacket"
         ];
-        loot2Names["Vehicle"] = [
+        loot2Names[2] = [
             "Hoverboard",
             "Superbike",
             "Air-ship",
@@ -62,14 +58,14 @@ contract Gears is ERC721Enumerable, Ownable {
             "Auto-Car",
             "Hushicopter"
         ];
-        loot2Names["Gizmo"] = [
+        loot2Names[3] = [
             "Neutralizer",
             "Replicator",
             "Battery",
             "Fuel Canister",
             "Supercomputer"
         ];
-        loot2Names["Pill"] = [
+        loot2Names[4] = [
             "Soma",
             "Nootropic",
             "LSX",
@@ -118,16 +114,15 @@ contract Gears is ERC721Enumerable, Ownable {
         return rand % 100;
     }
 
-    function pluck(uint256 tokenId) internal view returns (string[2] memory) {
+    function pluck(uint256 catIdx, uint256 titleIdx)
+        internal
+        view
+        returns (string[2] memory)
+    {
         string[2] memory results;
-        uint256 rand = getRandom(tokenId);
-        string memory cat = categories[rand % categories.length];
-        results[0] = cat;
-        string[] memory gears = loot2Names[cat];
-        string memory name = string(
-            abi.encodePacked(gears[rand % gears.length])
-        );
-        results[1] = name;
+        results[0] = categories[catIdx];
+        string memory name = loot2Names[catIdx][titleIdx];
+        results[1] = string(abi.encodePacked(name));
         return results;
     }
 
@@ -139,8 +134,11 @@ contract Gears is ERC721Enumerable, Ownable {
         uint256 id = _tokenIds.current();
         _mint(playerWonAddr, id);
         lastTokenId = id;
+        uint256 rand = getRandom(id);
         Gear storage gear = gears[id];
         gear.tokenId = id;
+        gear.catIdx = rand % categories.length;
+        gear.titleIdx = rand % loot2Names[gear.catIdx].length;
         gear.name = string(abi.encodePacked("Dropped by ", alienName));
         gear.rarity = rarity;
         gear.exists = true;
@@ -152,7 +150,7 @@ contract Gears is ERC721Enumerable, Ownable {
     function tokenURI(uint256 id) public view override returns (string memory) {
         require(_exists(id), "not exist");
         Gear storage gear = gears[id];
-        string[2] memory results = pluck(id);
+        string[2] memory results = pluck(gear.catIdx, gear.titleIdx);
         return
             GearsMetadataSvg.tokenURI(id, results[0], results[1], gear.rarity);
     }
@@ -161,13 +159,13 @@ contract Gears is ERC721Enumerable, Ownable {
         return categories;
     }
 
-    function randomTokenURI(uint256 id, uint256 rarityLevel)
-        public
-        view
-        returns (string memory)
-    {
-        string[2] memory results = pluck(id);
-        return
-            GearsMetadataSvg.tokenURI(id, results[0], results[1], rarityLevel);
-    }
+    // function randomTokenURI(uint256 id, uint256 rarityLevel)
+    //     public
+    //     view
+    //     returns (string memory)
+    // {
+    //     string[2] memory results = pluck(id);
+    //     return
+    //         GearsMetadataSvg.tokenURI(id, results[0], results[1], rarityLevel);
+    // }
 }

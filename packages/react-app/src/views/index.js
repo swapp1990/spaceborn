@@ -6,3 +6,4 @@ export { default as MVPUI } from "./MVPUI";
 export { default as BadKidsTest } from "./BadKidsTest";
 export { default as LootTest } from "./LootTest";
 export { default as CombatTest } from "./CombatTest";
+export { default as WireframeUI } from "./WireframeUI";

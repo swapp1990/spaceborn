@@ -174,7 +174,7 @@ contract GameManager {
         return gearCat2AlienBuffs[idx];
     }
 
-    function getFinalProbs(
+    function calculateBuff(
         uint256 baseProbs,
         UsedGear[] memory usedGears,
         uint256 alienCatIdx
@@ -214,9 +214,26 @@ contract GameManager {
         if (totalBuff > 99) {
             totalBuff = 99;
         }
-        uint256 modifiedBaseProbs = baseProbs - ((totalBuff * baseProbs) / 100);
-        uint256 finalProbs = modifiedBaseProbs;
-        return finalProbs;
+        return (totalBuff * baseProbs) / 100;
+    }
+
+    function getTotalBuff(
+        uint256 baseProbs,
+        UsedGear[] memory usedGears,
+        uint256 alienCatIdx
+    ) public view returns (uint256) {
+        return calculateBuff(baseProbs, usedGears, alienCatIdx);
+    }
+
+    function getFinalProbs(
+        uint256 baseProbs,
+        UsedGear[] memory usedGears,
+        uint256 alienCatIdx
+    ) public view returns (uint256) {
+        uint256 modifiedBaseProbs = baseProbs -
+            calculateBuff(baseProbs, usedGears, alienCatIdx);
+        // uint256 finalProbs = modifiedBaseProbs;
+        return modifiedBaseProbs;
     }
 
     function getGearRarity(uint256 baseProb) public view returns (uint256) {
@@ -248,13 +265,13 @@ contract GameManager {
         );
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
-            emit PlayerWon(0, finalProb, msg.sender);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);
             gearsContract.dropGear(
                 alienContract.getAlienName(alien_id),
                 rarity,
                 msg.sender
             );
+            emit PlayerWon(0, finalProb, msg.sender);
         } else {
             emit AlienWon(0, finalProb, msg.sender);
         }
