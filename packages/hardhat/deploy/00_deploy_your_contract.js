@@ -34,28 +34,23 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   let gearsContract = await ethers.getContract("Gears", deployer);
-  // let address = "0xeAe052b6C4B18F05d74DFc32Ecce5d43011195DB";
-  // await gearsContract.dropGear("Moloch", 0, address);
-  // await gearsContract.dropGear("Moloch", 1, address);
 
   await deploy("GameManager", {
     from: deployer,
     args: [alienContract.address, gearsContract.address],
     log: true,
   });
-
   const gameContract = await ethers.getContract("GameManager", deployer);
+
+  // let address = "0xeAe052b6C4B18F05d74DFc32Ecce5d43011195DB";
+  // await gearsContract.dropGear("Moloch", 0, address);
+  // await gearsContract.dropGear("Moloch", 1, address);
+
   await deploy("Player", {
     from: deployer,
     args: [gameContract.address],
     log: true,
   });
-
-  //   await deploy("ScifiLoot", {
-  //     from: deployer,
-  //     args: [alienContract.address],
-  //     log: true,
-  //   });
 
   //   const baseUri =
   //     "https://gateway.pinata.cloud/ipfs/QmTV8L1G1D4ow9SA5Bnw3XZw7mdLkHo5uYfDsPbRqZqNm2/";

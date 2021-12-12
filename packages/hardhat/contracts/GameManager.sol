@@ -24,15 +24,18 @@ contract GameManager {
     // mapping(string => uint256) alienNameToIdx;
     // mapping(string => uint256) gearTypeToIdx;
     mapping(uint256 => uint256) public gearCat2AlienBuffs;
+    mapping(uint256 => uint256) public round2GearLostProb;
 
     constructor(address alienAddress, address gearsAddress) public {
         alienContract = Alien(alienAddress);
         gearsContract = Gears(gearsAddress);
+        setupGame();
         initBuffs();
     }
 
     event PlayerWon(uint256 tokenId, uint256 finalProbs, address sender);
     event AlienWon(uint256 tokenId, uint256 finalProbs, address sender);
+    event PlayerLostGear(uint256 tokenId, uint256 lostGearId, address sender);
 
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
@@ -161,6 +164,12 @@ contract GameManager {
         gearCat2AlienBuffs[85] = 2;
     }
 
+    function setupGame() internal {
+        round2GearLostProb[1] = 50;
+        round2GearLostProb[2] = 70;
+        round2GearLostProb[3] = 90;
+    }
+
     function getCat2AlienBuff(uint256 alienCatIdx, uint256 gearCatIdx)
         public
         view
@@ -236,21 +245,12 @@ contract GameManager {
         return modifiedBaseProbs;
     }
 
-    function getGearRarity(uint256 baseProb) public view returns (uint256) {
-        // string memory rarity = "Common";
-        // if(baseProb >=50 && baseProb <= 80) {
-        // 	rarity = "Uncommon";
-        // } else if(baseProb > 80) {
-        // 	rarity = "Rare";
-        // }
-        return 0;
-    }
-
     function claimRandomGear() public {
         gearsContract.dropGear("Moloch", 0, msg.sender);
     }
 
     function fightAlien(
+        uint256 roundId,
         uint256 alien_id,
         uint256 clientRandom,
         UsedGear[] memory usedGears
@@ -263,6 +263,7 @@ contract GameManager {
             usedGears,
             alienContract.getAlienCatIdx(alien_id)
         );
+        // uint256 finalProb = 100;
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);
@@ -274,6 +275,16 @@ contract GameManager {
             emit PlayerWon(0, finalProb, msg.sender);
         } else {
             emit AlienWon(0, finalProb, msg.sender);
+            if (usedGears.length > 0) {
+                uint256 dropProb = round2GearLostProb[roundId];
+                if (rand100 > dropProb) {
+                    UsedGear memory gear = usedGears[
+                        rand100 % usedGears.length
+                    ];
+                    gearsContract.transferNft(gear.gearIdx, address(this));
+                    emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
+                }
+            }
         }
     }
 
@@ -294,5 +305,13 @@ contract GameManager {
         } else {
             emit AlienWon(0, finalProb, msg.sender);
         }
+    }
+
+    function getAddress() public view returns (address) {
+        return address(this);
+    }
+
+    function getRoundLostProb(uint256 roundId) public view returns (uint256) {
+        return round2GearLostProb[roundId];
     }
 }

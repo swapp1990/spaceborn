@@ -13,7 +13,8 @@ import { default as GameScreen } from "./game/GameScreen";
 import { default as PlayerWindow } from "./game/PlayerWindow";
 import { default as WalletWindow } from "./game/WalletWindow";
 import { default as LogsScreen } from "./game/LogsScreen";
-import { Wallet } from "./figma/Wallet";
+
+import GContext from "../GContext";
 
 const { Text, Link, Title } = Typography;
 
@@ -28,7 +29,7 @@ export default function MVPUI({
   context
 }) {
   //Global state
-  // const { state, dispatch } = useContext(context);
+  const { state, dispatch } = useContext(GContext);
 
   const [playerNft, setPlayerNft] = useState(null);
 
@@ -40,74 +41,61 @@ export default function MVPUI({
       init();
     }
   }, [contracts, address]);
+  useEffect(() => {
+    console.log({ player: state.playerState });
+  }, [state.playerState])
 
 
   const init = async () => {
-    updateProfile();
-    // setPlayerNft({ "name": "swap" });
-    // updateWallet();
-
+    updatePlayerState();
     // addEventListener("ScifiLoot", "LootMinted", onLootMinted);
-    addEventListener("Player", "PlayerCreated", onPlayerCreated);
+    // addEventListener("Player", "PlayerCreated", onPlayerCreated);
     // addEventListener("Alien", "PlayerLostLoot", onPlayerLostLoot);
     // addEventListener("Alien", "MintedAliens", onMintedAliens);
-    // initEmptyEquip();
   };
 
-  async function updateProfile() {
+  //contract Events
+  // const addEventListener = async (contractName, eventName, callback) => {
+  //   await contracts[contractName].removeListener(eventName);
+  //   contracts[contractName].on(eventName, (...args) => {
+  //     let eventBlockNum = args[args.length - 1].blockNumber;
+  //     // console.log(eventName, eventBlockNum, provider._lastBlockNumber);
+  //     if (eventBlockNum >= provider._lastBlockNumber - 1) {
+  //       let msg = args.pop().args;
+  //       callback(msg);
+  //     }
+  //   });
+  // };
+
+  // function onPlayerCreated(msg) {
+  //   console.log("onPlayerCreated", msg);
+  //   updateProfile();
+  // }
+
+  async function updatePlayerState() {
     const tokenId = await contracts.Player.getTokenId(address);
     if (tokenId.toNumber() == 0) {
       console.log("player not found!");
       return;
     }
     const player = await contracts.Player.getPlayer(tokenId);
-    setPlayerNft({
+    const playerState = {
       id: tokenId,
       name: player.name,
       image: null,
       owner: address,
-    });
-    console.log("found player nft ", player.name);
+      joined: player.joined,
+      roundId: player.joinedRoundId.toNumber()
+    };
+    dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
+    console.log("updated player state ", player.name);
   }
 
-  const addEventListener = async (contractName, eventName, callback) => {
-    await contracts[contractName].removeListener(eventName);
-    contracts[contractName].on(eventName, (...args) => {
-      let eventBlockNum = args[args.length - 1].blockNumber;
-      // console.log(eventName, eventBlockNum, provider._lastBlockNumber);
-      if (eventBlockNum >= provider._lastBlockNumber - 1) {
-        let msg = args.pop().args;
-        callback(msg);
-      }
-    });
-  };
-
-  function onPlayerCreated(msg) {
-    console.log("onPlayerCreated", msg);
-    updateProfile();
+  function isPlayerState() {
+    return !state.playerState || Object.keys(state.playerState).length === 0;
   }
 
-  // const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [modalImageSrc, setModalImageSrc] = useState();
-
-
-  // const showModal = () => {
-  //   setIsModalVisible(true);
-  // };
-  // const handleOk = () => {
-  //   setIsModalVisible(false);
-  // };
-  // const handleCancel = () => {
-  //   setIsModalVisible(false);
-  // };
-  // function viewItem(imgSrc) {
-  //   showModal();
-  //   setModalImageSrc(imgSrc);
-  // }
-  // function changeGlobalState() {
-  //   dispatch({ type: "setName", payload: "Swapp", fieldName: "name" })
-  // }
-
+  // Logs Functions
   // function updateLogs(txt) {
   //   let prevLogs = logs;
   //   if (!prevLogs.includes(txt)) {
@@ -115,12 +103,6 @@ export default function MVPUI({
   //   }
   //   setLogs(prevLogs.reverse());
   // }
-
-  // const lootItemModal = (
-  //   <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-  //     <img style={{ width: 300 }} src={modalImageSrc} />
-  //   </Modal>
-  // );
 
   // const logsScreen = (
   //   <Card style={{ width: 400 }} title="Logs">
@@ -139,33 +121,6 @@ export default function MVPUI({
   //   </Card>
   // );
 
-  const oldUi = (
-    <div style={{ width: "full", paddingBottom: 256, marginLeft: 64 }}>
-      <Space align="start">
-        <Space direction="vertical">
-          <PlayerWindow address={address} tx={tx} contracts={contracts} playerNft={playerNft} />
-          <WalletWindow
-            address={address}
-            tx={tx}
-            contracts={contracts}
-            provider={provider}
-            context={context}
-          />
-        </Space>
-        <Space>
-          <GameScreen
-            address={address}
-            tx={tx}
-            contracts={contracts}
-            provider={provider}
-            context={context}
-          />
-        </Space>
-
-      </Space>
-    </div>
-  )
-
   const uiBody = (
     <div className="body">
       <div className="side">
@@ -177,18 +132,18 @@ export default function MVPUI({
           <WalletWindow address={address} tx={tx} contracts={contracts} provider={provider} />
         </div>
       </div>
-      <div className="game">
-        {/* <GameScreen address={address} tx={tx} contracts={contracts} /> */}
-        <Dashboard address={address} tx={tx} contracts={contracts} />
-      </div>
+      {state.playerState && <div className="game">
+        {state.playerState.joined && <GameScreen address={address} tx={tx} contracts={contracts} />}
+        {!state.playerState.joined && <Dashboard address={address} tx={tx} contracts={contracts} />}
+      </div>}
     </div >
   )
 
   return (
     <>
-      {!playerNft && (
+      {isPlayerState() && (
         <CreatePlayer address={address} tx={tx} contracts={contracts} />
       )}
-      {playerNft && uiBody}</>
+      {!isPlayerState() && uiBody}</>
   )
 }

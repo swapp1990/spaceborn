@@ -7,9 +7,37 @@
     padding: 5px;
     font-family: 'Raleway', sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 
+    .loading-main {
+        position: absolute;
+        width: 75%;
+        height: 100%;
+        background-color: #FFD630;
+        opacity: 70%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .welcome {
+        margin-bottom: 40px;
+         .title {
+            width: 100%;
+            background-color: beige;
+
+            display: flex;
+            justify-content: center;
+
+            font-weight: 800;
+            font-size: 50px;
+            color: black;
+        }
+        .mint {
+            color: black;
+        }
+    }
     .rounds {
         width: 100%;
         height: 100%;
@@ -27,7 +55,7 @@
             justify-content: center;
 
             font-weight: 800;
-            font-size: 56px;
+            font-size: 40px;
             color: black;
         }
         .roundsObj {
@@ -44,18 +72,33 @@
                 margin: 10px;
 
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
 
-                font-weight: 800;
-                font-size: 48px;
                 color: black;
-                line-height: 40px;
 
                 border: 5px dashed #1A1C48;
                 border-radius: 10px;
                 padding: 10px;
                 cursor: pointer;
+
+                .roundTitle {
+                    font-weight: 800;
+                    font-size: 48px;
+                    line-height: 40px;
+                }
+
+                .roundDesc {
+                    padding-top: 20px;
+                    font-weight: 500;
+                    font-size: 15px;
+                    line-height: 17px;
+                }
+            }
+            .disabled {
+                opacity: 50%;
+                cursor: default;
             }
         }
     }

@@ -201,7 +201,10 @@ function App(props) {
     const initialState = {
         name: "Test",
         gearSlots: [],
-        alienIdx: -1
+        walletGearsCount: 0,
+        alienIdx: -1,
+        playerState: {},
+        gameStepIdx: 1
     }
     function globalReducer(state, action) {
         switch (action.type) {
@@ -218,6 +221,24 @@ function App(props) {
                 }
             }
             case 'setAlienIdx': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setPlayerState': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setGameStepIdx': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setWalletGearsCount': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload
@@ -324,14 +345,24 @@ function App(props) {
                                 Game
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="/contract">
+                        <Menu.Item key="/gears">
                             <Link
                                 onClick={() => {
-                                    setRoute("/contract");
+                                    setRoute("/gears");
                                 }}
-                                to="/contract"
+                                to="/gears"
                             >
-                                Contract
+                                Gears
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="/alien">
+                            <Link
+                                onClick={() => {
+                                    setRoute("/alien");
+                                }}
+                                to="/alien"
+                            >
+                                Alien
                             </Link>
                         </Menu.Item>
                     </Menu>
@@ -348,9 +379,18 @@ function App(props) {
                                 contracts={contracts}
                             />
                         </Route>
-                        <Route path="/contract">
+                        <Route path="/gears">
                             <Contract
                                 name="Gears"
+                                signer={userSigner}
+                                provider={provider}
+                                address={address}
+                                blockExplorer={blockExplorer}
+                            />
+                        </Route>
+                        <Route path="/alien">
+                            <Contract
+                                name="Alien"
                                 signer={userSigner}
                                 provider={provider}
                                 address={address}

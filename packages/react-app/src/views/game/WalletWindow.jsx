@@ -37,6 +37,7 @@ import mimic from "../../assets/mimic.png";
 import mind from "../../assets/mind-control.png";
 import brain from "../../assets/brain.png";
 import npc from "../../assets/npc.png";
+import { default as PopupWindow } from "./PopupWindow";
 
 const { Text, Link, Title } = Typography;
 
@@ -99,6 +100,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
 
   const [walletGears, setWalletGears] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [popupWindowMsg, setpopupWindowMsg] = useState({ show: false });
 
   useEffect(async () => {
     if (contracts && contracts.Gears) {
@@ -111,7 +113,12 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     updateWallet();
     if (contracts && contracts.Gears) {
       addEventListener("Gears", "GearDropped", onGearDropped);
+      addEventListener("Gears", "GearDropped", onGearDropped);
     }
+    if (contracts && contracts.GameManager) {
+      addEventListener("GameManager", "PlayerLostGear", onPlayerLostGear);
+    }
+
   };
 
   const addEventListener = async (contractName, eventName, callback) => {
@@ -127,6 +134,12 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   };
   async function onGearDropped(msg) {
     console.log({ onGearDropped: msg });
+    setTimeout(() => {
+      updateWallet();
+    }, 2000)
+  }
+
+  async function onPlayerLostGear(msg) {
     setTimeout(() => {
       updateWallet();
     }, 2000)
@@ -161,7 +174,22 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     }
   }
 
-  function equip(gear) {
+  async function approve(gear) {
+    let gameAddr = await contracts.GameManager.address;
+    setLoading(true);
+    await tx(contracts.Gears.approveGear(gameAddr, gear.tokenIdx), update => {
+      if (update.status === "confirmed" || update.status === 1) {
+        console.log("approved gear");
+        updateWallet();
+      }
+      if (update.events) {
+        updateWallet();
+        setLoading(false);
+      }
+    });
+  }
+
+  async function equip(gear) {
     // console.log(gear);
     let slotFound = state.gearSlots.find(g => g.slotId == gear.tokenIdx);
     // console.log({ slotFound })
@@ -254,10 +282,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   async function updateWallet() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
     console.log({ "balanceLoot": balanceLoot.toNumber() });
-    if (balanceLoot.toNumber() == walletGears.length) {
-      console.log("wallet is updated!");
-      return;
-    }
+    dispatch({ type: "setWalletGearsCount", payload: balanceLoot.toNumber(), fieldName: "walletGearsCount" });
+    // if (balanceLoot.toNumber() == walletGears.length) {
+    //   console.log("wallet is updated!");
+    //   return;
+    // }
     setLoading(true);
     const walletGearsUpdate = [];
     for (let tokenIndex = 0; tokenIndex < balanceLoot; tokenIndex++) {
@@ -277,8 +306,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           gearJsObj.gearJson = svgJson;
           gearJsObj.category = svgJson.category;
           gearJsObj.name = svgJson.name;
+          gearJsObj.itemName = svgJson.item;
           gearJsObj.icon = getIconGear(gearJsObj.category);
           gearJsObj.strongIcons = getStrongIcons(gearJsObj.category);
+          let gameAddr = await contracts.GameManager.address;
+          gearJsObj.approved = await contracts.Gears.isApproved(tokenId, gameAddr);
           // console.log(svgImg);
           walletGearsUpdate.push(gearJsObj);
         }
@@ -316,82 +348,14 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   /////////// UI events
-  async function walletGearClicked(item) {
-    console.log("walletGearClicked ", item);
-    let equippedFound = state.equippedGears.find(loot => loot.id == item.tokenId);
-    // console.log({ equippedFound });
-    if (equippedFound) {
-      let selEquippedSlotIdx = state.equippedGears.findIndex(loot => loot.id === item.tokenId);
-      // console.log({ selEquippedSlotIdx });
-      let newState = [...state.equippedGears];
-      newState[selEquippedSlotIdx].id = -1;
-      newState[selEquippedSlotIdx].name = "Select from wallet";
-      newState[selEquippedSlotIdx].image = null;
-      dispatch({ type: "setEquippedGears", payload: newState, fieldName: "equippedGears" })
-    } else {
-      let newState = [...state.equippedGears];
-      let emptySlotIdx = state.equippedGears.findIndex(loot => loot.id === -1);
-      // console.log({ emptySlotIdx });
-      if (emptySlotIdx == -1) {
-        return;
-      }
-      let walletGearsFound = walletGears.find(loot => loot.tokenId == item.tokenId);
-      // console.log({ walletGearsFound })
-      if (walletGearsFound) {
-        newState[emptySlotIdx].id = walletGearsFound.tokenId;
-        newState[emptySlotIdx].name = walletGearsFound.note;
-        newState[emptySlotIdx].image = walletGearsFound.gearJson.image;
-        const gearCatIdx = GEAR_CATS.indexOf(walletGearsFound.gearJson.category);
-        const gearIdx = GEARS[walletGearsFound.gearJson.category].indexOf(walletGearsFound.gearJson.item);
-        newState[emptySlotIdx].usedGear = {
-          rarityIdx: parseInt(walletGearsFound.gearJson.rarityLevel), catIdx: gearCatIdx, gearIdx: gearIdx
-        };
-        // console.log({ newState });
-        dispatch({ type: "setEquippedGears", payload: newState, fieldName: "equippedGears" })
-      }
-    }
-  }
-
-  function getWalletItemBgColor(idx) {
-    // let equippedFound = state.equippedGears.find(loot => loot.id == idx);
-    // // console.log({ "gears": state.equippedGears }, idx);
-    // if (equippedFound) {
-    //   return { backgroundColor: "lightgreen" };
-    // }
-    return { backgroundColor: "black" };
-  }
-
-  // const walletWindowOld = (
-  //   <>
-  //     <Card
-  //       title="Wallet"
-  //       extra={
-  //         <Button onClick={claimFree} type="dashed" disabled={walletGears.length != 0}>
-  //           Claim a free loot
-  //         </Button>
-  //       }
-  //     >
-  //       <List
-  //         grid={{ gutter: 16, column: 2 }}
-  //         dataSource={walletGears}
-  //         style={{ overflowY: "auto", overflowX: "hidden", height: "400px" }}
-  //         renderItem={item => (
-  //           <List.Item>
-  //             <Card title={item.name} hoverable onClick={() => walletGearClicked(item)} style={getWalletItemBgColor(item.tokenId)}>
-  //               <Space direction="vertical">
-  //                 <div>{item.tokenId}</div>
-  //                 <img src={item.gearJson.image} style={{ width: 150 }}></img>
-  //                 <a href={"https://opensea.io/assets/"} target="_blank">
-  //                   View on OpenSea
-  //                 </a>
-  //               </Space>
-  //             </Card>
-  //           </List.Item>
-  //         )}
-  //       />
-  //     </Card>
-  //   </>
-  // );
+  // function getWalletItemBgColor(idx) {
+  //   // let equippedFound = state.equippedGears.find(loot => loot.id == idx);
+  //   // // console.log({ "gears": state.equippedGears }, idx);
+  //   // if (equippedFound) {
+  //   //   return { backgroundColor: "lightgreen" };
+  //   // }
+  //   return { backgroundColor: "black" };
+  // }
 
   /////////////////////// Render
   function gearBox(gear, idx) {
@@ -412,15 +376,30 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
 
           {/* <Gear1 className="gearSvg" /> */}
-          <div>{gear.name} </div>
+          <div>{gear.itemName} </div>
         </div>
         <div className="gearSide">
-          {!gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
-          {gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
-          <button className="gearBtn">View NFT</button>
+          {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>}
+          {gear.approved && !gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
+          {gear.approved && gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
+          <button className="gearBtn" onClick={() => viewNft(gear)}>View NFT</button>
         </div>
       </div>
     )
+  }
+
+  function handlePopup(msg) {
+    // console.log(msg);
+    setpopupWindowMsg({ ...msg, show: false })
+  }
+  function viewNft(gear) {
+    // console.log({ gear })
+    let msg = {
+      show: true,
+      title: gear.itemName,
+      imgSrc: gear.gearJson.image
+    }
+    setpopupWindowMsg(msg)
   }
 
   const walletWindow = (
@@ -436,6 +415,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
         </div>
       </div>
+      {popupWindowMsg && popupWindowMsg.show && <PopupWindow onCloseCallback={handlePopup} popupMsg={popupWindowMsg}></PopupWindow>}
     </>
   )
   return (

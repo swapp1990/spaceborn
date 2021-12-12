@@ -39,7 +39,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
           networkId: network.chainId,
           // darkMode: Boolean, // (default: false)
           transactionHandler: txInformation => {
-            if (DEBUG) console.log("HANDLE TX", txInformation);
+            // if (DEBUG) console.log("HANDLE TX", txInformation);s
             const possibleFunction = callbacks[txInformation.transaction.hash];
             if (typeof possibleFunction === "function") {
               possibleFunction(txInformation.transaction);
@@ -102,7 +102,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
           if (callback) {
             const txResult = await tx;
             const listeningInterval = setInterval(async () => {
-              console.log("CHECK IN ON THE TX", txResult, provider);
+              // console.log("CHECK IN ON THE TX", txResult, provider);
               const currentTransactionReceipt = await provider.getTransactionReceipt(txResult.hash);
               if (currentTransactionReceipt && currentTransactionReceipt.confirmations) {
                 callback({ ...txResult, ...currentTransactionReceipt });
