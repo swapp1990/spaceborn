@@ -106,7 +106,7 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.rinkeby;
+const targetNetwork = NETWORKS.kovan;
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -201,6 +201,7 @@ function App(props) {
     const initialState = {
         name: "Test",
         gearSlots: [],
+        walletGearsCount: 0,
         alienIdx: -1,
         playerState: {},
         gameStepIdx: 1
@@ -232,6 +233,12 @@ function App(props) {
                 }
             }
             case 'setGameStepIdx': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setWalletGearsCount': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload

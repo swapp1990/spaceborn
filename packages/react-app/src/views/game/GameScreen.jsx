@@ -352,7 +352,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     const foundGears = state.gearSlots.filter(e => e.slotId != -1).map(i => i.usedGear);
     // console.log({ foundGears });
     setStepIdx(3);
-    await tx(contracts.GameManager.fightAlien(state.alienIdx, clientRandom, foundGears), update => {
+    await tx(contracts.GameManager.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
       if (update) {
         // console.log({ update });
         if (update.status === "confirmed" || update.status === 1) {

@@ -113,7 +113,12 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     updateWallet();
     if (contracts && contracts.Gears) {
       addEventListener("Gears", "GearDropped", onGearDropped);
+      addEventListener("Gears", "GearDropped", onGearDropped);
     }
+    if (contracts && contracts.GameManager) {
+      addEventListener("GameManager", "PlayerLostGear", onPlayerLostGear);
+    }
+
   };
 
   const addEventListener = async (contractName, eventName, callback) => {
@@ -129,6 +134,12 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   };
   async function onGearDropped(msg) {
     console.log({ onGearDropped: msg });
+    setTimeout(() => {
+      updateWallet();
+    }, 2000)
+  }
+
+  async function onPlayerLostGear(msg) {
     setTimeout(() => {
       updateWallet();
     }, 2000)
@@ -165,12 +176,15 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
 
   async function approve(gear) {
     let gameAddr = await contracts.GameManager.address;
+    setLoading(true);
     await tx(contracts.Gears.approveGear(gameAddr, gear.tokenIdx), update => {
       if (update.status === "confirmed" || update.status === 1) {
         console.log("approved gear");
+        updateWallet();
       }
       if (update.events) {
         updateWallet();
+        setLoading(false);
       }
     });
   }
@@ -268,10 +282,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   async function updateWallet() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
     console.log({ "balanceLoot": balanceLoot.toNumber() });
-    if (balanceLoot.toNumber() == walletGears.length) {
-      console.log("wallet is updated!");
-      return;
-    }
+    dispatch({ type: "setWalletGearsCount", payload: balanceLoot.toNumber(), fieldName: "walletGearsCount" });
+    // if (balanceLoot.toNumber() == walletGears.length) {
+    //   console.log("wallet is updated!");
+    //   return;
+    // }
     setLoading(true);
     const walletGearsUpdate = [];
     for (let tokenIndex = 0; tokenIndex < balanceLoot; tokenIndex++) {
@@ -374,11 +389,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   function handlePopup(msg) {
-    console.log(msg);
+    // console.log(msg);
     setpopupWindowMsg({ ...msg, show: false })
   }
   function viewNft(gear) {
-    console.log({ gear })
+    // console.log({ gear })
     let msg = {
       show: true,
       title: gear.itemName,

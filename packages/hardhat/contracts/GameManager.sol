@@ -24,10 +24,12 @@ contract GameManager {
     // mapping(string => uint256) alienNameToIdx;
     // mapping(string => uint256) gearTypeToIdx;
     mapping(uint256 => uint256) public gearCat2AlienBuffs;
+    mapping(uint256 => uint256) public round2GearLostProb;
 
     constructor(address alienAddress, address gearsAddress) public {
         alienContract = Alien(alienAddress);
         gearsContract = Gears(gearsAddress);
+        setupGame();
         initBuffs();
     }
 
@@ -162,6 +164,12 @@ contract GameManager {
         gearCat2AlienBuffs[85] = 2;
     }
 
+    function setupGame() internal {
+        round2GearLostProb[1] = 50;
+        round2GearLostProb[2] = 70;
+        round2GearLostProb[3] = 90;
+    }
+
     function getCat2AlienBuff(uint256 alienCatIdx, uint256 gearCatIdx)
         public
         view
@@ -242,6 +250,7 @@ contract GameManager {
     }
 
     function fightAlien(
+        uint256 roundId,
         uint256 alien_id,
         uint256 clientRandom,
         UsedGear[] memory usedGears
@@ -249,12 +258,12 @@ contract GameManager {
         require(alienContract.canFight(alien_id), "Alien not exist/dead");
         uint256 rand100 = getRandom(clientRandom);
 
-        // uint256 finalProb = getFinalProbs(
-        //     alienContract.getAlienBaseProb(alien_id),
-        //     usedGears,
-        //     alienContract.getAlienCatIdx(alien_id)
-        // );
-        uint256 finalProb = 100;
+        uint256 finalProb = getFinalProbs(
+            alienContract.getAlienBaseProb(alien_id),
+            usedGears,
+            alienContract.getAlienCatIdx(alien_id)
+        );
+        // uint256 finalProb = 100;
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);
@@ -267,9 +276,14 @@ contract GameManager {
         } else {
             emit AlienWon(0, finalProb, msg.sender);
             if (usedGears.length > 0) {
-                UsedGear memory gear = usedGears[rand100 % usedGears.length];
-                gearsContract.transferNft(gear.gearIdx, address(this));
-                emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
+                uint256 dropProb = round2GearLostProb[roundId];
+                if (rand100 > dropProb) {
+                    UsedGear memory gear = usedGears[
+                        rand100 % usedGears.length
+                    ];
+                    gearsContract.transferNft(gear.gearIdx, address(this));
+                    emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
+                }
             }
         }
     }
@@ -295,5 +309,9 @@ contract GameManager {
 
     function getAddress() public view returns (address) {
         return address(this);
+    }
+
+    function getRoundLostProb(uint256 roundId) public view returns (uint256) {
+        return round2GearLostProb[roundId];
     }
 }
