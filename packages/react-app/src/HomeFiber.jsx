@@ -116,7 +116,7 @@ export default function HomeFiber() {
     </div>
 
     return (
-        <div className="body">
+        <div className="fiberbody">
             {showCanvas && <div className="titleObj">
                 <div className="title">
                     <img src="Spaceborn.png" width="500px"></img>

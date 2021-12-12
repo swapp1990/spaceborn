@@ -6,7 +6,7 @@ import React from "react";
 export default function Header() {
   return (
     <a href="https://github.com/swapp1990/scifi-loot" target="_blank" rel="noopener noreferrer">
-      <PageHeader title="Scifi Gear" subTitle="forkable Scifi Gear NFT blockchain game" style={{ cursor: "pointer" }} />
+      <PageHeader title="Spaceborn" subTitle="forkable NFT blockchain game" style={{ cursor: "pointer" }} />
     </a>
   );
 }
