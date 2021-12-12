@@ -33,6 +33,7 @@ contract GameManager {
 
     event PlayerWon(uint256 tokenId, uint256 finalProbs, address sender);
     event AlienWon(uint256 tokenId, uint256 finalProbs, address sender);
+    event PlayerLostGear(uint256 tokenId, uint256 lostGearId, address sender);
 
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
@@ -236,16 +237,6 @@ contract GameManager {
         return modifiedBaseProbs;
     }
 
-    function getGearRarity(uint256 baseProb) public view returns (uint256) {
-        // string memory rarity = "Common";
-        // if(baseProb >=50 && baseProb <= 80) {
-        // 	rarity = "Uncommon";
-        // } else if(baseProb > 80) {
-        // 	rarity = "Rare";
-        // }
-        return 0;
-    }
-
     function claimRandomGear() public {
         gearsContract.dropGear("Moloch", 0, msg.sender);
     }
@@ -258,11 +249,12 @@ contract GameManager {
         require(alienContract.canFight(alien_id), "Alien not exist/dead");
         uint256 rand100 = getRandom(clientRandom);
 
-        uint256 finalProb = getFinalProbs(
-            alienContract.getAlienBaseProb(alien_id),
-            usedGears,
-            alienContract.getAlienCatIdx(alien_id)
-        );
+        // uint256 finalProb = getFinalProbs(
+        //     alienContract.getAlienBaseProb(alien_id),
+        //     usedGears,
+        //     alienContract.getAlienCatIdx(alien_id)
+        // );
+        uint256 finalProb = 100;
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);
@@ -274,6 +266,11 @@ contract GameManager {
             emit PlayerWon(0, finalProb, msg.sender);
         } else {
             emit AlienWon(0, finalProb, msg.sender);
+            if (usedGears.length > 0) {
+                UsedGear memory gear = usedGears[rand100 % usedGears.length];
+                gearsContract.transferNft(gear.gearIdx, address(this));
+                emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
+            }
         }
     }
 
@@ -294,5 +291,9 @@ contract GameManager {
         } else {
             emit AlienWon(0, finalProb, msg.sender);
         }
+    }
+
+    function getAddress() public view returns (address) {
+        return address(this);
     }
 }

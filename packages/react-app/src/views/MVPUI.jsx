@@ -91,6 +91,10 @@ export default function MVPUI({
     console.log("updated player state ", player.name);
   }
 
+  function isPlayerState() {
+    return !state.playerState || Object.keys(state.playerState).length === 0;
+  }
+
   // Logs Functions
   // function updateLogs(txt) {
   //   let prevLogs = logs;
@@ -137,9 +141,9 @@ export default function MVPUI({
 
   return (
     <>
-      {!state.playerState && (
+      {isPlayerState() && (
         <CreatePlayer address={address} tx={tx} contracts={contracts} />
       )}
-      {state.playerState && uiBody}</>
+      {!isPlayerState() && uiBody}</>
   )
 }

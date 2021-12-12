@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./GearsMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
+import "./GameManager.sol";
 
 contract Gears is ERC721Enumerable, Ownable {
     using SafeMath for uint256;
@@ -132,7 +133,9 @@ contract Gears is ERC721Enumerable, Ownable {
         address playerWonAddr
     ) external {
         uint256 id = _tokenIds.current();
+
         _mint(playerWonAddr, id);
+
         lastTokenId = id;
         uint256 rand = getRandom(id);
         Gear storage gear = gears[id];
@@ -147,6 +150,11 @@ contract Gears is ERC721Enumerable, Ownable {
         emit GearDropped(gear);
     }
 
+    function approveGear(address gameContract, uint256 tokenId) public {
+        require(_exists(tokenId), "not exist");
+        approve(gameContract, tokenId);
+    }
+
     function tokenURI(uint256 id) public view override returns (string memory) {
         require(_exists(id), "not exist");
         Gear storage gear = gears[id];
@@ -157,6 +165,24 @@ contract Gears is ERC721Enumerable, Ownable {
 
     function getGearCats() public view returns (string[] memory) {
         return categories;
+    }
+
+    function transferNft(uint256 tokenId, address address_to)
+        public
+        returns (bool)
+    {
+        require(_exists(tokenId), "not exist");
+        transferFrom(ownerOf(tokenId), address_to, tokenId);
+        return true;
+    }
+
+    function isApproved(uint256 tokenId, address contractAddr)
+        public
+        view
+        returns (bool)
+    {
+        require(_exists(tokenId), "not exist");
+        return _isApprovedOrOwner(contractAddr, tokenId);
     }
 
     // function randomTokenURI(uint256 id, uint256 rarityLevel)

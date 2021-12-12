@@ -163,7 +163,19 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     }
   }
 
-  function equip(gear) {
+  async function approve(gear) {
+    let gameAddr = await contracts.GameManager.address;
+    await tx(contracts.Gears.approveGear(gameAddr, gear.tokenIdx), update => {
+      if (update.status === "confirmed" || update.status === 1) {
+        console.log("approved gear");
+      }
+      if (update.events) {
+        updateWallet();
+      }
+    });
+  }
+
+  async function equip(gear) {
     // console.log(gear);
     let slotFound = state.gearSlots.find(g => g.slotId == gear.tokenIdx);
     // console.log({ slotFound })
@@ -282,6 +294,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           gearJsObj.itemName = svgJson.item;
           gearJsObj.icon = getIconGear(gearJsObj.category);
           gearJsObj.strongIcons = getStrongIcons(gearJsObj.category);
+          let gameAddr = await contracts.GameManager.address;
+          gearJsObj.approved = await contracts.Gears.isApproved(tokenId, gameAddr);
           // console.log(svgImg);
           walletGearsUpdate.push(gearJsObj);
         }
@@ -350,8 +364,9 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           <div>{gear.itemName} </div>
         </div>
         <div className="gearSide">
-          {!gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
-          {gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
+          {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>}
+          {gear.approved && !gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
+          {gear.approved && gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
           <button className="gearBtn" onClick={() => viewNft(gear)}>View NFT</button>
         </div>
       </div>

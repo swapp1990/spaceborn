@@ -106,7 +106,7 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.kovan;
+const targetNetwork = NETWORKS.rinkeby;
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -338,14 +338,24 @@ function App(props) {
                                 Game
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="/contract">
+                        <Menu.Item key="/gears">
                             <Link
                                 onClick={() => {
-                                    setRoute("/contract");
+                                    setRoute("/gears");
                                 }}
-                                to="/contract"
+                                to="/gears"
                             >
-                                Contract
+                                Gears
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="/alien">
+                            <Link
+                                onClick={() => {
+                                    setRoute("/alien");
+                                }}
+                                to="/alien"
+                            >
+                                Alien
                             </Link>
                         </Menu.Item>
                     </Menu>
@@ -362,9 +372,18 @@ function App(props) {
                                 contracts={contracts}
                             />
                         </Route>
-                        <Route path="/contract">
+                        <Route path="/gears">
                             <Contract
                                 name="Gears"
+                                signer={userSigner}
+                                provider={provider}
+                                address={address}
+                                blockExplorer={blockExplorer}
+                            />
+                        </Route>
+                        <Route path="/alien">
+                            <Contract
+                                name="Alien"
                                 signer={userSigner}
                                 provider={provider}
                                 address={address}

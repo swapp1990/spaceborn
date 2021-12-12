@@ -51,6 +51,8 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   const [stepIdx, setStepIdx] = useState(1);
   const [alienWon, setAlienWon] = useState(null);
   const [gearWonImg, setGearWonImg] = useState(null);
+  const [gearLostImg, setGearLostImg] = useState(null);
+
   const [canMint, setCanMint] = useState(null);
   const [roundId, setRoundId] = useState();
   const [disableHuntMore, setDisableHuntMore] = useState(false);
@@ -263,7 +265,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     // console.log({ maxToShow })
     setLoading(false);
     const randAliens = chooseRandom(aliensUpdate, maxToShow);
-    console.log({ "randAliens": randAliens.length })
+    // console.log({ "randAliens": randAliens.length })
     setRandomAliens(randAliens);
     setdeadAliens(deadaliensUpdate);
   }
@@ -348,16 +350,17 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
     const foundGears = state.gearSlots.filter(e => e.slotId != -1).map(i => i.usedGear);
-    console.log({ foundGears });
+    // console.log({ foundGears });
     setStepIdx(3);
-    const result = await tx(contracts.GameManager.fightAlien(state.alienIdx, clientRandom, foundGears), update => {
+    await tx(contracts.GameManager.fightAlien(state.alienIdx, clientRandom, foundGears), update => {
       if (update) {
+        // console.log({ update });
         if (update.status === "confirmed" || update.status === 1) {
           console.log("fightAlien success");
         }
         if (update.events) {
-          console.log({ "event": update.events });
-          let event = update.events.find(e => e.event != null);
+          // console.log({ "events": update.events });
+          let event = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
           if (event) {
             console.log({ event })
             let eventInfo = event;
@@ -365,6 +368,10 @@ export default function GameScreen({ address, tx, contracts, provider }) {
               const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
               setgameActionMsg(txt);
               setAlienWon(true);
+              let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
+              if (lostGearEvent) {
+                updateLostGear(lostGearEvent);
+              }
             } else if (eventInfo.event == "PlayerWon") {
               const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
               setgameActionMsg(txt);
@@ -374,6 +381,15 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         }
       }
     });
+  }
+
+  async function updateLostGear(event) {
+    console.log({ "lostEvent": event });
+    const lostGearIdx = event.args.lostGearId.toNumber();
+    console.log({ lostGearIdx });
+    let svgImg = await getSvgImgGear(lostGearIdx);
+    // console.log({ svgImg });
+    setGearLostImg(svgImg);
   }
 
   function resetGearSlots() {
@@ -429,7 +445,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         <div className="result-title lost-txt">You Lost</div>
         <div className="win-gear">
           <div className="gearTitle">Gears Lost</div>
-          <div className="gearCard"></div>
+          <div className="gearCard">
+            <img src={gearLostImg} width="250px" height="250px"></img>
+          </div>
         </div>
         <div className="next-btn" onClick={onNewFight}>
           Start a new fight
