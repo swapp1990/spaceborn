@@ -355,6 +355,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     await tx(contracts.GameManager.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
       if (update) {
         // console.log({ update });
+        if (update.code) {
+          setLoading(false);
+        }
         if (update.status === "confirmed" || update.status === 1) {
           console.log("fightAlien success");
         }

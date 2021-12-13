@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   Card,
-  Carousel,
-  DatePicker,
-  Divider,
   Form,
   Input,
   List,
-  Progress,
-  Select,
-  Slider,
   Spin,
-  Switch,
-  Row,
-  Col,
-  Space,
-  Typography,
-  Modal,
 } from "antd";
+import GContext from "../../GContext";
 
 export default function CreatePlayer({ address, tx, contracts }) {
+  const { state, dispatch } = useContext(GContext);
+  const [loading, setLoading] = useState(false);
+
   const [ownedNfts, setOwnedNfts] = useState([]);
   const [balanceTokens, setBalanceTokens] = useState(0);
   const [playerInfo, setplayerInfo] = useState();
@@ -77,8 +69,27 @@ export default function CreatePlayer({ address, tx, contracts }) {
       );
   };
 
+  async function updatePlayerState() {
+    const tokenId = await contracts.Player.getTokenId(address);
+    if (tokenId.toNumber() == 0) {
+      console.log("player not found!");
+      return;
+    }
+    const player = await contracts.Player.getPlayer(tokenId);
+    const playerState = {
+      id: tokenId,
+      name: player.name,
+      image: null,
+      owner: address,
+      joined: player.joined,
+      roundId: player.joinedRoundId.toNumber()
+    };
+    dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
+    console.log("updated player state ", player.name);
+  }
+
   function clickPfpFromGallery(item) {
-    console.log(item);
+    // console.log(item);
     setselectedPfp(item);
   }
 
@@ -88,17 +99,23 @@ export default function CreatePlayer({ address, tx, contracts }) {
     playerInfoNew.name = playerInfo.name;
     // playerInfoNew.pfp_name = selectedPfp.name;
     // playerInfoNew.pfp_url = selectedPfp.pfp_url;
-    await tx(contracts.Player.mint(playerInfoNew)),
+    setLoading(true);
+    await tx(contracts.Player.mint(playerInfoNew),
       update => {
         if (update) {
+          if (update.code) {
+            setLoading(false);
+          }
           if (update.status === "confirmed" || update.status === 1) {
             console.log("player created");
           }
           if (update.events) {
             console.log({ "event": update.events });
+            updatePlayerState();
+            setLoading(false);
           }
         }
-      };
+      });
   }
 
   const loadOwnedNFTs = async () => {
@@ -144,7 +161,9 @@ export default function CreatePlayer({ address, tx, contracts }) {
       <Card style={{ width: 800 }} title="Create Player">
         {playerInfo && (
           <>
-            <div>Choose a PFP NFT that you want to set your player to</div>
+            {/* <div>Choose a PFP NFT that you want to set your player to</div> */}
+            {loading && <Spin size="large"></Spin>}
+            <div>Confirm</div>
             {/* <div>
               <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
             </div>
@@ -152,7 +171,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
             <div>{pfpGallery}</div>
             <div>Selected PFP: {selectedPfp.name}</div> */}
             <div>
-              <Button onClick={confirmCreate}>Confirm Create Player</Button>
+              <Button onClick={confirmCreate} disabled={loading}>Confirm Create Player</Button>
             </div>
           </>
         )}

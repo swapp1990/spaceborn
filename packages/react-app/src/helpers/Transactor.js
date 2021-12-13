@@ -131,7 +131,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
           message = e.message
         }
 
-        console.log("Attempt to clean up:", message);
+        // console.log("Attempt to clean up:", message);
         try {
           let obj = JSON.parse(message)
           if (obj && obj.body) {

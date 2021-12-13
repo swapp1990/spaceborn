@@ -58,6 +58,9 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         setLoading(true);
         await tx(contracts.Player.joinGame(roundId), update => {
             if (update) {
+                if (update.code) {
+                    setLoading(false);
+                }
                 if (update.status === "confirmed" || update.status === 1) {
                     console.log("Player joined game");
                 }
@@ -74,6 +77,10 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         setLoading(true);
         await tx(contracts.GameManager.claimRandomGear(), update => {
             if (update) {
+                // console.log({ update });
+                if (update.code) {
+                    setLoading(false);
+                }
                 if (update.status === "confirmed" || update.status === 1) {
                     console.log("Claimed free gear");
                 }
