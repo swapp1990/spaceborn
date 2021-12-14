@@ -2,11 +2,10 @@
 
 .body {
     width: 100vw;
-    background-color: beige;
-    padding: 5px;
+    /* background-color: beige; */
     height: 100%;
     font-family: 'Raleway', sans-serif;
-     display: flex;
+    display: flex;
 }
 
 .game-main {

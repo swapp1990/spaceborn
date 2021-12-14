@@ -79,8 +79,4 @@ contract Player is ERC721("Player", "PLR") {
     function getTokenId(address addr) public view returns (uint256) {
         return addr2token[addr];
     }
-
-    // function takeAction(uint256 alien_id, uint256 clientRandom) public {
-    // 	gameManager.fightAlien(alien_id, clientRandom);
-    // }
 }

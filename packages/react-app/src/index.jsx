@@ -25,7 +25,6 @@ ReactDOM.render(
   <BrowserRouter>
     <Switch>
       <Route exact path="/">
-        {/* <Home /> */}
         <SplashPage />
       </Route>
       <Route exact path="/app">
