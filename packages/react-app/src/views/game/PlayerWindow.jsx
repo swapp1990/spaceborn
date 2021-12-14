@@ -52,7 +52,7 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
   const playerWrapper = (
     <div className="profile">
       <div className="profileImg">
-        <img src="./img_avatar.png" alt="Avatar"></img>
+        <img src="./images/img_avatar.png" alt="Avatar"></img>
       </div>
       <div className="profileInfo">
         <div>swap</div>

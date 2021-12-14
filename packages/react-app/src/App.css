@@ -2,4 +2,18 @@
   margin: 0px auto;
   text-align: center;
   background-color: hsl(0deg 0% 10%);
+  height: 100vh;
+}
+.Header {
+  height: 11%;
+}
+.Content {
+  height: 89%;
+  overflow: hidden;
+}
+.Navbar {
+  height: 5%;
+}
+.RouteBody {
+  height: 95%;
 }

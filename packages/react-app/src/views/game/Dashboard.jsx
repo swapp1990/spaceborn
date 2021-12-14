@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Spin } from "antd";
-import GContext from "../../GContext";
+import GContext from "../../helpers/GContext";
 import "./dashboard.scss";
 
 export default function Dashboard({ address, tx, contracts, provider }) {

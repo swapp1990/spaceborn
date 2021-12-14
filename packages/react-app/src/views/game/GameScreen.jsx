@@ -21,16 +21,8 @@ import {
 } from "antd";
 import "./game.css"
 import * as svgUtils from "../../helpers/svgUtils";
-import GContext from "../../GContext";
-import alienIcon from "../../assets/alien.png";
-import speed from "../../assets/speed.png";
-import power from "../../assets/power.png";
-import replication from "../../assets/replication.png";
-import charm from "../../assets/charm.png";
-import mimic from "../../assets/mimic.png";
-import mind from "../../assets/mind-control.png";
-import brain from "../../assets/brain.png";
-import npc from "../../assets/npc.png";
+import GContext from "../../helpers/GContext";
+import IMAGES from "../../helpers/imageImporter";
 
 const { Text, Link, Title } = Typography;
 const categories = [
@@ -189,26 +181,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   }
 
   function getIcon2(cat) {
-    switch (cat) {
-      case "Agility":
-        return speed;
-      case "Powerful":
-        return power;
-      case "Charm":
-        return charm;
-      case "Mind Control":
-        return mind;
-      case "Replication":
-        return replication;
-      case "Mimic":
-        return mimic;
-      case "Superintelligent":
-        return brain;
-      case "NPC":
-        return npc;
-      default:
-        return;
-    }
+    return IMAGES[cat.toUpperCase()];
   }
 
   const chooseRandom = (arr, num = 1) => {
@@ -248,7 +221,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
             alienObj.name = alien.name;
             alienObj.category = svgJson.category;
             alienObj.probs = alien.baseProb.toNumber();
-            alienObj.icon = alienIcon;
+            alienObj.icon = IMAGES["ALIEN_ICON"];
             alienObj.icon2 = getIcon2(alienObj.category);
             aliensUpdate.push(alienObj);
           } else {

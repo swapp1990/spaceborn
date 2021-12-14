@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState, useReducer, useMemo } from "re
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import GContext from "./GContext";
+import GContext from "./helpers/GContext";
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -44,7 +44,7 @@ const walletLinkProvider = walletLink.makeWeb3Provider(`https://mainnet.infura.i
 const web3Modal = new Web3Modal({
     network: "mainnet", // Optional. If using WalletConnect on xDai, change network to "xdai" and add RPC info below for xDai chain.
     cacheProvider: true, // optional
-    theme: "light", // optional. Change to "dark" for a dark theme.
+    theme: "dark", // optional. Change to "dark" for a dark theme.
     providerOptions: {
         authereum: {
             package: Authereum, // required
@@ -52,7 +52,8 @@ const web3Modal = new Web3Modal({
     },
 });
 
-const targetNetwork = NETWORKS.kovan;
+const networkName = process.env.REACT_APP_NETWORK ? process.env.REACT_APP_NETWORK : "rinkeby";
+const targetNetwork = NETWORKS[networkName];
 const NETWORKCHECK = true;
 let chainId = null;
 const blockExplorer = targetNetwork.blockExplorer;
@@ -277,74 +278,82 @@ function App(props) {
     return (
         <GContext.Provider value={contextValue}>
             <div className="App">
-                <Header />
+                <div className="Header">
+                    <Header />
+                </div>
                 {networkDisplay}
-                <BrowserRouter>
-                    <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-                        <Menu.Item key="/app">
-                            <Link
-                                onClick={() => {
-                                    setRoute("/app");
-                                }}
-                                to="/app"
-                            >
-                                Game
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="/gears">
-                            <Link
-                                onClick={() => {
-                                    setRoute("/gears");
-                                }}
-                                to="/gears"
-                            >
-                                Gears
-                            </Link>
-                        </Menu.Item>
-                        <Menu.Item key="/alien">
-                            <Link
-                                onClick={() => {
-                                    setRoute("/alien");
-                                }}
-                                to="/alien"
-                            >
-                                Alien
-                            </Link>
-                        </Menu.Item>
-                    </Menu>
-                    <Switch>
-                        <Route exact path="/app">
-                            {/* <WireframeUI contracts={contracts} /> */}
-                            <MVPUI
-                                address={address}
-                                userSigner={userSigner}
-                                mainnetProvider={mainnetProvider}
-                                provider={provider}
-                                price={price}
-                                tx={tx}
-                                contracts={contracts}
-                            />
-                        </Route>
-                        <Route path="/gears">
-                            <Contract
-                                name="Gears"
-                                signer={userSigner}
-                                provider={provider}
-                                address={address}
-                                blockExplorer={blockExplorer}
-                            />
-                        </Route>
-                        <Route path="/alien">
-                            <Contract
-                                name="Alien"
-                                signer={userSigner}
-                                provider={provider}
-                                address={address}
-                                blockExplorer={blockExplorer}
-                            />
-                        </Route>
-                    </Switch>
-                </BrowserRouter>
+                <div className="Content">
+                    <BrowserRouter>
+                        <div className="Navbar">
+                            <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+                                <Menu.Item key="/app">
+                                    <Link
+                                        onClick={() => {
+                                            setRoute("/app");
+                                        }}
+                                        to="/app"
+                                    >
+                                        Game
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item key="/gears">
+                                    <Link
+                                        onClick={() => {
+                                            setRoute("/gears");
+                                        }}
+                                        to="/gears"
+                                    >
+                                        Gears
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item key="/alien">
+                                    <Link
+                                        onClick={() => {
+                                            setRoute("/alien");
+                                        }}
+                                        to="/alien"
+                                    >
+                                        Alien
+                                    </Link>
+                                </Menu.Item>
+                            </Menu>
+                        </div>
+                        <div className="RouteBody">
+                            <Switch>
+                                <Route exact path="/app">
+                                    {/* <WireframeUI contracts={contracts} /> */}
+                                    <MVPUI
+                                        address={address}
+                                        userSigner={userSigner}
+                                        mainnetProvider={mainnetProvider}
+                                        provider={provider}
+                                        price={price}
+                                        tx={tx}
+                                        contracts={contracts}
+                                    />
+                                </Route>
+                                <Route path="/gears">
+                                    <Contract
+                                        name="Gears"
+                                        signer={userSigner}
+                                        provider={provider}
+                                        address={address}
+                                        blockExplorer={blockExplorer}
+                                    />
+                                </Route>
+                                <Route path="/alien">
+                                    <Contract
+                                        name="Alien"
+                                        signer={userSigner}
+                                        provider={provider}
+                                        address={address}
+                                        blockExplorer={blockExplorer}
+                                    />
+                                </Route>
+                            </Switch>
+                        </div>
+                    </BrowserRouter>
+                </div>
                 <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
                     <Account
                         address={address}

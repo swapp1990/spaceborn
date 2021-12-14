@@ -4,13 +4,12 @@ import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import ReactDOM from "react-dom";
 import App from "./App";
-import Home from "./Home";
-import HomeFiber from "./HomeFiber";
 import "./index.css";
+import SplashPage from "./views/SplashPage";
 
 const themes = {
-  dark: `${process.env.PUBLIC_URL}/dark-theme.css`,
-  light: `${process.env.PUBLIC_URL}/light-theme.css`,
+  dark: `${process.env.PUBLIC_URL}/css/dark-theme.css`,
+  light: `${process.env.PUBLIC_URL}/css/dark-theme.css`,
 };
 
 const prevTheme = window.localStorage.getItem("theme");
@@ -27,7 +26,7 @@ ReactDOM.render(
     <Switch>
       <Route exact path="/">
         {/* <Home /> */}
-        <HomeFiber />
+        <SplashPage />
       </Route>
       <Route exact path="/app">
         <ApolloProvider client={client}>

@@ -1,7 +1,7 @@
 import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin, Switch, Row, Col } from "antd";
 import React, { useEffect, useState } from "react";
 import { ReactComponent as CardEx } from "../card_ex.svg";
-import * as svgUtils from "../helpers/svgUtils";
+import * as svgUtils from "../../helpers/svgUtils";
 
 export default function LootTest({
   address,
@@ -15,9 +15,9 @@ export default function LootTest({
 }) {
   const [imgSrc, setImgSrc] = useState(null);
   const [tokenIdx, setTokenIdx] = useState(0);
-  const init = async () => {};
+  const init = async () => { };
 
-  const update = async () => {};
+  const update = async () => { };
   useEffect(() => {
     if (readContracts && readContracts.Gears) {
       init();

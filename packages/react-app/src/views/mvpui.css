@@ -2,11 +2,11 @@
 
 .body {
     width: 100vw;
-    height: 88vh;
+    height: inherit;
     background-color: beige;
     padding: 5px;
     font-family: 'Raleway', sans-serif;
-     display: flex;
+    display: flex;
 }
 
 .side {

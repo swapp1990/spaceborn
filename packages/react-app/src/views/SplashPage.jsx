@@ -1,21 +1,20 @@
 import * as THREE from 'three'
 import { useState, useEffect, useRef, Suspense, useMemo } from 'react'
+import { useHistory } from "react-router-dom";
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber'
 import { Reflector, CameraShake, OrbitControls, useTexture, Stars } from '@react-three/drei'
 import { KernelSize } from 'postprocessing'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
-import "./homefiber.scss"
-import { ReactComponent as Gear1 } from "./assets/loot1.svg";
-import { ReactComponent as Gear2 } from "./assets/loot2.svg";
-import { ReactComponent as Gear3 } from "./assets/loot3.svg";
-import { useHistory } from "react-router-dom";
+import { default as SVGs } from "../helpers/svgImporter";
+import "./splash.scss"
+
 
 function Triangle({ color, ...props }) {
     const ref = useRef()
     const [r] = useState(() => Math.random() * 10000)
     useFrame((_) => (ref.current.position.y = -1.75 + Math.sin(_.clock.elapsedTime + r) / 10))
-    const { paths: [path] } = useLoader(SVGLoader, '/triangle.svg') // prettier-ignore
+    const { paths: [path] } = useLoader(SVGLoader, '/images/triangle.svg') // prettier-ignore
     const geom = useMemo(() => SVGLoader.pointsToStroke(path.subPaths[0].getPoints(), path.userData.style), [])
     return (
         <group ref={ref}>
@@ -39,7 +38,7 @@ function Rig({ children }) {
 }
 
 function Ground(props) {
-    const [floor, normal] = useTexture(['/SurfaceImperfections003_1K_var1.jpg', '/SurfaceImperfections003_1K_Normal.jpg'])
+    const [floor, normal] = useTexture(['/images/SurfaceImperfections003_1K_var1.jpg', '/images/SurfaceImperfections003_1K_Normal.jpg'])
     return (
         <Reflector resolution={1024} args={[8, 8]} {...props}>
             {(Material, props) => <Material color="#f0f0f0" metalness={0} roughnessMap={floor} normalMap={normal} normalScale={[2, 2]} {...props} />}
@@ -47,7 +46,7 @@ function Ground(props) {
     )
 }
 
-export default function HomeFiber() {
+export default function SplashPage() {
     const [showCanvas, setShowCanvas] = useState(true);
     const history = useHistory();
 
@@ -85,9 +84,9 @@ export default function HomeFiber() {
                 <p>Example Moonshot Gears NFT</p>
             </div>
             <div className="cards">
-                <Gear1 />
-                <Gear2 />
-                <Gear3 />
+                {/* {SVGs["GEAR1"]} */}
+                {/* <Gear2 />
+                <Gear3 /> */}
             </div>
         </div>
         <div className="section2">
@@ -119,7 +118,7 @@ export default function HomeFiber() {
         <div className="fiberbody">
             {showCanvas && <div className="titleObj">
                 <div className="title">
-                    <img src="Spaceborn.png" width="500px"></img>
+                    <img src="images/Spaceborn.png" width="500px"></img>
                 </div>
                 <div className="subtitle">
                     Humanity finally reached the stars. The ones who survived out there called themselves Spaceborn. This is there story ...
@@ -131,7 +130,7 @@ export default function HomeFiber() {
             </div>}
             {!showCanvas && <div className="titleObj2">
                 <div className="title">
-                    <img src="Spaceborn.png" width="400px"></img>
+                    <img src="/images/Spaceborn.png" width="400px"></img>
                 </div>
                 <div className="menu">
                     <button className="infoBtn" onClick={() => onBack()}>Back</button>
@@ -139,7 +138,7 @@ export default function HomeFiber() {
                 </div>
                 {scrollContent}
             </div>}
-            <div className="canvas" style={{ backgroundImage: "url('/bg_lights.png')" }}>
+            <div className="canvas" style={{ backgroundImage: "url('/images/bg_lights.png')" }}>
                 <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 15] }}>
                     <ambientLight />
                     <Suspense fallback={null}>

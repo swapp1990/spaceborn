@@ -5,7 +5,6 @@ import {
 } from "antd";
 
 import React, { useEffect, useState, useContext, useReducer, useMemo } from "react";
-import "./main.css";
 import "./mvpui.css";
 import { default as CreatePlayer } from "./game/CreatePlayer";
 import { default as Dashboard } from "./game/Dashboard";
@@ -14,7 +13,7 @@ import { default as PlayerWindow } from "./game/PlayerWindow";
 import { default as WalletWindow } from "./game/WalletWindow";
 import { default as LogsScreen } from "./game/LogsScreen";
 
-import GContext from "../GContext";
+import GContext from "../helpers/GContext";
 
 const { Text, Link, Title } = Typography;
 

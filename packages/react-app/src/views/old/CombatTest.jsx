@@ -17,7 +17,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { ReactComponent as CardEx } from "../card_ex.svg";
 const { Text, Link, Title } = Typography;
-import * as svgUtils from "../helpers/svgUtils";
+import * as svgUtils from "../../helpers/svgUtils";
 
 const GEAR_CATS = ["Weapon",
   "Apparel",

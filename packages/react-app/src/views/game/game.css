@@ -2,9 +2,9 @@
 
 .body {
     width: 100vw;
-    height: 88vh;
     background-color: beige;
     padding: 5px;
+    height: 100%;
     font-family: 'Raleway', sans-serif;
      display: flex;
 }

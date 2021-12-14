@@ -7,7 +7,7 @@ import {
   List,
   Spin,
 } from "antd";
-import GContext from "../../GContext";
+import GContext from "../../helpers/GContext";
 
 export default function CreatePlayer({ address, tx, contracts }) {
   const { state, dispatch } = useContext(GContext);

@@ -21,23 +21,11 @@ import {
   Modal,
 } from "antd";
 import * as svgUtils from "../../helpers/svgUtils";
-import GContext from "../../GContext";
-import "./wallet.css";
-import apparel from "../../assets/Apparel.png";
-import pill from "../../assets/Pill.png";
-import vehicle from "../../assets/Vehicle.png";
-import weapon from "../../assets/Weapon.png";
-import gizmo from "../../assets/Gizmo.png";
+import GContext from "../../helpers/GContext";
+import "./wallet.scss";
+import IMAGES from "../../helpers/imageImporter";
 
-import speed from "../../assets/speed.png";
-import power from "../../assets/power.png";
-import replication from "../../assets/replication.png";
-import charm from "../../assets/charm.png";
-import mimic from "../../assets/mimic.png";
-import mind from "../../assets/mind-control.png";
-import brain from "../../assets/brain.png";
-import npc from "../../assets/npc.png";
-import { default as PopupWindow } from "./PopupWindow";
+import { default as PopupWindow } from "../../components/PopupWindow";
 
 const { Text, Link, Title } = Typography;
 
@@ -229,43 +217,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   function getIconGear(cat) {
-    switch (cat) {
-      case "Weapon":
-        return weapon;
-      case "Apparel":
-        return apparel;
-      case "Vehicle":
-        return vehicle;
-      case "Pill":
-        return pill;
-      case "Gizmo":
-        return gizmo;
-      default:
-        return
-    }
+    return IMAGES[cat.toUpperCase()];
   }
 
   function getIconAlien(type) {
-    switch (type) {
-      case "Agility":
-        return speed;
-      case "Powerful":
-        return power;
-      case "Mind Control":
-        return mind;
-      case "Charm":
-        return charm;
-      case "Replication":
-        return replication;
-      case "Mimic":
-        return mimic;
-      case "Superintelligent":
-        return brain
-      case "NPC":
-        return npc
-      default:
-        return
-    }
+    return IMAGES[type.toUpperCase()];
   }
 
   function getStrongIcons(cat) {
