@@ -1,10 +1,4 @@
-.inventoryObj {
-    padding: 0px;
-    width: auto;
-    height: 75%;
-    /* background-color: aqua; */
-}
-.invTitle {
+.panelTitle {
     width: 100%;
     font-weight: 800;
     font-size: 26px;
@@ -12,17 +6,43 @@
 
     display: flex;
     justify-content: space-between;
+    .count {
+        width: 40px;
+        height: 40px;
+        border-radius: 150px;
+        background-color:#FFD630;
+        color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
-.gearsCount {
-    width: 40px;
-    height: 40px;
-    border-radius: 150px;
-    background-color:#FFD630;
-    color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.panelSubTitle {
+    padding-top: 10px;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 11px;
 }
+
+.apprObj {
+    padding: 0px;
+    width: auto;
+    height: 25%;
+    // background-color: #FFD630;
+    .appColl {
+        display: flex;
+        overflow-x: scroll;
+        justify-content: flex-start;
+        align-items: center;
+    }
+}
+.inventoryObj {
+    padding: 0px;
+    width: auto;
+    height: 75%;
+    /* background-color: aqua; */
+}
+
 .invColl {
     padding: 0px;
     height: 90%;

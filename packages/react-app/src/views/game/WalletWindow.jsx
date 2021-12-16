@@ -87,6 +87,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   const { state, dispatch } = useContext(GContext);
 
   const [walletGears, setWalletGears] = useState([]);
+  const [approveGears, setApproveGears] = useState([]);
   const [loading, setLoading] = useState(false);
   const [popupWindowMsg, setpopupWindowMsg] = useState({ show: false });
 
@@ -275,8 +276,12 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
         console.log(e);
       }
     }
+    let needsApproved = walletGearsUpdate.filter(w => w.approved == false);
+    console.log(needsApproved);
+    setApproveGears(needsApproved);
     // console.log(walletGearsUpdate);
-    setWalletGears(walletGearsUpdate.reverse());
+    let approvedGears = walletGearsUpdate.filter(w => w.approved == true);
+    setWalletGears(approvedGears.reverse());
     setLoading(false);
   }
 
@@ -314,6 +319,16 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   // }
 
   /////////////////////// Render
+  function approveGearBox(gear, idx) {
+    return (
+      <div className="apprGearBox" key={idx}>
+        <div className="gearImg">
+          <img src={gear.icon} width="50" height="50" />
+        </div>
+        {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>}
+      </div>
+    )
+  }
   function gearBox(gear, idx) {
     // console.log(gear);
     return (
@@ -335,8 +350,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           <div>{gear.itemName} </div>
         </div>
         <div className="gearSide">
-          {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>}
-          {gear.approved && !gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
+          {/* {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>} */}
+          {gear.approved && state.playerState && state.playerState.joined && !gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
           {gear.approved && gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
           <button className="gearBtn" onClick={() => viewNft(gear)}>View NFT</button>
         </div>
@@ -360,17 +375,32 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
 
   const walletWindow = (
     <>
+      <div className="apprObj">
+        <div className="panelTitle">Approve Gears
+          <div className="count">{approveGears.length}</div>
+        </div>
+        <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div>
+        <div className="appColl">
+          <div>
+            {approveGears.length == 0 && <span>No gears in your wallet needs approval</span>}
+            {approveGears.map((gear, idx) => approveGearBox(gear, idx))}
+          </div>
+        </div>
+      </div>
+      <hr />
       <div className="inventoryObj">
-        <div className="invTitle">Gear Collected
-          <div className="gearsCount">{walletGears.length}</div>
+        <div className="panelTitle">Gear Approved
+          <div className="count">{walletGears.length}</div>
         </div>
         <div className="invColl">
           {loading && <Spin size="large"></Spin>}
           <div className="gearWrapper">
+            {walletGears.length == 0 && <span>No approved gears found</span>}
             {walletGears.map((gear, idx) => gearBox(gear, idx))}
           </div>
         </div>
       </div>
+
       {popupWindowMsg && popupWindowMsg.show && <PopupWindow onCloseCallback={handlePopup} popupMsg={popupWindowMsg}></PopupWindow>}
     </>
   )

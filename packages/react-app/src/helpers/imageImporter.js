@@ -21,7 +21,7 @@ const IMAGES = {
     "VEHICLE": vehicle,
     "WEAPON": weapon,
     "GIZMO": gizmo,
-    "SPEED": speed,
+    "AGILITY": speed,
     "POWERFUL": power,
     "REPLICATION": replication,
     "CHARM": charm,

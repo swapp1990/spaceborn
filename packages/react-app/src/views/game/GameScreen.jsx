@@ -17,6 +17,7 @@ import {
   Col,
   Space,
   Typography,
+  Tooltip,
   Modal,
 } from "antd";
 import "./game.css"
@@ -434,9 +435,12 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   const alienCard = (alien, i) => {
     return (<div className="cardObj" key={i} onClick={() => onAlienSel(alien)}>
       <div className="cardBox">
+
         <img src={alien.icon} width="80" height="80" />
         <div className="icon2">
-          <img src={alien.icon2} width="30" height="30" />
+          <Tooltip title={alien.category}>
+            <img src={alien.icon2} width="30" height="30" />
+          </Tooltip>
         </div>
       </div>
       <div className="cardTitle">{alien.name}</div>
