@@ -7,7 +7,9 @@ import {
   List,
   Spin,
 } from "antd";
+import { useMoralisWeb3Api } from "react-moralis"
 import GContext from "../../helpers/GContext";
+import "./create.scss";
 
 export default function CreatePlayer({ address, tx, contracts }) {
   const { state, dispatch } = useContext(GContext);
@@ -16,14 +18,22 @@ export default function CreatePlayer({ address, tx, contracts }) {
   const [ownedNfts, setOwnedNfts] = useState([]);
   const [balanceTokens, setBalanceTokens] = useState(0);
   const [playerInfo, setplayerInfo] = useState();
-  const [selectedPfp, setselectedPfp] = useState({ id: -1 });
+  const [selectedPfp, setselectedPfp] = useState(null);
+  const [pfpList, setPfpList] = useState({ "MSB": [], "ARC": [] })
 
   const [form] = Form.useForm();
+  const Web3Api = useMoralisWeb3Api();
+
+  useEffect(async () => {
+
+  }, []);
 
   const onFinish = values => {
     console.log(values);
     setplayerInfo(values);
+    getAllNfts();
   };
+
   const onGenderChange = value => {
     switch (value) {
       case "male":
@@ -33,13 +43,6 @@ export default function CreatePlayer({ address, tx, contracts }) {
       case "other":
     }
   };
-
-  function gePfpItemBgColor(idx) {
-    if (selectedPfp.id == idx) {
-      return { backgroundColor: "lightgreen", color: "black" };
-    }
-    return { backgroundColor: "black", color: "black" };
-  }
 
   const getImgFromToken = token => {
     return fetch(token.image)
@@ -69,6 +72,46 @@ export default function CreatePlayer({ address, tx, contracts }) {
       );
   };
 
+  async function getAllNfts() {
+    const options = {
+      chain: 'eth', address: '0x99066C5fa8F44EEF3FCDee1811fcD90C2D45ddf5'
+    }
+    const res = await Web3Api.account.getNFTs(options)
+    // console.log(res.result)
+    const moonshotBotsContract = "0x8b13e88ead7ef8075b58c94a7eb18a89fd729b18";
+    const nfts_msb = res.result.filter(r => r.token_address === moonshotBotsContract);
+    // console.log(nfts_msb);
+    let pfp_msb = [];
+    nfts_msb.forEach(async e => {
+      let metaJson = await getMetadataFromTokenUri(e.token_uri);
+      let currPfpList = pfpList["MSB"];
+      currPfpList.push(
+        {
+          "name": "MSB",
+          "img": metaJson.image,
+          "token_id": Number(e.token_id)
+        }
+      );
+      setPfpList({ ...pfpList, ["MSB"]: currPfpList });
+    });
+
+    const arcadiansContract = "0xc3c8a1e1ce5386258176400541922c414e1b35fd";
+    const nfts_arc = res.result.filter(r => r.token_address === arcadiansContract);
+
+    nfts_arc.forEach(async e => {
+      let metaJson = await getMetadataFromTokenUri(e.token_uri);
+      let currPfpList = pfpList["ARC"];
+      currPfpList.push(
+        {
+          "name": "ARC",
+          "img": metaJson.image,
+          "token_id": Number(e.token_id)
+        }
+      );
+      setPfpList({ ...pfpList, ["ARC"]: currPfpList });
+    });
+  }
+
   async function updatePlayerState() {
     const tokenId = await contracts.Player.getTokenId(address);
     if (tokenId.toNumber() == 0) {
@@ -88,9 +131,15 @@ export default function CreatePlayer({ address, tx, contracts }) {
     console.log("updated player state ", player.name);
   }
 
-  function clickPfpFromGallery(item) {
-    // console.log(item);
-    setselectedPfp(item);
+  function isSelected(pfpObj) {
+    if (pfpObj == selectedPfp) {
+      return true;
+    }
+    return false;
+  }
+
+  function handleChange(pfpObj) {
+    setselectedPfp(pfpObj);
   }
 
   async function confirmCreate() {
@@ -118,51 +167,74 @@ export default function CreatePlayer({ address, tx, contracts }) {
       });
   }
 
-  const loadOwnedNFTs = async () => {
-    const balance = await contracts.BadKidsAlley.balanceOf(address);
-    console.log(balance.toNumber());
-    setBalanceTokens(balance.toNumber());
-    let nfts = [];
-    for (let i = 0; i < balance; i++) {
-      const tokenUri = await contracts.BadKidsAlley.tokenURI(i);
-      let result = await getMetadataFromTokenUri(tokenUri);
-      console.log(result);
-      let imgSrc = await getImgFromToken(result);
-      nfts.push({ id: i, name: result.name, imgSrc: imgSrc, pfp_url: result.image });
-    }
-    setOwnedNfts(nfts);
-  };
-  const pfpGallery = (
-    <Card title="Wallet" style={{ overflowY: "auto", overflowX: "hidden", height: 400 }}>
-      <List
-        grid={{ gutter: 16, column: 4 }}
-        dataSource={ownedNfts}
-        style={{ overflowY: "hidden", overflowX: "auto" }}
-        renderItem={item => (
-          <List.Item>
-            <div onClick={() => clickPfpFromGallery(item)}>
-              <Card
-                hoverable
-                bordered
-                title={item.name}
-                style={gePfpItemBgColor(item.id)}
-                headStyle={{ backgroundColor: "rgba(255, 255, 255, 0.4)", border: 0 }}
-              >
-                <img style={{ height: 100 }} src={item.imgSrc} />
-              </Card>
-            </div>
-          </List.Item>
-        )}
-      ></List>
-    </Card>
-  );
+  // const loadOwnedNFTs = async () => {
+  //   const balance = await contracts.BadKidsAlley.balanceOf(address);
+  //   console.log(balance.toNumber());
+  //   setBalanceTokens(balance.toNumber());
+  //   let nfts = [];
+  //   for (let i = 0; i < balance; i++) {
+  //     const tokenUri = await contracts.BadKidsAlley.tokenURI(i);
+  //     let result = await getMetadataFromTokenUri(tokenUri);
+  //     console.log(result);
+  //     let imgSrc = await getImgFromToken(result);
+  //     nfts.push({ id: i, name: result.name, imgSrc: imgSrc, pfp_url: result.image });
+  //   }
+  //   setOwnedNfts(nfts);
+  // };
+  // const pfpGallery = (
+  //   <Card title="Wallet" style={{ overflowY: "auto", overflowX: "hidden", height: 400 }}>
+  //     <List
+  //       grid={{ gutter: 16, column: 4 }}
+  //       dataSource={ownedNfts}
+  //       style={{ overflowY: "hidden", overflowX: "auto" }}
+  //       renderItem={item => (
+  //         <List.Item>
+  //           <div onClick={() => clickPfpFromGallery(item)}>
+  //             <Card
+  //               hoverable
+  //               bordered
+  //               title={item.name}
+  //               style={gePfpItemBgColor(item.id)}
+  //               headStyle={{ backgroundColor: "rgba(255, 255, 255, 0.4)", border: 0 }}
+  //             >
+  //               <img style={{ height: 100 }} src={item.imgSrc} />
+  //             </Card>
+  //           </div>
+  //         </List.Item>
+  //       )}
+  //     ></List>
+  //   </Card>
+  // );
+
   const createPlayerScreen = (
     <div className="create">
-      <Card style={{ width: 800 }} title="Create Player">
+      <Card style={{ width: 800 }} title="Choose PFP">
         {playerInfo && (
           <>
-            {/* <div>Choose a PFP NFT that you want to set your player to</div> */}
+            <div>Choose a PFP NFT that you want to set your player to</div>
             {loading && <Spin size="large"></Spin>}
+            <div className="choosePfp">
+              <div className="projWrapper">
+                <div className="projTitle">Moonshot Bots</div>
+                <div className="projSel">
+                  {pfpList["MSB"].map((e, key) => <div key={key} className="pfpEntry">
+                    <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
+                    <label for={key}><img src={e.img} /></label>
+                  </div>)}
+                </div>
+              </div>
+              <div className="projWrapper">
+                <div className="projTitle">Arcadians</div>
+                <div className="projSel">
+                  {pfpList["ARC"].map((e, key) => <div key={key} className="pfpEntry">
+                    <input type="checkbox" id={'S' + key} checked={isSelected(e)} onChange={() => handleChange(e)} />
+                    <label for={'S' + key}><img src={e.img} /></label>
+                  </div>)}
+                </div>
+
+              </div>
+            </div>
+
             <div>Confirm</div>
             {/* <div>
               <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
