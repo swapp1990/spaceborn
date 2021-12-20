@@ -13,6 +13,7 @@ import mind from "../assets/images/mind-control.png";
 import brain from "../assets/images/brain.png";
 import npc from "../assets/images/npc.png";
 import alienIcon from "../assets/images/alien.png";
+import vsImg from "../assets/images/vs_img.png";
 
 const IMAGES = {
     "ALIEN_ICON": alienIcon,
@@ -28,7 +29,8 @@ const IMAGES = {
     "MIMIC": mimic,
     "MIND CONTROL": mind,
     "SUPERINTELLIGENT": brain,
-    "NPC": npc
+    "NPC": npc,
+    "VS": vsImg,
 };
 
 export default IMAGES;

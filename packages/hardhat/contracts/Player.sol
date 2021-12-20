@@ -20,12 +20,19 @@ contract Player is ERC721("Player", "PLR") {
         uint256 tokenId;
         bool exists;
         string name;
+        string pfpUrl;
+        string pfpName;
+        string faction;
+        uint256 pfpTokenId;
         bool joined;
         uint256 joinedRoundId;
     }
 
     struct PlayerInp {
         string name;
+        uint256 pfpTokenId;
+        string pfpUrl;
+        string pfpName;
     }
 
     mapping(address => Player) public players;
@@ -51,6 +58,10 @@ contract Player is ERC721("Player", "PLR") {
         Player storage player = players[msg.sender];
         player.tokenId = id;
         player.name = playerInp.name;
+        player.pfpTokenId = playerInp.pfpTokenId;
+        player.pfpName = playerInp.pfpName;
+        player.pfpUrl = playerInp.pfpUrl;
+        // player.faction = playerInp.faction;
         player.exists = true;
         player.joined = false;
         // player.joinedRoundId = 1;

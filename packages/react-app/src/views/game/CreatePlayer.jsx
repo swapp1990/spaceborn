@@ -122,6 +122,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
     const playerState = {
       id: tokenId,
       name: player.name,
+      pfpUrl: player.pfpUrl,
       image: null,
       owner: address,
       joined: player.joined,
@@ -139,6 +140,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
   }
 
   function handleChange(pfpObj) {
+    console.log({ pfpObj })
     setselectedPfp(pfpObj);
   }
 
@@ -146,9 +148,13 @@ export default function CreatePlayer({ address, tx, contracts }) {
     // let playerInfoNew = { ...playerInfo, ...selectedPfp };
     let playerInfoNew = {};
     playerInfoNew.name = playerInfo.name;
-    // playerInfoNew.pfp_name = selectedPfp.name;
-    // playerInfoNew.pfp_url = selectedPfp.pfp_url;
+    if (selectedPfp) {
+      playerInfoNew.pfpName = selectedPfp.name;
+      playerInfoNew.pfpUrl = selectedPfp.img;
+      playerInfoNew.pfpTokenId = selectedPfp.token_id;
+    }
     setLoading(true);
+    console.log({ playerInfoNew })
     await tx(contracts.Player.mint(playerInfoNew),
       update => {
         if (update) {
@@ -251,7 +257,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
         {!playerInfo && (
           <Form form={form} name="control-hooks" onFinish={onFinish}>
             <Form.Item name="name" label="Player Name" rules={[{ required: true }]}>
-              <Input />
+              <Input autoComplete="off" />
             </Form.Item>
             {/* <Form.Item name="gender" label="Player Gender" rules={[{ required: true }]}>
               <Select placeholder="Select a option and change input text above" onChange={onGenderChange} allowClear>

@@ -41,7 +41,7 @@ export default function MVPUI({
     }
   }, [contracts, address]);
   useEffect(() => {
-    console.log({ player: state.playerState });
+    // console.log({ player: state.playerState });
   }, [state.playerState])
 
 
@@ -78,16 +78,18 @@ export default function MVPUI({
       return;
     }
     const player = await contracts.Player.getPlayer(tokenId);
+    // console.log({ player });
     const playerState = {
       id: tokenId,
       name: player.name,
+      pfpUrl: player.pfpUrl,
       image: null,
       owner: address,
       joined: player.joined,
       roundId: player.joinedRoundId.toNumber()
     };
     dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
-    console.log("updated player state ", player.name);
+    // console.log("updated player state ", player.name);
   }
 
   function isPlayerState() {

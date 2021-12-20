@@ -6,12 +6,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy("TestOracle", {
-    from: deployer,
-    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
-
   await deploy("Alien", {
     from: deployer,
     //args: [ "Hello", ethers.utils.parseEther("1.5") ],

@@ -20,10 +20,12 @@ import {
   Tooltip,
   Modal,
 } from "antd";
-import "./game.css"
+import "./game.scss"
 import * as svgUtils from "../../helpers/svgUtils";
 import GContext from "../../helpers/GContext";
 import IMAGES from "../../helpers/imageImporter";
+import chanceNumber from "../../assets/images/chanceNumber.png";
+import chanceBar from "../../assets/images/chanceBar.png";
 
 const { Text, Link, Title } = Typography;
 const categories = [
@@ -208,7 +210,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     setTotalAliens(aliensMinted.toNumber() + 1);
     const aliensUpdate = [];
     const deadaliensUpdate = [];
-    setLoading(true);
+    // setLoading(true);
     setRandomAliens([]);
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
       try {
@@ -488,57 +490,143 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       return setGear(gear, i);
     }
   }
-  const step2 = (
-    <>
-      <div className="chosen-alien">
-        <div className="alien-obj">
-          <div>ALIEN {chosenAlien.name}</div>
-          <div className="alien-card">
-            <img src={chosenAlien.icon} width="220" height="220" />
+  const progressPanel = (
+    <div className="progressBody">
+      <div className="progressPanel">
+        <div class="fancyLoadContainer">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <p>Showdown...</p>
+        </div>
+      </div>
+    </div>
+  )
+  const resultPanel = (
+    <div className="resultBody">
+      <div className="resultPanel" style={{ backgroundImage: "url('/images/bg_won.png')" }}>
+        <div className="wonTop">
+          <button className="commonBtn" onClick={onNewFight}>Fight Again</button>
+          <div className="wonMsg">You won the fight</div>
+        </div>
+
+        <div className="wonGear">
+          <div>Gear Earned</div>
+          <div className="wonBox">
+
           </div>
         </div>
-        <div className="alien-stats">
-          <div className="stats-title">Stats</div>
-          <div className="stats-card">
-            <div>Category: {chosenAlien.category}</div>
-            <div>Chance of winning:
-              <div>
-                <Progress type="line" percent={chosenAlien.probs} width={80} trailColor="red" showInfo={true} />
-                <span>{chosenAlien.probs} %</span>
-                {totalBuffApplied > 0 && <span className="reduceTxt"> (-{totalBuffApplied}%)</span>}
-              </div>
+      </div>
+    </div>
+  )
+  const combatPanel = (<div className="chosenAlien">
+    <div className="playerSide">
+      <div className="playerObj">
+        <div className="sideName playerName">
+          Player Name: Swap
+        </div>
+        <div className="deckCard playerBody">
+          <div className="cardImg">
+            <img src={state.playerState.pfpUrl} alt="Avatar"></img>
+          </div>
+          <div className="cardStats">
+            <div>Strong against </div>
+          </div>
+        </div>
 
+      </div>
+      <div className="chanceObj left">
+        <div className="chanceBar">
+          <img src={chanceNumber}></img>
+          <img src={chanceBar}></img>
+          <div className="chancePercent">
+            % {(100 - chosenAlien.probs)}
+          </div>
+          <div className="chanceTitle">
+            <div>Players chance of winning</div>
+          </div>
+          <div className="chanceWrapper">
+            <div className="chanceInd" style={{ width: (100 - chosenAlien.probs) + "%" }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="divider">
+      <img src={IMAGES["VS"]}></img>
+      <div className="vsText">VS</div>
+    </div>
+    <div className="enemySide">
+      <div className="enemyObj">
+        <div className="sideName enemyName">
+          Alien Name: {chosenAlien.name}
+        </div>
+        <div className="deckCard enemyBody">
+          <div className="cardImg">
+            <img src={IMAGES["ALIEN_ICON"]} alt="Avatar"></img>
+          </div>
+          <div className="cardStats">
+            <div className="entry">
+              <div> </div>
+              <div>{chosenAlien.category}</div>
             </div>
           </div>
         </div>
       </div>
-      <div className="chosen-gears">
-        <div className="gear-title">
-          Pick 3 gears from you wallet and prepare for battle
-        </div>
-        <div className="gear-cards">
-          {state.gearSlots.map((slot, i) => whichGearSlot(slot, i))}
+      <div className="chanceObj right">
+        <div className="chanceBar">
+          <img src={chanceNumber}></img>
+          <img className="flipImg" src={chanceBar}></img>
+          <div className="chancePercent right">
+            {chosenAlien.probs} %
+          </div>
+          <div className="chanceTitle right">
+            <div>Aliens chance of winning</div>
+          </div>
+          <div className="chanceWrapper">
+            <div className="chanceInd red" style={{ width: chosenAlien.probs + "%" }}></div>
+          </div>
         </div>
       </div>
+    </div>
+  </div>);
+  const chooseGearPanel = (<div className="chosenGears">
+    <div className="gearTitle">
+      <div>Equip Gears</div>
+      <div className="subtitle">
+        (Choose upto 3 approved gears from your wallet for better chances)
+      </div>
+    </div>
+    <div className="gearCards">
+      {state.gearSlots.map((slot, i) => whichGearSlot(slot, i))}
+    </div>
+  </div>);
+  const step2 = (
+    <>
+      {/* {stepIdx == 3 && progressPanel} */}
+      {combatPanel}
+      {chooseGearPanel}
     </>
   )
 
   const gameScreen = (<>
-    <div className="game-main">
+    <div className="game-main" style={{ backgroundImage: "url('/images/bg_alienworld3.png')" }}>
       {loading && <div className="loading-main">
         <Spin size="large"></Spin>
       </div>}
+      {stepIdx == 3 && progressPanel}
+      {stepIdx == 4 && resultPanel}
       <div className="main-top">
-        {stepIdx == 2 && <div className="main-btn" onClick={onBack}>Back</div>}
-        <div className="main-btn">Round {state.playerState.roundId}</div>
+        {stepIdx >= 2 && <div className="main-btn" onClick={onBack}>Back</div>}
+        {stepIdx == 1 && <div></div>}
+        <div className="round">Round {state.playerState.roundId}</div>
         <button className="leave-btn" onClick={leaveRound}>Leave Round</button>
       </div>
       <div className="main-body">
         {stepIdx == 1 && step1}
-        {stepIdx == 2 && step2}
-        {stepIdx == 3 && combatScreen}
+        {stepIdx >= 2 && step2}
+        {/* {stepIdx == 3 && combatScreen}
         {stepIdx == 4 && alienWon && resultLostScreen}
-        {stepIdx == 4 && !alienWon && resultWonScreen}
+        {stepIdx == 4 && !alienWon && resultWonScreen} */}
       </div>
       <div className="main-footer">
         {stepIdx == 1 && (<div className="logmsg">Beginning Battle ...</div>)}
@@ -546,12 +634,10 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <><div className="logmsg">
             Preparing To Fight ...
           </div>
-            <button className="footerBtn" onClick={() => beginFight()}>Begin Fight</button></>)}
+            <button className="commonBtn footerBtn" onClick={() => beginFight()}>Begin Fight</button></>)}
       </div>
     </div>
   </>);
-
-
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -20,19 +20,23 @@ import {
   Modal,
 } from "antd";
 import "./player.css";
+import GContext from "../../helpers/GContext";
 
 const { Text, Link, Title } = Typography;
 export default function PlayerWindow({ address, tx, contracts, playerNft }) {
+  //Global use context
+  const { state, dispatch } = useContext(GContext);
 
   useEffect(async () => {
     if (contracts && contracts.Player) {
       init();
-      // console.log("init");
+      console.log("init");
     }
   }, [contracts, address]);
 
   const init = async () => {
     // updateProfile();
+    console.log(state.playerState);
   };
 
   const getImgFromUrl = url => {
@@ -52,10 +56,10 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
   const playerWrapper = (
     <div className="profile">
       <div className="profileImg">
-        <img src="./images/img_avatar.png" alt="Avatar"></img>
+        <img src={state.playerState.pfpUrl} alt="Avatar"></img>
       </div>
       <div className="profileInfo">
-        <div>swap</div>
+        <div>{state.playerState.name}</div>
         <div>Faction: Warrior</div>
       </div>
     </div>
