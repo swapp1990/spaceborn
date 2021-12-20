@@ -87,6 +87,9 @@
             height: 120px;
             border: 1px solid white;
             border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     }
 }
@@ -428,7 +431,6 @@ p{
         justify-content: space-around;
     }
 }
-
 
 .main-btn {
     font-size: 48px;

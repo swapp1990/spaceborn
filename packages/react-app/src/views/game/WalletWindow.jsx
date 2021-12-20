@@ -179,7 +179,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   async function equip(gear) {
-    // console.log(gear);
+    console.log(gear);
     let slotFound = state.gearSlots.find(g => g.slotId == gear.tokenIdx);
     // console.log({ slotFound })
     if (slotFound) {
@@ -196,7 +196,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       newState[emptySlotIdx].catIdx = gear.catIdx;
       newState[emptySlotIdx].gearIdx = gear.gearIdx;
       newState[emptySlotIdx].category = gear.category;
-      newState[emptySlotIdx].name = gear.name;
+      newState[emptySlotIdx].name = gear.gearJson.item;
       newState[emptySlotIdx].icon = gear.icon;
       newState[emptySlotIdx].probsReduce = gear.probsReduce;
       newState[emptySlotIdx].type = "set";
@@ -376,10 +376,16 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   const walletWindow = (
     <>
       <div className="apprObj">
-        <div className="panelTitle">Approve Gears
+        <div className="panelTitle">
+          <div className="title">
+            Approve Gears
+            <Tooltip title="Approving gears makes it available for use in the game. This is a one time transaction for each new gear.">
+              <img src={IMAGES["HELP"]} width="20px" height="20px"></img>
+            </Tooltip>
+          </div>
           <div className="count">{approveGears.length}</div>
         </div>
-        <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div>
+        {/* <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div> */}
         <div className="appColl">
           <div>
             {approveGears.length == 0 && <span>No gears in your wallet needs approval</span>}
@@ -389,7 +395,13 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       </div>
       <hr />
       <div className="inventoryObj">
-        <div className="panelTitle">Gear Approved
+        <div className="panelTitle">
+          <div className="title">
+            Gears Approved
+            <Tooltip title="This gears are available for use in the game. Warning: In this game, you agree with the risk that there's a chance you will lose a gear used during combat to the game enemy!">
+              <img src={IMAGES["HELP"]} width="20px" height="20px"></img>
+            </Tooltip>
+          </div>
           <div className="count">{walletGears.length}</div>
         </div>
         <div className="invColl">

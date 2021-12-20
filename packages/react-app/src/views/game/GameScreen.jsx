@@ -127,9 +127,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     const balanceLoot = await contracts.Gears.balanceOf(address);
     const tokenId = await contracts.Gears.tokenOfOwnerByIndex(address, balanceLoot - 1);
     const gearObj = await contracts.Gears.gears(tokenId);
-    console.log({ gearObj });
+    // console.log({ gearObj });
     let svgImg = await getSvgImgGear(gearObj.tokenId);
-    console.log({ svgImg });
+    // console.log({ svgImg });
     setGearWonImg(svgImg);
     resetGearSlots();
   }
@@ -206,11 +206,11 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       return;
     }
     const aliensMinted = await contracts.Alien.lastTokenId();
-    console.log({ aliensMinted: aliensMinted.toNumber() });
+    // console.log({ aliensMinted: aliensMinted.toNumber() });
     setTotalAliens(aliensMinted.toNumber() + 1);
     const aliensUpdate = [];
     const deadaliensUpdate = [];
-    // setLoading(true);
+    setLoading(true);
     setRandomAliens([]);
     for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
       try {
@@ -393,47 +393,6 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   }
 
   //////////// Render 
-  const combatScreen = (
-    <>
-      <div className="screen">
-        <Spin size="large" />
-        <div className="gearTitle">Fighting Alien with your Gears ...</div>
-      </div>
-    </>
-  )
-  const resultWonScreen = (
-    <>
-      <div className="screen">
-        <div className="result-title won-txt">You Won</div>
-        <div className="results-info">Alien had only { }% chance of winning!</div>
-        <div className="win-gear">
-          <div className="gearTitle">Gear Earned</div>
-          <div className="gearCard">
-            <img src={gearWonImg} width="250px" height="250px"></img>
-          </div>
-        </div>
-        <div className="next-btn" onClick={onNewFight}>
-          Start a new fight
-        </div>
-      </div>
-    </>
-  )
-  const resultLostScreen = (
-    <>
-      <div className="screen">
-        <div className="result-title lost-txt">You Lost</div>
-        <div className="win-gear">
-          <div className="gearTitle">Gears Lost</div>
-          <div className="gearCard">
-            <img src={gearLostImg} width="250px" height="250px"></img>
-          </div>
-        </div>
-        <div className="next-btn" onClick={onNewFight}>
-          Start a new fight
-        </div>
-      </div>
-    </>
-  )
   const alienCard = (alien, i) => {
     return (<div className="cardObj" key={i} onClick={() => onAlienSel(alien)}>
       <div className="cardBox">
@@ -467,7 +426,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <img src={gear.icon} width="50" height="50" />
         </div>
         <div className="gear-stats">
-          <div>{gear.name}</div>
+          <div>[{gear.category}] - {gear.name}</div>
         </div>
       </div >
     )
@@ -484,10 +443,18 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   };
 
   const whichGearSlot = (gear, i) => {
+    // console.log(gear);
     if (gear.type == "empty") {
       return emptyGear(gear, i);
     } else if (gear.type == "set") {
       return setGear(gear, i);
+    }
+  }
+  const whichResultBg = () => {
+    if (alienWon) {
+      return "url('/images/bg_lost.jpeg')"
+    } else {
+      return "url('/images/bg_won.png')"
     }
   }
   const progressPanel = (
@@ -504,18 +471,29 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   )
   const resultPanel = (
     <div className="resultBody">
-      <div className="resultPanel" style={{ backgroundImage: "url('/images/bg_won.png')" }}>
+      <div className="resultPanel" style={{ backgroundImage: whichResultBg() }}>
         <div className="wonTop">
           <button className="commonBtn" onClick={onNewFight}>Fight Again</button>
-          <div className="wonMsg">You won the fight</div>
+          {alienWon && <div className="wonMsg">You lost the fight</div>}
+          {!alienWon && <div className="wonMsg">You won the fight</div>}
         </div>
 
-        <div className="wonGear">
+        {!alienWon && <div className="wonGear">
           <div>Gear Earned</div>
           <div className="wonBox">
-
+            <div className="gearCard">
+              <img src={gearWonImg} width="250px" height="250px"></img>
+            </div>
           </div>
-        </div>
+        </div>}
+        {alienWon && <div className="wonGear">
+          <div>Gear Lost</div>
+          <div className="wonBox">
+            <div className="gearCard">
+              <img src={gearLostImg} width="250px" height="250px"></img>
+            </div>
+          </div>
+        </div>}
       </div>
     </div>
   )
@@ -529,9 +507,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <div className="cardImg">
             <img src={state.playerState.pfpUrl} alt="Avatar"></img>
           </div>
-          <div className="cardStats">
+          {/* <div className="cardStats">
             <div>Strong against </div>
-          </div>
+          </div> */}
         </div>
 
       </div>
@@ -540,13 +518,13 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <img src={chanceNumber}></img>
           <img src={chanceBar}></img>
           <div className="chancePercent">
-            % {(100 - chosenAlien.probs)}
+            % {(100 - (chosenAlien.probs - totalBuffApplied))}
           </div>
           <div className="chanceTitle">
             <div>Players chance of winning</div>
           </div>
           <div className="chanceWrapper">
-            <div className="chanceInd" style={{ width: (100 - chosenAlien.probs) + "%" }}></div>
+            <div className="chanceInd" style={{ width: (100 - (chosenAlien.probs - totalBuffApplied)) + "%" }}></div>
           </div>
         </div>
       </div>
@@ -567,7 +545,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <div className="cardStats">
             <div className="entry">
               <div> </div>
-              <div>{chosenAlien.category}</div>
+              <div>{chosenAlien.category}  (<img src={chosenAlien.icon2} width="30" height="30" />)</div>
             </div>
           </div>
         </div>
@@ -577,13 +555,13 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <img src={chanceNumber}></img>
           <img className="flipImg" src={chanceBar}></img>
           <div className="chancePercent right">
-            {chosenAlien.probs} %
+            {(chosenAlien.probs - totalBuffApplied)} %
           </div>
           <div className="chanceTitle right">
             <div>Aliens chance of winning</div>
           </div>
           <div className="chanceWrapper">
-            <div className="chanceInd red" style={{ width: chosenAlien.probs + "%" }}></div>
+            <div className="chanceInd red" style={{ width: (chosenAlien.probs - totalBuffApplied) + "%" }}></div>
           </div>
         </div>
       </div>

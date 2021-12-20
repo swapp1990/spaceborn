@@ -16,6 +16,13 @@
         justify-content: center;
         align-items: center;
     }
+    .title {
+        display: flex;
+        img {
+            border-radius: 150px;
+            background-color: #C4C4C4;
+        }
+    }
 }
 .panelSubTitle {
     padding-top: 10px;

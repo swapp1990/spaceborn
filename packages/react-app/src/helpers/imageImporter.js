@@ -15,6 +15,8 @@ import npc from "../assets/images/npc.png";
 import alienIcon from "../assets/images/alien.png";
 import vsImg from "../assets/images/vs_img.png";
 
+import help from "../assets/images/question-mark.png";
+
 const IMAGES = {
     "ALIEN_ICON": alienIcon,
     "APPAREL": apparel,
@@ -31,6 +33,7 @@ const IMAGES = {
     "SUPERINTELLIGENT": brain,
     "NPC": npc,
     "VS": vsImg,
+    "HELP": help
 };
 
 export default IMAGES;

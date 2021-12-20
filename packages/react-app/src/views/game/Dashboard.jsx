@@ -19,6 +19,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
             id: 3, probOfGearsLost: 0, disabled: true
         }
     ]);
+    const [showWelcome, setShowWelcome] = useState(false);
 
     useEffect(() => {
         init();
@@ -32,6 +33,8 @@ export default function Dashboard({ address, tx, contracts, provider }) {
             updatedRounds[i].probOfGearsLost = roundProb.toNumber();
         });
         setRounds(updatedRounds);
+        // console.log("init");
+        updateShowWelcome()
     }
 
     async function updatePlayerState() {
@@ -51,6 +54,14 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         };
         dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
         console.log("updated player state ", player.name);
+    }
+
+    function updateShowWelcome() {
+        if (state.walletGearsCount == 0) {
+            setShowWelcome(true);
+        } else {
+            setShowWelcome(false);
+        }
     }
 
     //contract action
@@ -83,9 +94,11 @@ export default function Dashboard({ address, tx, contracts, provider }) {
                 }
                 if (update.status === "confirmed" || update.status === 1) {
                     console.log("Claimed free gear");
+                    updateShowWelcome();
                 }
                 if (update.events) {
                     setLoading(false);
+                    updateShowWelcome();
                 }
             }
         });
@@ -96,13 +109,14 @@ export default function Dashboard({ address, tx, contracts, provider }) {
             <div className="dash-main">
                 {loading && <div className="loading-main">
                     <Spin size="large"></Spin></div>}
-                <div className="welcome">
+                {showWelcome && <div className="welcome">
                     <div className="title">Welcome!</div>
                     <div>
-                        {state.walletGearsCount == 0 && <button className="mint" onClick={claimGear}>Mint your first gear to start the adventure!</button>}
+                        <button className="mint commonBtn" onClick={claimGear}>Claim free Gear NFT!</button>
+                        <div className="note">0/100 available.</div>
                     </div>
-                </div>
-                <div className="rounds">
+                </div>}
+                {!showWelcome && <div className="rounds">
                     <div className="title">
                         Choose Round
                     </div>
@@ -112,7 +126,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
                             <div className="roundDesc">Chance of losing gears: {r.probOfGearsLost}%</div>
                         </div>))}
                     </div>
-                </div>
+                </div>}
             </div>
         </>
     );
