@@ -213,68 +213,71 @@ export default function CreatePlayer({ address, tx, contracts }) {
   // );
 
   const createPlayerScreen = (
-    <div className="create">
-      <Card style={{ width: 800 }} title="Choose PFP">
-        {playerInfo && (
-          <>
-            <div>Choose a PFP NFT that you want to set your player to</div>
-            {loading && <Spin size="large"></Spin>}
-            <div className="choosePfp">
-              <div className="projWrapper">
-                <div className="projTitle">Moonshot Bots</div>
-                <div className="projSel">
-                  {pfpList["MSB"].map((e, key) => <div key={key} className="pfpEntry">
-                    <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
-                    <label for={key}><img src={e.img} /></label>
-                  </div>)}
+    <div className="createBody" style={{ backgroundImage: "url('/images/bg_alienworld2.png')" }}>
+      <div className="create">
+        <Card style={{ width: 800 }} title="Create Player">
+          {playerInfo && (
+            <>
+              <div>Choose a PFP NFT that you want to set your player to</div>
+              {loading && <Spin size="large"></Spin>}
+              <div className="choosePfp">
+                <div className="projWrapper">
+                  <div className="projTitle">Moonshot Bots</div>
+                  <div className="projSel">
+                    {pfpList["MSB"].map((e, key) => <div key={key} className="pfpEntry">
+                      <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
+                      <label for={key}><img src={e.img} /></label>
+                    </div>)}
+                  </div>
+                </div>
+                <div className="projWrapper">
+                  <div className="projTitle">Arcadians</div>
+                  <div className="projSel">
+                    {pfpList["ARC"].map((e, key) => <div key={key} className="pfpEntry">
+                      <input type="checkbox" id={'S' + key} checked={isSelected(e)} onChange={() => handleChange(e)} />
+                      <label for={'S' + key}><img src={e.img} /></label>
+                    </div>)}
+                  </div>
+
                 </div>
               </div>
-              <div className="projWrapper">
-                <div className="projTitle">Arcadians</div>
-                <div className="projSel">
-                  {pfpList["ARC"].map((e, key) => <div key={key} className="pfpEntry">
-                    <input type="checkbox" id={'S' + key} checked={isSelected(e)} onChange={() => handleChange(e)} />
-                    <label for={'S' + key}><img src={e.img} /></label>
-                  </div>)}
-                </div>
 
-              </div>
-            </div>
-
-            <div>Confirm</div>
-            {/* <div>
+              <div>Confirm</div>
+              {/* <div>
               <a onClick={() => loadOwnedNFTs()}>Bad Alley Kids</a>
             </div>
             <div>You own {balanceTokens} NFTs</div>
             <div>{pfpGallery}</div>
             <div>Selected PFP: {selectedPfp.name}</div> */}
-            <div>
-              <Button onClick={confirmCreate} disabled={loading}>Confirm Create Player</Button>
-            </div>
-          </>
-        )}
+              <div>
+                <Button onClick={confirmCreate} disabled={loading}>Confirm Create Player</Button>
+              </div>
+            </>
+          )}
 
-        {!playerInfo && (
-          <Form form={form} name="control-hooks" onFinish={onFinish}>
-            <Form.Item name="name" label="Player Name" rules={[{ required: true }]}>
-              <Input autoComplete="off" />
-            </Form.Item>
-            {/* <Form.Item name="gender" label="Player Gender" rules={[{ required: true }]}>
+          {!playerInfo && (
+            <Form form={form} name="control-hooks" onFinish={onFinish}>
+              <Form.Item name="name" label="Player Name" rules={[{ required: true }]}>
+                <Input autoComplete="off" />
+              </Form.Item>
+              {/* <Form.Item name="gender" label="Player Gender" rules={[{ required: true }]}>
               <Select placeholder="Select a option and change input text above" onChange={onGenderChange} allowClear>
                 <Option value="male">male</Option>
                 <Option value="female">female</Option>
                 <Option value="other">other</Option>
               </Select>
             </Form.Item> */}
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-        )}
-      </Card>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Submit
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
+        </Card>
+      </div>
     </div>
+
   );
 
   return <>{createPlayerScreen}</>;

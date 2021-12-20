@@ -2,7 +2,8 @@
     padding: 10px;
     width: auto;
     height: 20%;
-    background-color:#C4C4C4;
+    /* background-color:#C4C4C4; */
+    border: 3px solid #F73B76;
     display: flex;
     align-items: center;
 }

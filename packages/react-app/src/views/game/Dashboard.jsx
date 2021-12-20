@@ -25,6 +25,13 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         init();
     }, []);
 
+    useEffect(() => {
+        if (state.walletGearsCount) {
+            console.log({ "wallet ": state.walletGearsCount });
+            updateShowWelcome();
+        }
+    }, [state.walletGearsCount])
+
     function init() {
         let updatedRounds = rounds;
         rounds.forEach(async (r, i) => {
@@ -34,7 +41,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         });
         setRounds(updatedRounds);
         // console.log("init");
-        updateShowWelcome()
+        updateShowWelcome();
     }
 
     async function updatePlayerState() {
@@ -47,6 +54,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         const playerState = {
             id: tokenId,
             name: player.name,
+            pfpUrl: player.pfpUrl,
             image: null,
             owner: address,
             joined: player.joined,
@@ -106,14 +114,14 @@ export default function Dashboard({ address, tx, contracts, provider }) {
 
     const dashboard_body = (
         <>
-            <div className="dash-main">
+            <div className="dash-main" style={{ backgroundImage: "url('/images/bg_alienworld3.png')" }}>
                 {loading && <div className="loading-main">
                     <Spin size="large"></Spin></div>}
                 {showWelcome && <div className="welcome">
                     <div className="title">Welcome!</div>
                     <div>
                         <button className="mint commonBtn" onClick={claimGear}>Claim free Gear NFT!</button>
-                        <div className="note">0/100 available.</div>
+                        <div className="note">98/100 available.</div>
                     </div>
                 </div>}
                 {!showWelcome && <div className="rounds">

@@ -385,6 +385,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
           <div className="count">{approveGears.length}</div>
         </div>
+        <hr style={{ "width": "200px" }} />
         {/* <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div> */}
         <div className="appColl">
           <div>
@@ -393,9 +394,9 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
         </div>
       </div>
-      <hr />
+      {/* <hr /> */}
       <div className="inventoryObj">
-        <div className="panelTitle">
+        <div className="invTitle panelTitle">
           <div className="title">
             Gears Approved
             <Tooltip title="This gears are available for use in the game. Warning: In this game, you agree with the risk that there's a chance you will lose a gear used during combat to the game enemy!">
@@ -404,6 +405,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
           <div className="count">{walletGears.length}</div>
         </div>
+        <hr style={{ "width": "200px" }} />
         <div className="invColl">
           {loading && <Spin size="large"></Spin>}
           <div className="gearWrapper">

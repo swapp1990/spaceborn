@@ -34,6 +34,10 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
     }
   }, [contracts, address]);
 
+  useEffect(() => {
+    console.log(state.playerState);
+  }, [state.playerState]);
+
   const init = async () => {
     // updateProfile();
     console.log(state.playerState);

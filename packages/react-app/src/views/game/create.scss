@@ -1,3 +1,12 @@
+.createBody {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+    margin: 0;
+    background-size: cover;
+}
 .create {
     display: flex;
     justify-content: center;

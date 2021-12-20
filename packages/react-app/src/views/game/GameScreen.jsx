@@ -256,6 +256,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     const playerState = {
       id: tokenId,
       name: player.name,
+      pfpUrl: player.pfpUrl,
       image: null,
       owner: address,
       joined: player.joined,
@@ -410,7 +411,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   const step1 = (
     <>
       <div className="main-title">Choose alien to fight</div>
-      <div className="refresh"><button onClick={onRefreshAliens}>Refresh</button></div>
+      <div className="refresh"><button className="commonBtn" onClick={onRefreshAliens}>Refresh</button></div>
       <div className="alien-cards">
         {randomAliens.map((alien, i) => alienCard(alien, i))}
         {randomAliens.length == 0 && !loading && <span className="won-txt">No aliens found for this round! Come back later!</span>}
@@ -545,7 +546,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <div className="cardStats">
             <div className="entry">
               <div> </div>
-              <div>{chosenAlien.category}  (<img src={chosenAlien.icon2} width="30" height="30" />)</div>
+              <div className="category">{chosenAlien.category}  (<img src={chosenAlien.icon2} width="30" height="30" />)</div>
             </div>
           </div>
         </div>
@@ -594,10 +595,10 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       {stepIdx == 3 && progressPanel}
       {stepIdx == 4 && resultPanel}
       <div className="main-top">
-        {stepIdx >= 2 && <div className="main-btn" onClick={onBack}>Back</div>}
+        {stepIdx >= 2 && <div className="backBtn commonBtn" onClick={onBack}>Back</div>}
         {stepIdx == 1 && <div></div>}
         <div className="round">Round {state.playerState.roundId}</div>
-        <button className="leave-btn" onClick={leaveRound}>Leave Round</button>
+        <button className="leaveBtn commonBtn" onClick={leaveRound}>Leave Round</button>
       </div>
       <div className="main-body">
         {stepIdx == 1 && step1}

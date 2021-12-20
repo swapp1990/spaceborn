@@ -128,7 +128,7 @@ export default function MVPUI({
         <div className="player">
           <PlayerWindow address={address} tx={tx} contracts={contracts} />
         </div>
-        <hr style={{ "width": "100px" }} />
+        {/* <hr style={{ "width": "100px" }} /> */}
         <div className="wallet">
           <WalletWindow address={address} tx={tx} contracts={contracts} provider={provider} />
         </div>

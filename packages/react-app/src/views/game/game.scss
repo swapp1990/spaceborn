@@ -204,6 +204,12 @@ p{
         text-transform: uppercase;
         margin-top: 20px;
     }
+    .backBtn {
+        font-size: 30px;
+    }
+    .leaveBtn {
+        font-size: 30px;
+    }
 }
 .main-body {
     height: 80%;
@@ -265,6 +271,12 @@ p{
             width: 100%;
             display: flex;
             justify-content: space-between;
+            .category {
+                background-color:#fd8f5b;
+                border: 1px solid #F73B76;
+                border-radius: 0px;
+                padding-left: 10px;
+            }
         }
     }
 }
@@ -290,6 +302,7 @@ p{
             bottom: 0;
             left: -180px;
             width: 100%;
+            pointer-events: none;
         }
         .chanceTitle {
             position: absolute;
@@ -350,6 +363,7 @@ p{
             }
             .playerBody {
                 height: 90%;
+                max-width: 300px;
             }
         }
         
@@ -386,6 +400,7 @@ p{
         }
         .enemyBody {
             height: 90%;
+            max-width: 300px;
         }
     }
 }
@@ -432,22 +447,6 @@ p{
     }
 }
 
-.main-btn {
-    font-size: 48px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 91px;
-    letter-spacing: 0em;
-    text-align: center;
-    color: black;
-}
-.leave-btn {
-    border: 1px solid red;
-    border-radius: 10px;
-    background-color:#f17f7f;
-    font-size: 20px;
-    cursor: pointer;
-}
 .main-title {
     font-size: 65px;
     font-style: normal;
@@ -477,7 +476,8 @@ p{
     width: 100px;
     height: 110px;
     border-radius: 10px;
-    background-color: #FFD630;
+    background-color: #361660;
+    border: 1px solid red;
 }
 .cardTitle {
     color: black;
@@ -486,18 +486,6 @@ p{
 .icon2 {
     display: flex;
     justify-content: flex-end;
-}
-.side {
-    padding: 10px;
-    /* margin: auto; */
-
-    height: 100%;
-    width: 25%;
-
-    background-color:black;
-
-    display: flex;
-    flex-direction: column;
 }
 .alien-obj {
     margin: 10px;
@@ -646,6 +634,6 @@ p{
     cursor: pointer;
 }
 .refresh {
-    background-color: #FFD630;
+    // background-color: #FFD630;
     color: black;
 }
