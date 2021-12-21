@@ -17,12 +17,15 @@ contract Gears is ERC721Enumerable, Ownable {
     Counters.Counter private _tokenIds;
     uint256 public lastTokenId;
 
+    address public approvedGameContract;
+
     mapping(uint256 => string[]) loot2Names;
 
     struct Gear {
         uint256 tokenId;
         uint256 catIdx;
         uint256 titleIdx;
+        uint256 health;
         string name;
         uint256 rarity;
         address playerWonAddr;
@@ -115,6 +118,14 @@ contract Gears is ERC721Enumerable, Ownable {
         return rand % 100;
     }
 
+    modifier onlyBy() {
+        require(
+            msg.sender == approvedGameContract,
+            "Game contract not approved"
+        );
+        _;
+    }
+
     function pluck(uint256 catIdx, uint256 titleIdx)
         internal
         view
@@ -131,9 +142,16 @@ contract Gears is ERC721Enumerable, Ownable {
         string memory alienName,
         uint256 rarity,
         address playerWonAddr
-    ) external {
-        uint256 id = _tokenIds.current();
+    ) external onlyBy {
+        // require(deadAliens[alienId] == false, "Already minted!");
+        // require(alienContract.isAlienExists(alienId), "Alien does not exist");
+        // require(
+        //     alienContract.checkCorrectPlayer(alienId, msg.sender),
+        //     "Incorrect player"
+        // );
 
+        uint256 id = _tokenIds.current();
+        // require(id > 0 && id <= 10000, "Token ID invalid");
         _mint(playerWonAddr, id);
 
         lastTokenId = id;
@@ -144,10 +162,23 @@ contract Gears is ERC721Enumerable, Ownable {
         gear.titleIdx = rand % loot2Names[gear.catIdx].length;
         gear.name = string(abi.encodePacked("Dropped by ", alienName));
         gear.rarity = rarity;
+        gear.health = 100;
         gear.exists = true;
         gear.playerWonAddr = playerWonAddr;
         _tokenIds.increment();
         emit GearDropped(gear);
+    }
+
+    function decreaseHealth(uint256 tokenId, uint256 factor) external onlyBy {
+        require(_exists(tokenId), "not exist");
+        Gear storage gear = gears[tokenId];
+        if (gear.health > 0) {
+            gear.health = gear.health - factor;
+        }
+    }
+
+    function approveGame(address gameContract) public {
+        approvedGameContract = gameContract;
     }
 
     function approveGear(address gameContract, uint256 tokenId) public {
@@ -163,15 +194,30 @@ contract Gears is ERC721Enumerable, Ownable {
             GearsMetadataSvg.tokenURI(id, results[0], results[1], gear.rarity);
     }
 
+    function randomTokenURI(uint256 id, Gear memory gear)
+        public
+        view
+        returns (string memory)
+    {
+        string[2] memory results = pluck(gear.catIdx, gear.titleIdx);
+        return
+            GearsMetadataSvg.tokenURI(id, results[0], results[1], gear.rarity);
+    }
+
     function getGearCats() public view returns (string[] memory) {
         return categories;
     }
 
     function transferNft(uint256 tokenId, address address_to)
-        public
+        external
+        onlyBy
         returns (bool)
     {
         require(_exists(tokenId), "not exist");
+        require(
+            address_to == approvedGameContract,
+            "cannot transfer gear to unapproved address"
+        );
         transferFrom(ownerOf(tokenId), address_to, tokenId);
         return true;
     }
@@ -184,14 +230,4 @@ contract Gears is ERC721Enumerable, Ownable {
         require(_exists(tokenId), "not exist");
         return _isApprovedOrOwner(contractAddr, tokenId);
     }
-
-    // function randomTokenURI(uint256 id, uint256 rarityLevel)
-    //     public
-    //     view
-    //     returns (string memory)
-    // {
-    //     string[2] memory results = pluck(id);
-    //     return
-    //         GearsMetadataSvg.tokenURI(id, results[0], results[1], rarityLevel);
-    // }
 }

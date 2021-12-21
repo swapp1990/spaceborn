@@ -21,8 +21,8 @@ import {
     useOnBlock,
     useUserSigner,
 } from "./hooks";
-// import Hints from "./Hints";
-import { MVPUI, TreasureHuntUI, Hints, Subgraph, BadKidsTest, LootTest, CombatTest } from "./views";
+import { MVPUI } from "./views";
+import { default as LootTest } from "./views/old/LootTest";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -151,7 +151,8 @@ function App(props) {
         walletGearsCount: 0,
         alienIdx: -1,
         playerState: {},
-        gameStepIdx: 1
+        gameStepIdx: 1,
+        aliens: []
     }
     function globalReducer(state, action) {
         switch (action.type) {
@@ -186,6 +187,12 @@ function App(props) {
                 }
             }
             case 'setWalletGearsCount': {
+                return {
+                    ...state,
+                    [action.fieldName]: action.payload
+                }
+            }
+            case 'setAliens': {
                 return {
                     ...state,
                     [action.fieldName]: action.payload
@@ -296,6 +303,16 @@ function App(props) {
                                         Game
                                     </Link>
                                 </Menu.Item>
+                                <Menu.Item key="/test">
+                                    <Link
+                                        onClick={() => {
+                                            setRoute("/test");
+                                        }}
+                                        to="/test"
+                                    >
+                                        Test
+                                    </Link>
+                                </Menu.Item>
                                 <Menu.Item key="/gears">
                                     <Link
                                         onClick={() => {
@@ -321,8 +338,18 @@ function App(props) {
                         <div className="RouteBody">
                             <Switch>
                                 <Route exact path="/app">
-                                    {/* <WireframeUI contracts={contracts} /> */}
                                     <MVPUI
+                                        address={address}
+                                        userSigner={userSigner}
+                                        mainnetProvider={mainnetProvider}
+                                        provider={provider}
+                                        price={price}
+                                        tx={tx}
+                                        contracts={contracts}
+                                    />
+                                </Route>
+                                <Route exact path="/test">
+                                    <LootTest
                                         address={address}
                                         userSigner={userSigner}
                                         mainnetProvider={mainnetProvider}

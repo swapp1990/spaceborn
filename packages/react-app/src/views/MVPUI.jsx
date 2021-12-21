@@ -24,8 +24,7 @@ export default function MVPUI({
   yourLocalBalance,
   price,
   tx,
-  contracts,
-  context
+  contracts
 }) {
   //Global state
   const { state, dispatch } = useContext(GContext);

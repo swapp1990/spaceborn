@@ -89,6 +89,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   useEffect(() => {
     if (alienWon != null) {
+      console.log({ alienWon });
       refreshGears();
       setTimeout(() => {
         console.log("timeout");
@@ -205,45 +206,62 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       console.log("No roundId found")
       return;
     }
+    const deadAlienIdxs = await contracts.Alien.getDeadAliens();
+    // console.log(deadAlienIdxs);
+    if (deadAliens.length != deadAlienIdxs.length) {
+      setdeadAliens(deadAlienIdxs);
+      updateAliens(deadAlienIdxs);
+      return;
+    }
+    if (state.aliens.length == 0) {
+      updateAliens(deadAlienIdxs);
+    }
+  }
+
+  async function updateAliens(deadAlienIdxs) {
     const aliensMinted = await contracts.Alien.lastTokenId();
     // console.log({ aliensMinted: aliensMinted.toNumber() });
     setTotalAliens(aliensMinted.toNumber() + 1);
+
+    let maxTokens = 5;
+    var allTokens = [];
+    for (var i = 1; i <= aliensMinted.toNumber(); i++) {
+      allTokens.push(i);
+    }
+    let liveTokens = allTokens.filter(it => !deadAlienIdxs.includes(it));
+    // console.log(liveTokens);
+
+    const maxToShow = liveTokens.length > maxTokens ? maxTokens : liveTokens.length;
+    const randAlienIdxs = chooseRandom(liveTokens, maxToShow);
+    // console.log(randAlienIdxs);
     const aliensUpdate = [];
-    const deadaliensUpdate = [];
     setLoading(true);
     setRandomAliens([]);
-    for (let tokenId = 1; tokenId <= aliensMinted; tokenId++) {
+    for (let i = 0; i < randAlienIdxs.length; i++) {
+      let tokenId = randAlienIdxs[i];
       try {
         const alien = await contracts.Alien.aliens(tokenId);
-        if (alien.roundId == state.playerState.roundId) {
-          if (!alien.isDead) {
-            let svgJson = await getSvgJson(tokenId);
-            // console.log({ svgJson });
-            const alienObj = {};
-            alienObj.tokenId = tokenId;
-            alienObj.name = alien.name;
-            alienObj.category = svgJson.category;
-            alienObj.probs = alien.baseProb.toNumber();
-            alienObj.icon = IMAGES["ALIEN_ICON"];
-            alienObj.icon2 = getIcon2(alienObj.category);
-            aliensUpdate.push(alienObj);
-          } else {
-            deadaliensUpdate.push({ id: tokenId, name: alien.name, base: alien.baseProb });
-          }
+        // console.log({ alien });
+        if (!alien.isDead) {
+          let svgJson = await getSvgJson(tokenId);
+          // console.log({ svgJson });
+          const alienObj = {};
+          alienObj.tokenId = tokenId;
+          alienObj.name = alien.name;
+          alienObj.category = svgJson.category;
+          alienObj.probs = alien.baseProb.toNumber();
+          alienObj.icon = IMAGES["ALIEN_ICON"];
+          alienObj.icon2 = getIcon2(alienObj.category);
+          aliensUpdate.push(alienObj);
         }
       } catch (e) {
         console.log(e);
       }
     }
 
-    // console.log(aliensUpdate);
-    const maxToShow = aliensUpdate.length > 5 ? 5 : aliensUpdate.length;
-    // console.log({ maxToShow })
+    setRandomAliens(aliensUpdate);
+    dispatch({ type: "setAliens", payload: aliensUpdate, fieldName: "aliens" });
     setLoading(false);
-    const randAliens = chooseRandom(aliensUpdate, maxToShow);
-    // console.log({ "randAliens": randAliens.length })
-    setRandomAliens(randAliens);
-    setdeadAliens(deadaliensUpdate);
   }
 
   async function updatePlayerState() {
@@ -329,6 +347,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     const foundGears = state.gearSlots.filter(e => e.slotId != -1).map(i => i.usedGear);
     // console.log({ foundGears });
     setStepIdx(3);
+    setAlienWon(null);
     await tx(contracts.GameManager.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
       if (update) {
         // console.log({ update });
@@ -340,10 +359,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         }
         if (update.events) {
           // console.log({ "events": update.events });
-          let event = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
-          if (event) {
-            console.log({ event })
-            let eventInfo = event;
+          let eventInfo = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
+          if (eventInfo) {
+            console.log(eventInfo.event)
             if (eventInfo.event == "AlienWon") {
               const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
               setgameActionMsg(txt);
@@ -351,6 +369,8 @@ export default function GameScreen({ address, tx, contracts, provider }) {
               let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
               if (lostGearEvent) {
                 updateLostGear(lostGearEvent);
+              } else {
+                updateLostGear(null);
               }
             } else if (eventInfo.event == "PlayerWon") {
               const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
@@ -364,9 +384,14 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   }
 
   async function updateLostGear(event) {
+    if (event == null) {
+      console.log("No gear lost");
+      setGearLostImg(null);
+      return;
+    }
     console.log({ "lostEvent": event });
     const lostGearIdx = event.args.lostGearId.toNumber();
-    console.log({ lostGearIdx });
+    // console.log({ lostGearIdx });
     let svgImg = await getSvgImgGear(lostGearIdx);
     // console.log({ svgImg });
     setGearLostImg(svgImg);
@@ -389,8 +414,10 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     console.log(result);
   }
 
-  function onRefreshAliens() {
-    updateGameScreen();
+  async function onRefreshAliens() {
+    // updateGameScreen();
+    const deadAlienIdxs = await contracts.Alien.getDeadAliens();
+    updateAliens(deadAlienIdxs);
   }
 
   //////////// Render 
@@ -474,7 +501,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     <div className="resultBody">
       <div className="resultPanel" style={{ backgroundImage: whichResultBg() }}>
         <div className="wonTop">
-          <button className="commonBtn" onClick={onNewFight}>Fight Again</button>
+          <button className="commonBtn resBtn" onClick={onNewFight}>Fight Again</button>
           {alienWon && <div className="wonMsg">You lost the fight</div>}
           {!alienWon && <div className="wonMsg">You won the fight</div>}
         </div>
@@ -489,11 +516,12 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         </div>}
         {alienWon && <div className="wonGear">
           <div>Gear Lost</div>
-          <div className="wonBox">
+          {gearLostImg && <div className="wonBox">
             <div className="gearCard">
               <img src={gearLostImg} width="250px" height="250px"></img>
             </div>
-          </div>
+          </div>}
+          <div>No gears lost!</div>
         </div>}
       </div>
     </div>

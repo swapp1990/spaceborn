@@ -10,6 +10,8 @@ contract GameManager {
     Alien alienContract;
     Gears gearsContract;
 
+    uint256 public freeGearsRemaining = 100;
+
     struct UsedGear {
         uint256 rarityIdx;
         uint256 catIdx;
@@ -29,6 +31,7 @@ contract GameManager {
     constructor(address alienAddress, address gearsAddress) public {
         alienContract = Alien(alienAddress);
         gearsContract = Gears(gearsAddress);
+        gearsContract.approveGame(address(this));
         setupGame();
         initBuffs();
     }
@@ -246,7 +249,13 @@ contract GameManager {
     }
 
     function claimRandomGear() public {
+        require(
+            gearsContract.balanceOf(msg.sender) == 0,
+            "Not eligible for free gear"
+        );
+        require(freeGearsRemaining > 0, "All free gears have been claimed");
         gearsContract.dropGear("Moloch", 0, msg.sender);
+        freeGearsRemaining = freeGearsRemaining - 1;
     }
 
     function fightAlien(
@@ -264,6 +273,12 @@ contract GameManager {
             alienContract.getAlienCatIdx(alien_id)
         );
         // uint256 finalProb = 100;
+        uint256 factor = 5;
+        for (uint256 i = 0; i < usedGears.length; i++) {
+            UsedGear memory gear = usedGears[i];
+            gearsContract.decreaseHealth(gear.gearIdx, factor);
+        }
+
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);

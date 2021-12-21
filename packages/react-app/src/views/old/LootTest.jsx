@@ -1,17 +1,25 @@
 import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin, Switch, Row, Col } from "antd";
 import React, { useEffect, useState } from "react";
-import { ReactComponent as CardEx } from "../card_ex.svg";
 import * as svgUtils from "../../helpers/svgUtils";
+
+// Gear {
+//   uint256 tokenId;
+//   uint256 catIdx;
+//   uint256 titleIdx;
+//   string name;
+//   uint256 rarity;
+//   address playerWonAddr;
+//   bool exists;
+// }
 
 export default function LootTest({
   address,
   mainnetProvider,
-  localProvider,
+  provider,
   yourLocalBalance,
   price,
   tx,
-  readContracts,
-  writeContracts,
+  contracts
 }) {
   const [imgSrc, setImgSrc] = useState(null);
   const [tokenIdx, setTokenIdx] = useState(0);
@@ -19,18 +27,28 @@ export default function LootTest({
 
   const update = async () => { };
   useEffect(() => {
-    if (readContracts && readContracts.Gears) {
+    if (contracts && contracts.Gears) {
       init();
     }
-  }, [readContracts]);
+  }, [contracts]);
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
   const mintLoot = async () => {
     const token_idx = getRandomInt(1000);
-    const rarityLevel = getRandomInt(4);
-    const result = await readContracts.Gears.randomTokenURI(token_idx, rarityLevel);
+    const titleIdx = getRandomInt(5);
+    const catIdx = getRandomInt(4);
+    const gearCustom = {
+      tokenId: token_idx,
+      catIdx: catIdx,
+      titleIdx: titleIdx,
+      name: "Gear Eg",
+      rarity: 0,
+      playerWonAddr: address,
+      exists: true
+    };
+    const result = await contracts.Gears.randomTokenURI(token_idx, gearCustom);
     setTokenIdx(token_idx);
 
     const base64_data = result.split("base64,")[1];

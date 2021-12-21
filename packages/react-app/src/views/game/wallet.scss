@@ -38,9 +38,15 @@
     // background-color: #FFD630;
     .appColl {
         display: flex;
+        flex-direction: row;
         overflow-x: scroll;
         justify-content: flex-start;
         align-items: center;
+
+        .apprGearBox {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
     }
 }
 .inventoryObj {

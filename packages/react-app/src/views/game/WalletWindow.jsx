@@ -195,6 +195,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       newState[emptySlotIdx].rarityIdx = gear.rarityIdx;
       newState[emptySlotIdx].catIdx = gear.catIdx;
       newState[emptySlotIdx].gearIdx = gear.gearIdx;
+      newState[emptySlotIdx].health = gear.health;
       newState[emptySlotIdx].category = gear.category;
       newState[emptySlotIdx].name = gear.gearJson.item;
       newState[emptySlotIdx].icon = gear.icon;
@@ -258,6 +259,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           gearJsObj.catIdx = gearObj.catIdx.toNumber();
           gearJsObj.gearIdx = gearObj.tokenId.toNumber();
           gearJsObj.tokenIdx = gearObj.tokenId.toNumber();
+          gearJsObj.health = gearObj.health.toNumber();
           let svgJson = await getSvgJson(gearJsObj.tokenIdx);
           // gearJsObj.image = svgJson.image;
           gearJsObj.gearJson = svgJson;
@@ -277,7 +279,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       }
     }
     let needsApproved = walletGearsUpdate.filter(w => w.approved == false);
-    console.log(needsApproved);
+    // console.log(needsApproved);
     setApproveGears(needsApproved);
     // console.log(walletGearsUpdate);
     let approvedGears = walletGearsUpdate.filter(w => w.approved == true);
@@ -348,6 +350,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
 
           {/* <Gear1 className="gearSvg" /> */}
           <div>{gear.itemName} </div>
+          <div>Health: {gear.health}</div>
         </div>
         <div className="gearSide">
           {/* {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>} */}
@@ -388,10 +391,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
         <hr style={{ "width": "200px" }} />
         {/* <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div> */}
         <div className="appColl">
-          <div>
-            {approveGears.length == 0 && <span>No gears in your wallet needs approval</span>}
-            {approveGears.map((gear, idx) => approveGearBox(gear, idx))}
-          </div>
+          {approveGears.length == 0 && <span>No gears in your wallet needs approval</span>}
+          {approveGears.map((gear, idx) => approveGearBox(gear, idx))}
         </div>
       </div>
       {/* <hr /> */}

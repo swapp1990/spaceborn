@@ -27,6 +27,7 @@ contract Alien is ERC721, Ownable {
     }
 
     mapping(uint256 => Alien) public aliens;
+    uint256[] public deadAliens;
 
     string[] private categories = [
         "Agility",
@@ -89,9 +90,14 @@ contract Alien is ERC721, Ownable {
         return categories;
     }
 
+    function getDeadAliens() public view returns (uint256[] memory) {
+        return deadAliens;
+    }
+
     function setAlienDead(uint256 tokenId) public {
         Alien storage alien = aliens[tokenId];
         alien.isDead = true;
+        deadAliens.push(tokenId);
     }
 
     function toString(uint256 value) internal pure returns (string memory) {
