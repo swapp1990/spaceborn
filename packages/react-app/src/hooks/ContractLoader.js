@@ -68,6 +68,7 @@ export default function useContractLoader(providerOrSigner, config = {}) {
           const providerNetwork = await provider.getNetwork();
 
           const _chainId = config.chainId || providerNetwork.chainId;
+          // console.log({ _chainId });
 
           let contractList = {};
           let externalContractList = {};

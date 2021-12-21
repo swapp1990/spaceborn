@@ -5,7 +5,7 @@ import { Alert, Button, Col, Menu, Row } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState, useReducer, useMemo } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
-import Web3Modal from "web3modal";
+import Web3Modal, { getChainId } from "web3modal";
 import "./App.css";
 import GContext from "./helpers/GContext";
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
@@ -88,7 +88,18 @@ function App(props) {
     //Load contracts and signer
     const mainnetProvider = mainnetInfura;
     const userSigner = useUserSigner(injectedProvider, localProvider);
-    const contracts = useContractLoader(userSigner, { chainId: chainId });
+
+    const getChainId = () => {
+        if (targetNetwork.name == "localhost") {
+            return chainId;
+        } else {
+            chainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+            // console.log({ chainId });
+            return chainId;
+        }
+    };
+
+    const contracts = useContractLoader(userSigner, { chainId: getChainId() });
     // const contracts = useContractLoader(localProvider);
     const gasPrice = useGasPrice(targetNetwork, "fast");
     const price = useExchangePrice(targetNetwork, mainnetProvider);
@@ -107,14 +118,19 @@ function App(props) {
         async function getNetwork() {
             if (userSigner) {
                 if (targetNetwork.name != "localhost") {
-                    const network = await userSigner.provider._networkPromise;
                     chainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
-                    console.log(chainId);
+                    // console.log(userSigner.provider._network);
+                    if (!userSigner.provider._network) {
+                        const awaitNetwork = await userSigner.provider.getNetwork();
+                        chainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+                        // console.log(userSigner.provider._network);
+                    }
                 }
                 const newAddress = await userSigner.getAddress();
                 setAddress(newAddress);
                 // console.log({ newAddress });
                 setNetworkSelected(NETWORK(chainId));
+                // console.log(NETWORK(chainId));
             }
         }
         getNetwork();
@@ -128,6 +144,7 @@ function App(props) {
     }, [injectedProvider])
 
     ///////////////////// Functions
+
     const loadWeb3Modal = useCallback(async () => {
         console.log("loadWeb3Modal")
         const provider = await web3Modal.connect();

@@ -28,6 +28,12 @@ export default function CreatePlayer({ address, tx, contracts }) {
 
   }, []);
 
+  useEffect(() => {
+    if (contracts) {
+      // console.log(contracts.Player);
+    }
+  }, [contracts]);
+
   const onFinish = values => {
     console.log(values);
     setplayerInfo(values);

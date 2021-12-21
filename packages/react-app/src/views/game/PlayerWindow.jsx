@@ -30,17 +30,17 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
   useEffect(async () => {
     if (contracts && contracts.Player) {
       init();
-      console.log("init");
+      // console.log("init");
     }
   }, [contracts, address]);
 
   useEffect(() => {
-    console.log(state.playerState);
+    // console.log(state.playerState);
   }, [state.playerState]);
 
   const init = async () => {
     // updateProfile();
-    console.log(state.playerState);
+    // console.log(state.playerState);
   };
 
   const getImgFromUrl = url => {
