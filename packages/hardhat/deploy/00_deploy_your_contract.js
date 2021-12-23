@@ -43,7 +43,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const gameContract = await ethers.getContract("GameManager", deployer);
 
   // let address = "0xeAe052b6C4B18F05d74DFc32Ecce5d43011195DB";
-  // await gearsContract.dropGear("Moloch", 0, address);
+  // await gearsContract.mintGearTest("Moloch", 0, 0, address);
+  // await gearsContract.mintGearTest("Moloch", 0, 1, address);
+  // await gearsContract.mintGearTest("Moloch", 0, 2, address);
+  // await gearsContract.mintGearTest("Moloch", 0, 3, address);
+  // await gearsContract.mintGearTest("Moloch", 0, 4, address);
   // await gearsContract.dropGear("Moloch", 1, address);
 
   await deploy("Player", {

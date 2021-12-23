@@ -308,7 +308,7 @@ function App(props) {
                 {networkDisplay}
                 <div className="Content">
                     <BrowserRouter>
-                        <div className="Navbar">
+                        {/* <div className="Navbar">
                             <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
                                 <Menu.Item key="/app">
                                     <Link
@@ -351,7 +351,7 @@ function App(props) {
                                     </Link>
                                 </Menu.Item>
                             </Menu>
-                        </div>
+                        </div> */}
                         <div className="RouteBody">
                             <Switch>
                                 <Route exact path="/app">

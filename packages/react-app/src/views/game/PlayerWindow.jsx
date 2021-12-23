@@ -60,11 +60,12 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
   const playerWrapper = (
     <div className="profile">
       <div className="profileImg">
-        <img src={state.playerState.pfpUrl} alt="Avatar"></img>
+        {state.playerState.pfpUrl != "" && <img src={state.playerState.pfpUrl} alt="Avatar"></img>}
+        {state.playerState.pfpUrl == "" && <img src="./images/img_avatar.png" alt="Avatar"></img>}
       </div>
       <div className="profileInfo">
-        <div>{state.playerState.name}</div>
-        <div>Faction: Warrior</div>
+        <div className="profileName">{state.playerState.name}</div>
+        {/* <div>Faction: Warrior</div> */}
       </div>
     </div>
   )

@@ -35,7 +35,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
   }, [contracts]);
 
   const onFinish = values => {
-    console.log(values);
+    // console.log(values);
     setplayerInfo(values);
     getAllNfts();
   };
@@ -79,15 +79,16 @@ export default function CreatePlayer({ address, tx, contracts }) {
   };
 
   async function getAllNfts() {
+    setLoading(true);
     const options = {
-      chain: 'eth', address: '0x99066C5fa8F44EEF3FCDee1811fcD90C2D45ddf5'
+      chain: 'eth', address: address
     }
     const res = await Web3Api.account.getNFTs(options)
     // console.log(res.result)
     const moonshotBotsContract = "0x8b13e88ead7ef8075b58c94a7eb18a89fd729b18";
     const nfts_msb = res.result.filter(r => r.token_address === moonshotBotsContract);
     // console.log(nfts_msb);
-    let pfp_msb = [];
+
     nfts_msb.forEach(async e => {
       let metaJson = await getMetadataFromTokenUri(e.token_uri);
       let currPfpList = pfpList["MSB"];
@@ -116,6 +117,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
       );
       setPfpList({ ...pfpList, ["ARC"]: currPfpList });
     });
+    setLoading(false);
   }
 
   async function updatePlayerState() {
@@ -158,6 +160,10 @@ export default function CreatePlayer({ address, tx, contracts }) {
       playerInfoNew.pfpName = selectedPfp.name;
       playerInfoNew.pfpUrl = selectedPfp.img;
       playerInfoNew.pfpTokenId = selectedPfp.token_id;
+    } else {
+      playerInfoNew.pfpName = "";
+      playerInfoNew.pfpUrl = "";
+      playerInfoNew.pfpTokenId = 0;
     }
     setLoading(true);
     console.log({ playerInfoNew })
@@ -224,12 +230,13 @@ export default function CreatePlayer({ address, tx, contracts }) {
         <Card style={{ width: 800 }} title="Create Player">
           {playerInfo && (
             <>
-              <div>Choose a PFP NFT that you want to set your player to</div>
+              <div className="title">Choose a PFP NFT that you want to set your player to</div>
               {loading && <Spin size="large"></Spin>}
               <div className="choosePfp">
                 <div className="projWrapper">
                   <div className="projTitle">Moonshot Bots</div>
                   <div className="projSel">
+                    {pfpList["MSB"].length == 0 && <div className="projNot">No Moonshot Bots NFT found. You can mint one from <a href="https://bots.moonshotcollective.space/" target="_blank">https://bots.moonshotcollective.space/</a></div>}
                     {pfpList["MSB"].map((e, key) => <div key={key} className="pfpEntry">
                       <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
                       <label for={key}><img src={e.img} /></label>
@@ -239,6 +246,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
                 <div className="projWrapper">
                   <div className="projTitle">Arcadians</div>
                   <div className="projSel">
+                    {pfpList["ARC"].length == 0 && <div className="projNot">No Arcadians NFT found. You can mint one from <a href="https://arcadians.io/" target="_blank">https://arcadians.io/</a></div>}
                     {pfpList["ARC"].map((e, key) => <div key={key} className="pfpEntry">
                       <input type="checkbox" id={'S' + key} checked={isSelected(e)} onChange={() => handleChange(e)} />
                       <label for={'S' + key}><img src={e.img} /></label>

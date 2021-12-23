@@ -13,6 +13,10 @@
     align-items: center;
     margin-top: 100px;
 }
+.title {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
 
 .choosePfp {
     display: flex;
@@ -24,8 +28,15 @@
         height: 200px;
         overflow-x: scroll;
         border: 1px solid red;
+        .projTitle {
+            margin-top: 10px;
+            font-size: 20px;
+        }
         .projSel {
             display: flex;
+            .projNot {
+                margin: 10px;
+            }
              .pfpEntry {
                 width: 200px;
                 height: 50px;

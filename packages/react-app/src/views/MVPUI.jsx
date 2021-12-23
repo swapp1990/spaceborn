@@ -46,31 +46,11 @@ export default function MVPUI({
 
   const init = async () => {
     updatePlayerState();
-    // addEventListener("ScifiLoot", "LootMinted", onLootMinted);
-    // addEventListener("Player", "PlayerCreated", onPlayerCreated);
-    // addEventListener("Alien", "PlayerLostLoot", onPlayerLostLoot);
-    // addEventListener("Alien", "MintedAliens", onMintedAliens);
   };
 
-  //contract Events
-  // const addEventListener = async (contractName, eventName, callback) => {
-  //   await contracts[contractName].removeListener(eventName);
-  //   contracts[contractName].on(eventName, (...args) => {
-  //     let eventBlockNum = args[args.length - 1].blockNumber;
-  //     // console.log(eventName, eventBlockNum, provider._lastBlockNumber);
-  //     if (eventBlockNum >= provider._lastBlockNumber - 1) {
-  //       let msg = args.pop().args;
-  //       callback(msg);
-  //     }
-  //   });
-  // };
-
-  // function onPlayerCreated(msg) {
-  //   console.log("onPlayerCreated", msg);
-  //   updateProfile();
-  // }
-
   async function updatePlayerState() {
+    console.log({ address });
+    if (!address) return;
     const tokenId = await contracts.Player.getTokenId(address);
     if (tokenId.toNumber() == 0) {
       console.log("player not found!");

@@ -25,7 +25,8 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 // Select the network you want to deploy to here:
 //
 // const defaultNetwork = "rinkeby";
-const defaultNetwork = "kovan";
+require('dotenv').config({ path: __dirname + '/.env' })
+const defaultNetwork = process.env.NETWORK;
 
 function mnemonic() {
   try {
@@ -51,6 +52,7 @@ module.exports = {
   networks: {
     localhost: {
       url: "http://localhost:8545",
+      gasPrice: 2000000000,
       /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)

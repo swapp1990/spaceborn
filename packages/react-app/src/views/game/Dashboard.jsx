@@ -20,6 +20,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         }
     ]);
     const [showWelcome, setShowWelcome] = useState(false);
+    const [freeGearsN, setFreeGearsN] = useState(100);
 
     useEffect(() => {
         init();
@@ -32,7 +33,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         }
     }, [state.walletGearsCount])
 
-    function init() {
+    async function init() {
         let updatedRounds = rounds;
         rounds.forEach(async (r, i) => {
             const roundProb = await contracts.GameManager.getRoundLostProb(r.id);
@@ -42,6 +43,8 @@ export default function Dashboard({ address, tx, contracts, provider }) {
         setRounds(updatedRounds);
         // console.log("init");
         updateShowWelcome();
+        const freeGears = await contracts.GameManager.freeGearsRemaining();
+        setFreeGearsN(freeGears.toNumber());
     }
 
     async function updatePlayerState() {
@@ -102,7 +105,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
                 }
                 if (update.status === "confirmed" || update.status === 1) {
                     console.log("Claimed free gear");
-                    updateShowWelcome();
+                    // updateShowWelcome();
                 }
                 if (update.events) {
                     setLoading(false);
@@ -121,7 +124,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
                     <div className="title">Welcome!</div>
                     <div>
                         <button className="mint commonBtn" onClick={claimGear}>Claim free Gear NFT!</button>
-                        <div className="note">98/100 available.</div>
+                        <div className="note">{freeGearsN}/100 available.</div>
                     </div>
                 </div>}
                 {!showWelcome && <div className="rounds">

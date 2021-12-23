@@ -534,7 +534,8 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         </div>
         <div className="deckCard playerBody">
           <div className="cardImg">
-            <img src={state.playerState.pfpUrl} alt="Avatar"></img>
+            {state.playerState.pfpUrl != "" && <img src={state.playerState.pfpUrl} alt="Avatar"></img>}
+            {state.playerState.pfpUrl == "" && <img src="./images/img_avatar.png" alt="Avatar"></img>}
           </div>
           {/* <div className="cardStats">
             <div>Strong against </div>

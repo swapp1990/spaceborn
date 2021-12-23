@@ -138,6 +138,31 @@ contract Gears is ERC721Enumerable, Ownable {
         return results;
     }
 
+    function mintGearTest(
+        string memory alienName,
+        uint256 rarity,
+        uint256 catIdx,
+        address playerWonAddr
+    ) external {
+        uint256 id = _tokenIds.current();
+        // require(id > 0 && id <= 10000, "Token ID invalid");
+        _mint(playerWonAddr, id);
+
+        lastTokenId = id;
+        uint256 rand = getRandom(id);
+        Gear storage gear = gears[id];
+        gear.tokenId = id;
+        gear.catIdx = catIdx;
+        gear.titleIdx = rand % loot2Names[gear.catIdx].length;
+        gear.name = string(abi.encodePacked("Dropped by ", alienName));
+        gear.rarity = rarity;
+        gear.health = 100;
+        gear.exists = true;
+        gear.playerWonAddr = playerWonAddr;
+        _tokenIds.increment();
+        emit GearDropped(gear);
+    }
+
     function dropGear(
         string memory alienName,
         uint256 rarity,
@@ -191,7 +216,13 @@ contract Gears is ERC721Enumerable, Ownable {
         Gear storage gear = gears[id];
         string[2] memory results = pluck(gear.catIdx, gear.titleIdx);
         return
-            GearsMetadataSvg.tokenURI(id, results[0], results[1], gear.rarity);
+            GearsMetadataSvg.tokenURI(
+                id,
+                results[0],
+                results[1],
+                gear.rarity,
+                gear.catIdx
+            );
     }
 
     function randomTokenURI(uint256 id, Gear memory gear)
@@ -201,7 +232,13 @@ contract Gears is ERC721Enumerable, Ownable {
     {
         string[2] memory results = pluck(gear.catIdx, gear.titleIdx);
         return
-            GearsMetadataSvg.tokenURI(id, results[0], results[1], gear.rarity);
+            GearsMetadataSvg.tokenURI(
+                id,
+                results[0],
+                results[1],
+                gear.rarity,
+                gear.catIdx
+            );
     }
 
     function getGearCats() public view returns (string[] memory) {

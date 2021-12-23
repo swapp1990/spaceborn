@@ -20,3 +20,6 @@
     align-items: flex-start;
     /* background-color: aliceblue; */
 }
+.profileName {
+    font-size: 20px;
+}
