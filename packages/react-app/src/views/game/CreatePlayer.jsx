@@ -88,36 +88,41 @@ export default function CreatePlayer({ address, tx, contracts }) {
     const moonshotBotsContract = "0x8b13e88ead7ef8075b58c94a7eb18a89fd729b18";
     const nfts_msb = res.result.filter(r => r.token_address === moonshotBotsContract);
     // console.log(nfts_msb);
+    try {
+      nfts_msb.forEach(async e => {
+        let metaJson = await getMetadataFromTokenUri(e.token_uri);
+        let currPfpList = pfpList["MSB"];
+        currPfpList.push(
+          {
+            "name": "MSB",
+            "img": metaJson.image,
+            "token_id": Number(e.token_id)
+          }
+        );
+        setPfpList({ ...pfpList, ["MSB"]: currPfpList });
+      });
 
-    nfts_msb.forEach(async e => {
-      let metaJson = await getMetadataFromTokenUri(e.token_uri);
-      let currPfpList = pfpList["MSB"];
-      currPfpList.push(
-        {
-          "name": "MSB",
-          "img": metaJson.image,
-          "token_id": Number(e.token_id)
-        }
-      );
-      setPfpList({ ...pfpList, ["MSB"]: currPfpList });
-    });
+      const arcadiansContract = "0xc3c8a1e1ce5386258176400541922c414e1b35fd";
+      const nfts_arc = res.result.filter(r => r.token_address === arcadiansContract);
 
-    const arcadiansContract = "0xc3c8a1e1ce5386258176400541922c414e1b35fd";
-    const nfts_arc = res.result.filter(r => r.token_address === arcadiansContract);
+      nfts_arc.forEach(async e => {
+        let metaJson = await getMetadataFromTokenUri(e.token_uri);
+        let currPfpList = pfpList["ARC"];
+        currPfpList.push(
+          {
+            "name": "ARC",
+            "img": metaJson.image,
+            "token_id": Number(e.token_id)
+          }
+        );
+        setPfpList({ ...pfpList, ["ARC"]: currPfpList });
+      });
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
 
-    nfts_arc.forEach(async e => {
-      let metaJson = await getMetadataFromTokenUri(e.token_uri);
-      let currPfpList = pfpList["ARC"];
-      currPfpList.push(
-        {
-          "name": "ARC",
-          "img": metaJson.image,
-          "token_id": Number(e.token_id)
-        }
-      );
-      setPfpList({ ...pfpList, ["ARC"]: currPfpList });
-    });
-    setLoading(false);
   }
 
   async function updatePlayerState() {

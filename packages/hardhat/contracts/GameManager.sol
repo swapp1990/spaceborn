@@ -168,7 +168,7 @@ contract GameManager {
     }
 
     function setupGame() internal {
-        round2GearLostProb[1] = 50;
+        round2GearLostProb[1] = 99;
         round2GearLostProb[2] = 70;
         round2GearLostProb[3] = 90;
     }

@@ -70,7 +70,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   useEffect(() => {
     if (contracts && contracts.Alien) {
-      console.log("init");
+      // console.log("init");
       resetGearSlots();
     }
   }, [contracts, address]);
@@ -92,7 +92,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       console.log({ alienWon });
       refreshGears();
       setTimeout(() => {
-        console.log("timeout");
+        // console.log("timeout");
         setStepIdx(4);
       }, 2000);
     }
@@ -353,15 +353,16 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         // console.log({ update });
         if (update.code) {
           setLoading(false);
+          setStepIdx(2);
         }
         if (update.status === "confirmed" || update.status === 1) {
           console.log("fightAlien success");
         }
         if (update.events) {
-          // console.log({ "events": update.events });
+          console.log({ "fightAlien events": update.events });
           let eventInfo = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
           if (eventInfo) {
-            console.log(eventInfo.event)
+            // console.log(eventInfo.event)
             if (eventInfo.event == "AlienWon") {
               const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
               setgameActionMsg(txt);
