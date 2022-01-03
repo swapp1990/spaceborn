@@ -3,18 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./GameManager.sol";
 
 contract Player is ERC721("Player", "PLR") {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address owner = address(0);
 
-    GameManager gameManager;
-
-    constructor(address gameContractAddress) public {
-        gameManager = GameManager(gameContractAddress);
-    }
+    constructor(address gameContractAddress) public {}
 
     struct Player {
         uint256 tokenId;

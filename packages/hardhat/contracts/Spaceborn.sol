@@ -3,12 +3,14 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Alien.sol";
 import "./Gears.sol";
+import "./TokenDistributor.sol";
 
 pragma experimental ABIEncoderV2;
 
-contract GameManager {
+contract Spaceborn {
     Alien alienContract;
     Gears gearsContract;
+    TokenDistributor tokenDistContract;
 
     uint256 public freeGearsRemaining = 100;
 
@@ -28,9 +30,14 @@ contract GameManager {
     mapping(uint256 => uint256) public gearCat2AlienBuffs;
     mapping(uint256 => uint256) public round2GearLostProb;
 
-    constructor(address alienAddress, address gearsAddress) public {
+    constructor(
+        address alienAddress,
+        address gearsAddress,
+        address tokenDistAddress
+    ) public {
         alienContract = Alien(alienAddress);
         gearsContract = Gears(gearsAddress);
+        tokenDistContract = TokenDistributor(tokenDistAddress);
         gearsContract.approveGame(address(this));
         setupGame();
         initBuffs();
@@ -60,16 +67,6 @@ contract GameManager {
     }
 
     function initBuffs() internal {
-        // string[] memory catsAlien = alienContract.getAlienCats();
-        // string[] memory catsGears = gearsContract.getGearCats();
-        // for (uint256 i = 0; i < catsGears.length; i++) {
-        //     gearTypeToIdx[catsGears[i]] = i;
-        // }
-        // uint256 mapCount = 0;
-        // for (uint256 i = 0; i < catsAlien.length; i++) {
-        //     alienNameToIdx[catsAlien[i]] = i;
-        // }
-
         /*	Agility -> Weapon - 2
 					-> Apparel - 1
 					-> Vehicle - 5
@@ -272,13 +269,15 @@ contract GameManager {
             usedGears,
             alienContract.getAlienCatIdx(alien_id)
         );
-        // uint256 finalProb = 100;
+        // // uint256 finalProb = 100;
         uint256 factor = 5;
         for (uint256 i = 0; i < usedGears.length; i++) {
             UsedGear memory gear = usedGears[i];
             gearsContract.decreaseHealth(gear.gearIdx, factor);
         }
 
+        tokenDistContract.rewardPlayer(msg.sender, 100);
+        tokenDistContract.rewardGameContract(address(this), 100);
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);

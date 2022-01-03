@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./GearsMetadataSvg.sol";
 
 pragma experimental ABIEncoderV2;
-import "./GameManager.sol";
 
 contract Gears is ERC721Enumerable, Ownable {
     using SafeMath for uint256;

@@ -4,39 +4,119 @@ const { solidity } = require("ethereum-waffle");
 
 use(solidity);
 
+// describe("Token", function () {
+//   let firstPlayer;
+//   let secondPlayer;
+//   let tokenContract;
+//   let rewardContract;
+
+//   describe("MangoToken", function () {
+//     it("Should deploy contracts", async function () {
+//       const [owner, second] = await ethers.getSigners();
+//       firstPlayer = owner;
+//       secondPlayer = second;
+//       const Mango = await ethers.getContractFactory("MangoToken");
+//       tokenContract = await Mango.deploy("MANGO", "MNG", 100000, owner.address);
+//       let tokenSupply = await tokenContract.balanceOf(owner.address)
+//       console.log(tokenSupply.toNumber());
+//       const Reward = await ethers.getContractFactory("RewardToken");
+//       rewardContract = await Reward.deploy(tokenContract.address, owner.address);
+//       tokenContract.transfer(rewardContract.address, 50000)
+
+//       await tokenContract.approve(rewardContract.address, 1000)
+//       await rewardContract.connect(second).rewardPlayer(secondPlayer.address, 1000);
+//       let ownerBalance = await tokenContract.balanceOf(owner.address)
+//       console.log(ownerBalance.toNumber());
+//       let escrow = await tokenContract.balanceOf(rewardContract.address)
+//       console.log(escrow.toNumber());
+
+//       let playerBalance = await tokenContract.balanceOf(secondPlayer.address)
+//       console.log(playerBalance.toNumber());
+//     })
+//   })
+// })
+
 describe("Game", function () {
-  let firstPlayer;
+  let owner;
+  let player1;
+  let player2;
+  let tokenDistContract;
   let gearsContract;
-  let gameManagerContract;
+  let alienContract;
+  let gameContract1;
 
   describe("Gears", function () {
+    it("Should deploy token", async function () {
+      [owner, player1, player2] = await ethers.getSigners();
+
+      const Mango = await ethers.getContractFactory("MangoToken");
+      tokenContract = await Mango.deploy("MANGO", "MNG", 100000, owner.address);
+      let tokenSupply = await tokenContract.balanceOf(owner.address);
+      // console.log(tokenSupply.toNumber());
+      expect(await tokenSupply).to.equal(100000);
+    });
+
+    it("Should escrow tokens to distribution contract", async function () {
+      //Deploy token distribution contract
+      const TokenDistributor = await ethers.getContractFactory("TokenDistributor");
+      tokenDistContract = await TokenDistributor.deploy(tokenContract.address, owner.address);
+      tokenContract.transfer(tokenDistContract.address, 60000);
+      let ownerBal = await tokenContract.balanceOf(owner.address);
+      // console.log(ownerBal.toNumber());
+      expect(await ownerBal).to.equal(40000);
+      let escrowBal = await tokenContract.balanceOf(tokenDistContract.address)
+      // console.log(escrowBal.toNumber());
+      expect(await escrowBal).to.equal(60000);
+    });
+
     it("Should deploy contracts", async function () {
-      const [owner] = await ethers.getSigners();
-      firstPlayer = owner;
       const Alien = await ethers.getContractFactory("Alien");
       alienContract = await Alien.deploy();
       const Gears = await ethers.getContractFactory("Gears");
       gearsContract = await Gears.deploy();
 
-      const GameManager = await ethers.getContractFactory("GameManager");
-      gameManagerContract = await GameManager.deploy(alienContract.address, gearsContract.address);
+      const Spaceborn = await ethers.getContractFactory("Spaceborn");
+      gameContract1 = await Spaceborn.deploy(alienContract.address, gearsContract.address, tokenDistContract.address);
     });
 
-    it("should claim free gear", async function () {
-      let approvedGame = await gearsContract.approvedGameContract();
-      // console.log(approvedGame);
-      let balance = await gearsContract.balanceOf(firstPlayer.address);
-      console.log({ balance: balance.toNumber() });
-      await gameManagerContract.claimRandomGear();
-      balance = await gearsContract.balanceOf(firstPlayer.address);
-      console.log({ balance: balance.toNumber() });
+    it("Mint 2 aliens", async function () {
+      await alienContract.mintMultipleAliens(["Allen", "Bernard"], [0, 35], [0, 1], 1);
+      let balance = await alienContract.balanceOf(owner.address);
+      expect(await balance).to.equal(2);
+    });
 
-      //should return error since free gear can be claimed only once
-      // await gameManagerContract.claimRandomGear();
+    it("Claim available free gears", async function () {
+      await gameContract1.connect(player1).claimRandomGear();
+      let p1_gears_balance = await gearsContract.balanceOf(player1.address);
+      expect(await p1_gears_balance).to.equal(1);
+      let available_free_gears = await gameContract1.freeGearsRemaining();
+      expect(await available_free_gears).to.equal(99);
 
-      //should return error since "dropGear" call can only be made by an approved game contract
-      // gearsContract.dropGear("Moloch", 0, firstPlayer.address);
+      //Should return error "Not eligible for free gear"
+      //await gameContract1.connect(player1).claimRandomGear();
+    });
 
+    it("combat alien", async function () {
+      let alienId = 0;
+      let roundId = 1;
+      let gearsIdx = [{
+        rarityIdx: 0, catIdx: 0, gearIdx: 0
+      }];
+      let clientRandom = Math.floor(Math.random() * 100);
+      await gameContract1.connect(player1).fightAlien(roundId, alienId, clientRandom, gearsIdx);
+      let gearUsed = await gearsContract.gears(0);
+      // console.log(gearUsed.health.toNumber());
+      expect(await gearUsed.health).to.equal(95);
+
+      let escrowBal = await tokenContract.balanceOf(tokenDistContract.address)
+      // console.log(escrowBal.toNumber());
+      expect(await escrowBal).to.equal(59800);
+      let player1Bal = await tokenContract.balanceOf(player1.address)
+      // console.log(player1Bal.toNumber());
+      expect(await player1Bal).to.equal(100);
+      let player2Bal = await tokenContract.balanceOf(player2.address)
+      expect(await player2Bal).to.equal(0);
+      // expect(await escrowBal).to.equal(60000);
     });
   });
 
