@@ -9,7 +9,7 @@ contract Player is ERC721("Player", "PLR") {
     Counters.Counter private _tokenIds;
     address owner = address(0);
 
-    constructor(address gameContractAddress) public {}
+    constructor() public {}
 
     struct Player {
         uint256 tokenId;

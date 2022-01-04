@@ -40,7 +40,6 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
 
   const init = async () => {
     // updateProfile();
-    // console.log(state.playerState);
   };
 
   const getImgFromUrl = url => {
@@ -65,6 +64,7 @@ export default function PlayerWindow({ address, tx, contracts, playerNft }) {
       </div>
       <div className="profileInfo">
         <div className="profileName">{state.playerState.name}</div>
+        <div className="profileBal">$MANGO: {state.playerTokenBalance}</div>
         {/* <div>Faction: Warrior</div> */}
       </div>
     </div>

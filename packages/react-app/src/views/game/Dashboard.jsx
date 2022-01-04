@@ -36,14 +36,14 @@ export default function Dashboard({ address, tx, contracts, provider }) {
     async function init() {
         let updatedRounds = rounds;
         rounds.forEach(async (r, i) => {
-            const roundProb = await contracts.GameManager.getRoundLostProb(r.id);
+            const roundProb = await contracts.Spaceborn.getRoundLostProb(r.id);
             // console.log({ roundProb: roundProb.toNumber() });
             updatedRounds[i].probOfGearsLost = roundProb.toNumber();
         });
         setRounds(updatedRounds);
         // console.log("init");
         updateShowWelcome();
-        const freeGears = await contracts.GameManager.freeGearsRemaining();
+        const freeGears = await contracts.Spaceborn.freeGearsRemaining();
         setFreeGearsN(freeGears.toNumber());
     }
 
@@ -97,7 +97,7 @@ export default function Dashboard({ address, tx, contracts, provider }) {
 
     async function claimGear() {
         setLoading(true);
-        await tx(contracts.GameManager.claimRandomGear(), update => {
+        await tx(contracts.Spaceborn.claimRandomGear(), update => {
             if (update) {
                 // console.log({ update });
                 if (update.code) {

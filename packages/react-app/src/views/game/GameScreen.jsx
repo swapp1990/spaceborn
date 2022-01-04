@@ -45,6 +45,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   const [stepIdx, setStepIdx] = useState(1);
   const [alienWon, setAlienWon] = useState(null);
+  const [playerReward, setPlayerReward] = useState(0);
   const [gearWonImg, setGearWonImg] = useState(null);
   const [gearLostImg, setGearLostImg] = useState(null);
 
@@ -71,6 +72,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   useEffect(() => {
     if (contracts && contracts.Alien) {
       // console.log("init");
+      updateTokenBalance();
       resetGearSlots();
     }
   }, [contracts, address]);
@@ -146,8 +148,8 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     // console.log(usedGears, state.alienIdx)
     if (state.alienIdx != -1) {
       chosenAlien.probs = chosenAlien.initProbs;
-      let totalBuff = await contracts.GameManager.getTotalBuff(chosenAlien.initProbs, usedGears, state.alienIdx);
-      console.log({ totalBuff: totalBuff.toNumber() })
+      let totalBuff = await contracts.Spaceborn.getTotalBuff(chosenAlien.initProbs, usedGears, state.alienIdx);
+      // console.log({ totalBuff: totalBuff.toNumber() })
       totalBuff = totalBuff.toNumber();
       setTotalBuffApplied(totalBuff);
 
@@ -284,6 +286,12 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     console.log("updated player state ", player.name);
   }
 
+  async function updateTokenBalance() {
+    let playerTokenBalance = await contracts.MangoToken.balanceOf(address);
+    console.log("playerTokenBalance ", playerTokenBalance.toNumber());
+    dispatch({ type: "setPlayerTokenBalance", payload: playerTokenBalance.toNumber(), fieldName: "playerTokenBalance" });
+  }
+
   async function leaveRound() {
     setLoading(true);
     const result = await tx(contracts.Player.leaveGame(), update => {
@@ -348,7 +356,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     // console.log({ foundGears });
     setStepIdx(3);
     setAlienWon(null);
-    await tx(contracts.GameManager.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
+    await tx(contracts.Spaceborn.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
       if (update) {
         // console.log({ update });
         if (update.code) {
@@ -360,9 +368,11 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         }
         if (update.events) {
           console.log({ "fightAlien events": update.events });
+          updateTokenBalance();
           let eventInfo = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
           if (eventInfo) {
             // console.log(eventInfo.event)
+            setPlayerReward(100);
             if (eventInfo.event == "AlienWon") {
               const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
               setgameActionMsg(txt);
@@ -505,6 +515,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <button className="commonBtn resBtn" onClick={onNewFight}>Fight Again</button>
           {alienWon && <div className="wonMsg">You lost the fight</div>}
           {!alienWon && <div className="wonMsg">You won the fight</div>}
+          <div className="wonReward">Earned {playerReward} $MANGO tokens!</div>
         </div>
 
         {!alienWon && <div className="wonGear">

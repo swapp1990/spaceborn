@@ -104,8 +104,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       addEventListener("Gears", "GearDropped", onGearDropped);
       addEventListener("Gears", "GearDropped", onGearDropped);
     }
-    if (contracts && contracts.GameManager) {
-      addEventListener("GameManager", "PlayerLostGear", onPlayerLostGear);
+    if (contracts && contracts.Spaceborn) {
+      addEventListener("Spaceborn", "PlayerLostGear", onPlayerLostGear);
     }
 
   };
@@ -164,7 +164,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   async function approve(gear) {
-    let gameAddr = await contracts.GameManager.address;
+    let gameAddr = await contracts.Spaceborn.address;
     setLoading(true);
     await tx(contracts.Gears.approveGear(gameAddr, gear.tokenIdx), update => {
       if (update.status === "confirmed" || update.status === 1) {
@@ -236,6 +236,21 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     return icons;
   }
 
+  function getRarityType(id) {
+    switch (id) {
+      case 0:
+        return "Common"
+      case 1:
+        return "Uncommon"
+      case 2:
+        return "Rare"
+      case 4:
+        return "Ultra"
+      default:
+        return ""
+    }
+  }
+
   /////////// Contract functions
   async function updateWallet() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
@@ -256,6 +271,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           let gearJsObj = {};
           gearJsObj.note = gearObj.name;
           gearJsObj.rarityIdx = gearObj.rarity.toNumber();
+          gearJsObj.rarity = getRarityType(gearJsObj.rarityIdx);
           gearJsObj.catIdx = gearObj.catIdx.toNumber();
           gearJsObj.gearIdx = gearObj.tokenId.toNumber();
           gearJsObj.tokenIdx = gearObj.tokenId.toNumber();
@@ -268,7 +284,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           gearJsObj.itemName = svgJson.item;
           gearJsObj.icon = getIconGear(gearJsObj.category);
           gearJsObj.strongIcons = getStrongIcons(gearJsObj.category);
-          let gameAddr = await contracts.GameManager.address;
+          let gameAddr = await contracts.Spaceborn.address;
           gearJsObj.approved = await contracts.Gears.isApproved(tokenId, gameAddr);
           // console.log(svgImg);
           walletGearsUpdate.push(gearJsObj);
@@ -288,7 +304,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   }
 
   const claimFree = async () => {
-    const result = await tx(contracts.GameManager.claimRandomGear(), update => {
+    const result = await tx(contracts.Spaceborn.claimRandomGear(), update => {
       if (update) {
         if (update.status === "confirmed" || update.status === 1) {
           console.log("claimed gear");
@@ -349,7 +365,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
 
           {/* <Gear1 className="gearSvg" /> */}
-          <div>{gear.itemName} </div>
+          <div>{gear.itemName} ({gear.rarity})</div>
           <div>Health: {gear.health}</div>
         </div>
         <div className="gearSide">

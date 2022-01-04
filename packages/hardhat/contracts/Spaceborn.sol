@@ -43,8 +43,18 @@ contract Spaceborn {
         initBuffs();
     }
 
-    event PlayerWon(uint256 tokenId, uint256 finalProbs, address sender);
-    event AlienWon(uint256 tokenId, uint256 finalProbs, address sender);
+    event PlayerWon(
+        uint256 tokenId,
+        uint256 finalProbs,
+        address sender,
+        uint256 playerReward
+    );
+    event AlienWon(
+        uint256 tokenId,
+        uint256 finalProbs,
+        address sender,
+        uint256 playerReward
+    );
     event PlayerLostGear(uint256 tokenId, uint256 lostGearId, address sender);
 
     function random(string memory input) internal pure returns (uint256) {
@@ -276,7 +286,8 @@ contract Spaceborn {
             gearsContract.decreaseHealth(gear.gearIdx, factor);
         }
 
-        tokenDistContract.rewardPlayer(msg.sender, 100);
+        uint256 playerReward = 100;
+        tokenDistContract.rewardPlayer(msg.sender, playerReward);
         tokenDistContract.rewardGameContract(address(this), 100);
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
@@ -286,9 +297,9 @@ contract Spaceborn {
                 rarity,
                 msg.sender
             );
-            emit PlayerWon(0, finalProb, msg.sender);
+            emit PlayerWon(alien_id, finalProb, msg.sender, playerReward);
         } else {
-            emit AlienWon(0, finalProb, msg.sender);
+            emit AlienWon(alien_id, finalProb, msg.sender, playerReward);
             if (usedGears.length > 0) {
                 uint256 dropProb = round2GearLostProb[roundId];
                 if (rand100 > dropProb) {

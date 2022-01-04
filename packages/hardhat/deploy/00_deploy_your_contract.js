@@ -5,25 +5,38 @@
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-
-  await deploy("MongoToken", {
+  console.log({ deployer })
+  await deploy("MangoToken", {
     from: deployer,
-    args: [],
+    args: ["MANGO", "MNG", 100000, deployer],
     log: true
-  })
+  });
+  let tokenContract = await ethers.getContract("MangoToken", deployer);
+  let tokenSupply = await tokenContract.balanceOf(deployer);
+  console.log({ tokenSupply: tokenSupply.toNumber() });
 
-  // await deploy("Alien", {
-  //   from: deployer,
-  //   //args: [ "Hello", ethers.utils.parseEther("1.5") ],
-  //   log: true,
-  // });
+  await deploy("TokenDistributor", {
+    from: deployer,
+    args: [tokenContract.address, deployer],
+    log: true
+  });
+  let tokenDistContract = await ethers.getContract("TokenDistributor", deployer);
+  tokenContract.transfer(tokenDistContract.address, 60000);
+  let escrowBal = await tokenContract.balanceOf(tokenDistContract.address);
+  console.log({ escrowBal: escrowBal.toNumber() });
 
-  // let alienContract = await ethers.getContract("Alien", deployer);
-  // let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin", "Bob", "Camden", "Roger", "Sheryl"];
-  // // let baseProbs = [10, 35, 95, 67, 89, 45, 22, 49, 76, 17];
-  // let baseProbs = [95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95];
-  // let dropGearRarity = [0, 0, 2, 0, 0, 0, 1, 1, 0, 0];
-  // await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 1);
+  await deploy("Alien", {
+    from: deployer,
+    //args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    log: true,
+  });
+
+  let alienContract = await ethers.getContract("Alien", deployer);
+  let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin", "Bob", "Camden", "Roger", "Sheryl"];
+  // let baseProbs = [10, 35, 95, 67, 89, 45, 22, 49, 76, 17];
+  let baseProbs = [95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95];
+  let dropGearRarity = [0, 0, 2, 0, 0, 0, 1, 1, 0, 0];
+  await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 1);
 
   // names = ["Shila", "Roxanne", "Scarlet", "Paula", "Emma", "Rani"];
   // baseProbs = [45, 67, 69, 35, 56, 35];
@@ -35,19 +48,19 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   // dropGearRarity = [0, 1, 2, 2, 1, 0];
   // await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 3);
 
-  // await deploy("Gears", {
-  //   from: deployer,
-  //   log: true,
-  // });
+  await deploy("Gears", {
+    from: deployer,
+    log: true,
+  });
 
-  // let gearsContract = await ethers.getContract("Gears", deployer);
+  let gearsContract = await ethers.getContract("Gears", deployer);
 
-  // await deploy("GameManager", {
-  //   from: deployer,
-  //   args: [alienContract.address, gearsContract.address],
-  //   log: true,
-  // });
-  // const gameContract = await ethers.getContract("GameManager", deployer);
+  await deploy("Spaceborn", {
+    from: deployer,
+    args: [alienContract.address, gearsContract.address, tokenDistContract.address],
+    log: true,
+  });
+  const game1Contract = await ethers.getContract("Spaceborn", deployer);
 
   // let address = "0xeAe052b6C4B18F05d74DFc32Ecce5d43011195DB";
   // await gearsContract.mintGearTest("Moloch", 0, 0, address);
@@ -57,42 +70,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   // await gearsContract.mintGearTest("Moloch", 0, 4, address);
   // await gearsContract.dropGear("Moloch", 1, address);
 
-  // await deploy("Player", {
-  //   from: deployer,
-  //   args: [gameContract.address],
-  //   log: true,
-  // });
-
-  //   const baseUri =
-  //     "https://gateway.pinata.cloud/ipfs/QmTV8L1G1D4ow9SA5Bnw3XZw7mdLkHo5uYfDsPbRqZqNm2/";
-  //   await deploy("BadKidsAlley", {
-  //     from: deployer,
-  //     args: [baseUri],
-  //     log: true,
-  //   });
-
-  /*
-  //If you want to send value to an address from the deployer
-  const deployerWallet = ethers.provider.getSigner()
-  await deployerWallet.sendTransaction({
-    to: "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-    value: ethers.utils.parseEther("0.001")
-  })
-  */
-
-  /*
-  //If you want to send some ETH to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
-  value: ethers.utils.parseEther("0.05")
+  await deploy("Player", {
+    from: deployer,
+    args: [],
+    log: true,
   });
-  */
-
-  /*
-  //If you want to link a library into your contract:
-  // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const yourContract = await deploy("YourContract", [], {}, {
-   LibraryName: **LibraryAddress**
-  });
-  */
 };
-module.exports.tags = ["Loot"];
+module.exports.tags = ["Spaceborn"];

@@ -168,56 +168,67 @@ function App(props) {
         walletGearsCount: 0,
         alienIdx: -1,
         playerState: {},
+        playerTokenBalance: 0,
         gameStepIdx: 1,
         aliens: []
     }
     function globalReducer(state, action) {
-        switch (action.type) {
-            case 'setName': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setGearSlots': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setAlienIdx': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setPlayerState': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setGameStepIdx': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setWalletGearsCount': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            case 'setAliens': {
-                return {
-                    ...state,
-                    [action.fieldName]: action.payload
-                }
-            }
-            default:
-                break;
+        return {
+            ...state,
+            [action.fieldName]: action.payload
         }
+        // switch (action.type) {
+        //     case 'setName': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setGearSlots': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setAlienIdx': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setPlayerState': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setPlayerTokenBalance': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setGameStepIdx': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setWalletGearsCount': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     case 'setAliens': {
+        //         return {
+        //             ...state,
+        //             [action.fieldName]: action.payload
+        //         }
+        //     }
+        //     default:
+        //         break;
+        // }
     }
     const [state, dispatch] = useReducer(globalReducer, initialState);
     const contextValue = useMemo(() => {
