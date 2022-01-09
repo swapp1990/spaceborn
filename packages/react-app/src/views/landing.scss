@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
+
+.landing_main {
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+  font-family: 'Raleway', sans-serif;
+  color: white;
+  .navigation {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 41;
+    .navLeft {
+      font-size: 20px;
+      width: 80%;
+      .title {
+        font-size: 30px;
+        margin-left: 20px;
+      }
+    }
+    .navRight {
+      width: 30%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-right: 50px;
+      button {
+        border: 0;
+        background-color: transparent;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+      }
+    }
+  }
+  .header {
+    position: relative;
+    z-index: 1;
+    .titleWrapper {
+      position: absolute;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .title {
+        color: white;
+        font-size: 140px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 119px;
+        letter-spacing: 0em;
+        text-align: center;
+        margin-top: 28%;
+      }
+      .playBtn {
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 170px;
+      }
+      .scroll {
+        margin-top: 50px;
+      }
+    }
+  }
+  .gameInfo {
+    height: 100vh;
+    width: 100vw;
+    .gameText {
+      color: white;
+      font-size: 40px;
+      padding: 30px;
+    }
+    .borderTitle {
+      position: relative;
+      .title {
+        color: white;
+        font-size: 65px;
+        margin-left: 30%;
+        padding-top: 5%;
+        text-transform: uppercase;
+      }
+      img {
+        position: absolute;
+        top: 18%;
+        width: 56%;
+        height: 88%;
+      }
+      .imgRight {
+        right: 0;
+      }
+    }
+    .about {
+      display: flex;
+      flex-direction: column;
+      .aboutSection {
+        padding: 30px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 24px;
+      }
+      .aboutTitle {
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+      }
+    }
+  }
+  .gameSteps {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+      
+    .stepsWrapper {
+      margin-top: 50px;
+      display: flex;
+      justify-content: flex-start;
+      .stepsMenu {
+        margin-left: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30%;
+        height: 50%;
+        .stepId {
+          color: white;
+          font-size: 72px;
+          padding-left: 10px;
+          cursor: pointer;
+        }
+        .selected {
+          background-color: aqua;
+          border-top-right-radius: 20px;
+          border-bottom-right-radius: 20px;
+          width: 70%;
+        }
+      }
+      .stepsContent {
+        width: 70%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        .box {
+          margin-top: 50px;
+          // border: 5px solid;
+          border-width: 3px;
+          border-style: solid;
+          border-image: 
+            linear-gradient(
+              to bottom, 
+              #FE1B5D, 
+              rgba(0, 0, 0, 0)
+            ) 1 100%;
+          width: 70%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          .imgCircle {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: bisque;
+            width: 200px;
+            height: 200px;
+          }
+          .boxText {
+            color: white;
+            padding: 30px;
+            font-size: 20px;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+  .contact {
+      width: 100vw;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+  }
+}
+.box {
+    width: 100vw;
+    display: flex;
+    background-color: black;
+    justify-content: center;
+    align-items: center;
+}
+.titleBar {
+    margin-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    .title {
+    color: white;
+    font-size: 48px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    }
+    .titleBg {
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    background: linear-gradient(90deg, #FE1B5D 0.92%, rgba(254, 27, 93, 0) 102.44%);
+    }
+    .flip {
+    transform: scaleX(-1);
+    }
+}
