@@ -167,6 +167,26 @@ export default function Landing() {
             </div>
           </div>
         </Box>
+        <Box height="50vh">
+          <div className="contact" id="contact">
+            <div className="titleBar">
+              <div className="titleBg"></div>
+              <div className="title">Contact</div>
+              <div className="titleBg flip"></div>
+            </div>
+            <div className="contactWrapper">
+              <button>
+                <img src="/images/twitter.png"></img>
+              </button>
+              <button>
+                <img src="/images/telegram.png"></img>
+              </button>
+              <button>
+                <img src="/images/discord.png"></img>
+              </button>
+            </div>
+          </div>
+        </Box>
       </Container>
     </div>
   );

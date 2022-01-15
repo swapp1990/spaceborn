@@ -223,8 +223,13 @@
   .contact {
       width: 100vw;
       height: 100%;
-      display: flex;
-      flex-direction: column;
+      .contactWrapper {
+        margin-top: 100px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 70%;
+      }
   }
 }
 .box {
