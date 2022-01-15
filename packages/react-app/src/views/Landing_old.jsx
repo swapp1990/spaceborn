@@ -1,4 +1,6 @@
+import { src } from "gulp";
 import "./landing.scss";
+
 export default function Landing() {
   const moveToSection = secName => {
     console.log(secName);
@@ -49,7 +51,6 @@ export default function Landing() {
             <img src="/images/landing_bg.png"></img>
             <div className="titleWrapper">
               <div className="title">SPACEBORN</div>
-              <div className="tagline">BUILD. PLAY. EARN</div>
               <div className="playBtn">
                 <img src="/images/playGame.png"></img>
               </div>
@@ -61,81 +62,60 @@ export default function Landing() {
         </Box>
         <Box>
           <div className="gameInfo" id="about">
-            {/* <div className="borderTitle">
-              <div className="title"></div>
+            <div className="borderTitle">
+              <div className="title">About the Game</div>
               <img src="/images/borderLeft.svg"></img>
-            </div> */}
+            </div>
             <div className="gameText">
-              <p>
-                Spaceborn is a collection of games developed by independant game developers using crypto-native game
-                engine.
-              </p>
-              <p>Players earn token-generating interoperable NFTs which earn income for both players and developers.</p>
-            </div>
-          </div>
-        </Box>
-        <Box>
-          <div className="gameFeats" id="about">
-            <div className="points">
-              <p>
-                <b>Build:</b> Independant game developers and artists publish forkable games and royalty generating game
-                assets using crypto-native game engine.
-              </p>
-              <p>
-                <b>Play:</b> Players earn token-generating NFTs while playing published games which can be utilized as
-                interoperable and composable in-game items. The NFTs have global health attached which decreases with
-                more usage determined by the games, which reduces it's income generating capabilities.
-              </p>
-              <p>
-                <b>Earn:</b> NFTs reward tokens to players who use it in different games which can accept them. Game
-                developers also earn tokens based on the NFT usage they can create in their own games.
-              </p>
-              <p>
-                <b>Competition:</b> Game developers are incentivized to create the most fun and unique experience for
-                players holding various NFTs. Players indirectly curate the best games because of the usage of precious
-                NFTs that they hold.
-              </p>
-            </div>
-          </div>
-        </Box>
-        <Box>
-          <div className="gameToken" id="token">
-            <div className="tokenInfo">
-              <div className="name">$MNGO</div>
-              <div className="points">
-                <p>Total Supply: 100 Million</p>
-                <p>ERC-20 Token</p>
-              </div>
-            </div>
-            <div className="tokenDist">
-              <img src="/images/token_dist.png"></img>
+              Spaceborn is a collection of games created by the community of devs which utilizes player owned composable
+              and interoperable NFTs which the players have earned by exploring the world.
             </div>
           </div>
         </Box>
         <Box>
           <div className="gameInfo">
             <div className="borderTitle">
-              <div className="title">Game Engine</div>
+              <div className="title">About the Game</div>
               <img src="/images/borderLeft.svg"></img>
             </div>
             <div className="about">
               <div className="aboutSection">
                 <div>
+                  <p>In Mirandus, players have absolute freedom of choice - there are no maps, no quest givers. </p>
                   <p>
-                    Crypto-native game engine that helps game developers not only easily create web3 ready game assets
-                    which can be used anywhere, but use them to develop and publish games on our platform.
+                    Players can set out into the wilderness alone to try their fortunes against the monsters of the deep
+                    woods and dungeons, join with one of the monarchs to serve as a knight in their court, or set up
+                    shop in one of the five great citadels of the realm.
                   </p>
                   <p>
-                    They can code rules to accept token-generating NFTs using this engine or develop their own special
-                    NFTs which offer other tokens as well.
+                    Players take on the role of avatars in the world, and if desired, can purchase an exemplar avatar
+                    with powers and abilities beyond those of others in Mirandus.
+                  </p>
+                </div>
+                <div>
+                  <p>In Mirandus, players have absolute freedom of choice - there are no maps, no quest givers. </p>
+                  <p>
+                    Players can set out into the wilderness alone to try their fortunes against the monsters of the deep
+                    woods and dungeons, join with one of the monarchs to serve as a knight in their court, or set up
+                    shop in one of the five great citadels of the realm.
                   </p>
                   <p>
-                    Web3 ready means they can follow certain standards decided by the community to make this game assets
-                    interoperable and composable.
+                    Players take on the role of avatars in the world, and if desired, can purchase an exemplar avatar
+                    with powers and abilities beyond those of others in Mirandus.
                   </p>
                 </div>
               </div>
-              <div className="aboutTitle">More Info</div>
+              <div className="aboutTitle">
+                In Mirandus, you decide who you will be and choose your own quest in the epic fight against evil.
+              </div>
+            </div>
+          </div>
+        </Box>
+        <Box>
+          <div className="gameInfo" id="features">
+            <div className="borderTitle">
+              <div className="title">Game Features</div>
+              <img src="/images/borderRight.svg" className="imgRight"></img>
             </div>
           </div>
         </Box>
@@ -143,7 +123,7 @@ export default function Landing() {
           <div className="gameSteps">
             <div className="titleBar">
               <div className="titleBg"></div>
-              <div className="title">Genesis Event</div>
+              <div className="title">How to Play</div>
               <div className="titleBg flip"></div>
             </div>
 
@@ -158,13 +138,25 @@ export default function Landing() {
                 <div className="box">
                   <div className="imgCircle"></div>
                   <div className="boxText">
-                    The first event launching soon on Polygon allows early players to earn the first 10000
-                    token-generating NFTs which are Sci-fi Gears which will be interoperable and composable across the
-                    subsequent games released on the platform.
+                    Spaceborn is the first game using open-source game engine being built to create open, forkable smart
+                    contracts enabling rapid development and experimentation when it comes to crypto-based next-gen
+                    games. The first game lets you create a Player NFT and claim randomized & unique "loot" inspired
+                    single gears which are minted and stored on blockchain and will be used throughout the Moonshot
+                    Sci-fi
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </Box>
+        <Box height="50vh">
+          <div className="contact" id="contact" style={{ backgroundImage: "url(" + "/images/footer_bg.png" + ")" }}>
+            <div className="titleBar">
+              <div className="titleBg"></div>
+              <div className="title">Contact</div>
+              <div className="titleBg flip"></div>
+            </div>
+            <div className="contactWrapper"></div>
           </div>
         </Box>
       </Container>
