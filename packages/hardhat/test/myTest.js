@@ -77,6 +77,8 @@ describe("Game", function () {
 
       const Spaceborn = await ethers.getContractFactory("Spaceborn");
       gameContract1 = await Spaceborn.deploy(alienContract.address, gearsContract.address, tokenDistContract.address);
+
+      await tokenDistContract.addGameContract(gameContract1.address);
     });
 
     it("Mint 2 aliens", async function () {

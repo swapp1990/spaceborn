@@ -20,7 +20,7 @@ import {
   Tooltip,
   Modal,
 } from "antd";
-import "./game.scss"
+import "./game.scss";
 import * as svgUtils from "../../helpers/svgUtils";
 import GContext from "../../helpers/GContext";
 import IMAGES from "../../helpers/imageImporter";
@@ -28,16 +28,7 @@ import chanceNumber from "../../assets/images/chanceNumber.png";
 import chanceBar from "../../assets/images/chanceBar.png";
 
 const { Text, Link, Title } = Typography;
-const categories = [
-  "Agility",
-  "Powerful",
-  "Mind Control",
-  "Charm",
-  "Replication",
-  "Mimic",
-  "Superintelligent",
-  "NPC"
-];
+const categories = ["Agility", "Powerful", "Mind Control", "Charm", "Replication", "Mimic", "Superintelligent", "NPC"];
 
 export default function GameScreen({ address, tx, contracts, provider }) {
   //Global use context
@@ -79,11 +70,11 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   useEffect(() => {
     // console.log({ state });
-  }, [state])
+  }, [state]);
 
   useEffect(() => {
     updateGameScreen();
-  }, [state.playerState])
+  }, [state.playerState]);
 
   useEffect(() => {
     updateProbsReduce();
@@ -98,13 +89,13 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         setStepIdx(4);
       }, 2000);
     }
-  }, [alienWon])
+  }, [alienWon]);
 
   useEffect(async () => {
     if (stepIdx == 1) {
       updateGameScreen();
     }
-  }, [stepIdx])
+  }, [stepIdx]);
 
   const init = async () => {
     initEmptyEquip();
@@ -112,19 +103,19 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   const onBack = () => {
     setStepIdx(stepIdx - 1);
-  }
+  };
 
-  const onAlienSel = (alien) => {
+  const onAlienSel = alien => {
     alien.initProbs = alien.probs;
     // console.log({ alien });
     dispatch({ type: "setAlienIdx", payload: alien.tokenId, fieldName: "alienIdx" });
     setChosenAlien(alien);
     setStepIdx(2);
-  }
+  };
 
   const onNewFight = () => {
     setStepIdx(1);
-  }
+  };
 
   async function refreshGears() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
@@ -144,7 +135,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       if (g.type != "empty") {
         usedGears.push({ gearIdx: g.gearIdx, catIdx: g.catIdx, rarityIdx: g.rarityIdx });
       }
-    })
+    });
     // console.log(usedGears, state.alienIdx)
     if (state.alienIdx != -1) {
       chosenAlien.probs = chosenAlien.initProbs;
@@ -152,7 +143,6 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       // console.log({ totalBuff: totalBuff.toNumber() })
       totalBuff = totalBuff.toNumber();
       setTotalBuffApplied(totalBuff);
-
     }
   }
 
@@ -192,20 +182,20 @@ export default function GameScreen({ address, tx, contracts, provider }) {
 
   const chooseRandom = (arr, num = 1) => {
     const res = [];
-    for (let i = 0; i < num;) {
+    for (let i = 0; i < num; ) {
       const random = Math.floor(Math.random() * arr.length);
       if (res.indexOf(arr[random]) !== -1) {
         continue;
-      };
+      }
       res.push(arr[random]);
       i++;
-    };
+    }
     return res;
   };
 
   async function updateGameScreen() {
     if (!state.playerState || !state.playerState.roundId) {
-      console.log("No roundId found")
+      console.log("No roundId found");
       return;
     }
     const deadAlienIdxs = await contracts.Alien.getDeadAliens();
@@ -280,7 +270,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       image: null,
       owner: address,
       joined: player.joined,
-      roundId: player.joinedRoundId.toNumber()
+      roundId: player.joinedRoundId.toNumber(),
     };
     dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
     console.log("updated player state ", player.name);
@@ -289,7 +279,11 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   async function updateTokenBalance() {
     let playerTokenBalance = await contracts.MangoToken.balanceOf(address);
     console.log("playerTokenBalance ", playerTokenBalance.toNumber());
-    dispatch({ type: "setPlayerTokenBalance", payload: playerTokenBalance.toNumber(), fieldName: "playerTokenBalance" });
+    dispatch({
+      type: "setPlayerTokenBalance",
+      payload: playerTokenBalance.toNumber(),
+      fieldName: "playerTokenBalance",
+    });
   }
 
   async function leaveRound() {
@@ -300,7 +294,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           console.log("Player left game");
         }
         if (update.events) {
-          console.log({ "event": update.events.length });
+          console.log({ event: update.events.length });
           resetGearSlots();
           updatePlayerState();
           setLoading(false);
@@ -356,42 +350,48 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     // console.log({ foundGears });
     setStepIdx(3);
     setAlienWon(null);
-    await tx(contracts.Spaceborn.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears), update => {
-      if (update) {
-        // console.log({ update });
-        if (update.code) {
-          setLoading(false);
-          setStepIdx(2);
-        }
-        if (update.status === "confirmed" || update.status === 1) {
-          console.log("fightAlien success");
-        }
-        if (update.events) {
-          console.log({ "fightAlien events": update.events });
-          updateTokenBalance();
-          let eventInfo = update.events.find(e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"));
-          if (eventInfo) {
-            // console.log(eventInfo.event)
-            setPlayerReward(100);
-            if (eventInfo.event == "AlienWon") {
-              const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
-              setgameActionMsg(txt);
-              setAlienWon(true);
-              let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
-              if (lostGearEvent) {
-                updateLostGear(lostGearEvent);
-              } else {
-                updateLostGear(null);
+    await tx(
+      contracts.Spaceborn.fightAlien(state.playerState.roundId, state.alienIdx, clientRandom, foundGears),
+      update => {
+        if (update) {
+          // console.log({ update });
+          if (update.code) {
+            setLoading(false);
+            setStepIdx(2);
+          }
+          if (update.status === "confirmed" || update.status === 1) {
+            console.log("fightAlien success");
+          }
+          if (update.events) {
+            console.log({ "fightAlien events": update.events });
+            updateTokenBalance();
+            let eventInfo = update.events.find(
+              e => e.event != null && (e.event == "AlienWon" || e.event == "PlayerWon"),
+            );
+            if (eventInfo) {
+              // console.log(eventInfo.event)
+              setPlayerReward(100);
+              if (eventInfo.event == "AlienWon") {
+                const txt = "Alien won with final prob of " + eventInfo.args.finalProbs.toNumber();
+                setgameActionMsg(txt);
+                setAlienWon(true);
+                let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
+                if (lostGearEvent) {
+                  updateLostGear(lostGearEvent);
+                } else {
+                  updateLostGear(null);
+                  refreshGears();
+                }
+              } else if (eventInfo.event == "PlayerWon") {
+                const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
+                setgameActionMsg(txt);
+                setAlienWon(false);
               }
-            } else if (eventInfo.event == "PlayerWon") {
-              const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
-              setgameActionMsg(txt);
-              setAlienWon(false);
             }
           }
         }
-      }
-    });
+      },
+    );
   }
 
   async function updateLostGear(event) {
@@ -400,7 +400,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
       setGearLostImg(null);
       return;
     }
-    console.log({ "lostEvent": event });
+    console.log({ lostEvent: event });
     const lostGearIdx = event.args.lostGearId.toNumber();
     // console.log({ lostGearIdx });
     let svgImg = await getSvgImgGear(lostGearIdx);
@@ -431,44 +431,55 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     updateAliens(deadAlienIdxs);
   }
 
-  //////////// Render 
+  //////////// Render
   const alienCard = (alien, i) => {
-    return (<div className="cardObj" key={i} onClick={() => onAlienSel(alien)}>
-      <div className="cardBox">
-
-        <img src={alien.icon} width="80" height="80" />
-        <div className="icon2">
-          <Tooltip title={alien.category}>
-            <img src={alien.icon2} width="30" height="30" />
-          </Tooltip>
+    return (
+      <div className="cardObj" key={i} onClick={() => onAlienSel(alien)}>
+        <div className="cardBox">
+          <img src={alien.icon} width="80" height="80" />
+          <div className="icon2">
+            <Tooltip title={alien.category}>
+              <img src={alien.icon2} width="30" height="30" />
+            </Tooltip>
+          </div>
         </div>
+        <div className="cardTitle">{alien.name}</div>
       </div>
-      <div className="cardTitle">{alien.name}</div>
-    </div>)
+    );
   };
   const step1 = (
     <>
       <div className="main-title">Choose alien to fight</div>
-      <div className="refresh"><button className="commonBtn" onClick={onRefreshAliens}>Refresh</button></div>
+      <div className="refresh">
+        <button className="commonBtn" onClick={onRefreshAliens}>
+          Refresh
+        </button>
+      </div>
       <div className="alien-cards">
         {randomAliens.map((alien, i) => alienCard(alien, i))}
-        {randomAliens.length == 0 && !loading && <span className="won-txt">No aliens found for this round! Come back later!</span>}
+        {randomAliens.length == 0 && !loading && (
+          <span className="won-txt">No aliens found for this round! Come back later!</span>
+        )}
       </div>
-      <div className="alien-info">Dead Aliens so far: {deadAliens.length}/{totalAliens}</div>
+      <div className="alien-info">
+        Dead Aliens so far: {deadAliens.length}/{totalAliens}
+      </div>
     </>
-  )
+  );
 
   const setGear = (gear, i) => {
     return (
-      < div className="gear-cardObj" key={i}>
+      <div className="gear-cardObj" key={i}>
         <div className="gear-card">
           <img src={gear.icon} width="50" height="50" />
         </div>
         <div className="gear-stats">
-          <div>[{gear.category}] - {gear.name}</div>
+          <div>
+            [{gear.category}] - {gear.name}
+          </div>
         </div>
-      </div >
-    )
+      </div>
+    );
   };
   const emptyGear = (gear, i) => {
     return (
@@ -478,7 +489,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
           <div>Pick from Wallet</div>
         </div>
       </div>
-    )
+    );
   };
 
   const whichGearSlot = (gear, i) => {
@@ -488,14 +499,14 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     } else if (gear.type == "set") {
       return setGear(gear, i);
     }
-  }
+  };
   const whichResultBg = () => {
     if (alienWon) {
-      return "url('/images/bg_lost.jpeg')"
+      return "url('/images/bg_lost.jpeg')";
     } else {
-      return "url('/images/bg_won.png')"
+      return "url('/images/bg_won.png')";
     }
-  }
+  };
   const progressPanel = (
     <div className="progressBody">
       <div className="progressPanel">
@@ -507,161 +518,171 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         </div>
       </div>
     </div>
-  )
+  );
   const resultPanel = (
     <div className="resultBody">
       <div className="resultPanel" style={{ backgroundImage: whichResultBg() }}>
         <div className="wonTop">
-          <button className="commonBtn resBtn" onClick={onNewFight}>Fight Again</button>
+          <button className="commonBtn resBtn" onClick={onNewFight}>
+            Fight Again
+          </button>
           {alienWon && <div className="wonMsg">You lost the fight</div>}
           {!alienWon && <div className="wonMsg">You won the fight</div>}
           <div className="wonReward">Earned {playerReward} $MANGO tokens!</div>
         </div>
 
-        {!alienWon && <div className="wonGear">
-          <div>Gear Earned</div>
-          <div className="wonBox">
-            <div className="gearCard">
-              <img src={gearWonImg} width="250px" height="250px"></img>
+        {!alienWon && (
+          <div className="wonGear">
+            <div>Gear Earned</div>
+            <div className="wonBox">
+              <div className="gearCard">
+                <img src={gearWonImg} width="250px" height="250px"></img>
+              </div>
             </div>
           </div>
-        </div>}
-        {alienWon && <div className="wonGear">
-          <div>Gear Lost</div>
-          {gearLostImg && <div className="wonBox">
-            <div className="gearCard">
-              <img src={gearLostImg} width="250px" height="250px"></img>
-            </div>
-          </div>}
-          <div>No gears lost!</div>
-        </div>}
+        )}
+        {alienWon && (
+          <div className="wonGear">
+            <div>Gear Lost</div>
+            {gearLostImg && (
+              <div className="wonBox">
+                <div className="gearCard">
+                  <img src={gearLostImg} width="250px" height="250px"></img>
+                </div>
+              </div>
+            )}
+            <div>No gears lost!</div>
+          </div>
+        )}
       </div>
     </div>
-  )
-  const combatPanel = (<div className="chosenAlien">
-    <div className="playerSide">
-      <div className="playerObj">
-        <div className="sideName playerName">
-          Player Name: Swap
-        </div>
-        <div className="deckCard playerBody">
-          <div className="cardImg">
-            {state.playerState.pfpUrl != "" && <img src={state.playerState.pfpUrl} alt="Avatar"></img>}
-            {state.playerState.pfpUrl == "" && <img src="./images/img_avatar.png" alt="Avatar"></img>}
-          </div>
-          {/* <div className="cardStats">
+  );
+  const combatPanel = (
+    <div className="chosenAlien">
+      <div className="playerSide">
+        <div className="playerObj">
+          <div className="sideName playerName">Player Name: Swap</div>
+          <div className="deckCard playerBody">
+            <div className="cardImg">
+              {state.playerState.pfpUrl != "" && <img src={state.playerState.pfpUrl} alt="Avatar"></img>}
+              {state.playerState.pfpUrl == "" && <img src="./images/img_avatar.png" alt="Avatar"></img>}
+            </div>
+            {/* <div className="cardStats">
             <div>Strong against </div>
           </div> */}
-        </div>
-
-      </div>
-      <div className="chanceObj left">
-        <div className="chanceBar">
-          <img src={chanceNumber}></img>
-          <img src={chanceBar}></img>
-          <div className="chancePercent">
-            % {(100 - (chosenAlien.probs - totalBuffApplied))}
-          </div>
-          <div className="chanceTitle">
-            <div>Players chance of winning</div>
-          </div>
-          <div className="chanceWrapper">
-            <div className="chanceInd" style={{ width: (100 - (chosenAlien.probs - totalBuffApplied)) + "%" }}></div>
           </div>
         </div>
-      </div>
-    </div>
-    <div className="divider">
-      <img src={IMAGES["VS"]}></img>
-      <div className="vsText">VS</div>
-    </div>
-    <div className="enemySide">
-      <div className="enemyObj">
-        <div className="sideName enemyName">
-          Alien Name: {chosenAlien.name}
-        </div>
-        <div className="deckCard enemyBody">
-          <div className="cardImg">
-            <img src={IMAGES["ALIEN_ICON"]} alt="Avatar"></img>
-          </div>
-          <div className="cardStats">
-            <div className="entry">
-              <div> </div>
-              <div className="category">{chosenAlien.category}  (<img src={chosenAlien.icon2} width="30" height="30" />)</div>
+        <div className="chanceObj left">
+          <div className="chanceBar">
+            <img src={chanceNumber}></img>
+            <img src={chanceBar}></img>
+            <div className="chancePercent">% {100 - (chosenAlien.probs - totalBuffApplied)}</div>
+            <div className="chanceTitle">
+              <div>Players chance of winning</div>
+            </div>
+            <div className="chanceWrapper">
+              <div className="chanceInd" style={{ width: 100 - (chosenAlien.probs - totalBuffApplied) + "%" }}></div>
             </div>
           </div>
         </div>
       </div>
-      <div className="chanceObj right">
-        <div className="chanceBar">
-          <img src={chanceNumber}></img>
-          <img className="flipImg" src={chanceBar}></img>
-          <div className="chancePercent right">
-            {(chosenAlien.probs - totalBuffApplied)} %
+      <div className="divider">
+        <img src={IMAGES["VS"]}></img>
+        <div className="vsText">VS</div>
+      </div>
+      <div className="enemySide">
+        <div className="enemyObj">
+          <div className="sideName enemyName">Alien Name: {chosenAlien.name}</div>
+          <div className="deckCard enemyBody">
+            <div className="cardImg">
+              <img src={IMAGES["ALIEN_ICON"]} alt="Avatar"></img>
+            </div>
+            <div className="cardStats">
+              <div className="entry">
+                <div> </div>
+                <div className="category">
+                  {chosenAlien.category} (<img src={chosenAlien.icon2} width="30" height="30" />)
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="chanceTitle right">
-            <div>Aliens chance of winning</div>
-          </div>
-          <div className="chanceWrapper">
-            <div className="chanceInd red" style={{ width: (chosenAlien.probs - totalBuffApplied) + "%" }}></div>
+        </div>
+        <div className="chanceObj right">
+          <div className="chanceBar">
+            <img src={chanceNumber}></img>
+            <img className="flipImg" src={chanceBar}></img>
+            <div className="chancePercent right">{chosenAlien.probs - totalBuffApplied} %</div>
+            <div className="chanceTitle right">
+              <div>Aliens chance of winning</div>
+            </div>
+            <div className="chanceWrapper">
+              <div className="chanceInd red" style={{ width: chosenAlien.probs - totalBuffApplied + "%" }}></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>);
-  const chooseGearPanel = (<div className="chosenGears">
-    <div className="gearTitle">
-      <div>Equip Gears</div>
-      <div className="subtitle">
-        (Choose upto 3 approved gears from your wallet for better chances)
+  );
+  const chooseGearPanel = (
+    <div className="chosenGears">
+      <div className="gearTitle">
+        <div>Equip Gears</div>
+        <div className="subtitle">(Choose upto 3 approved gears from your wallet for better chances)</div>
       </div>
+      <div className="gearCards">{state.gearSlots.map((slot, i) => whichGearSlot(slot, i))}</div>
     </div>
-    <div className="gearCards">
-      {state.gearSlots.map((slot, i) => whichGearSlot(slot, i))}
-    </div>
-  </div>);
+  );
   const step2 = (
     <>
       {/* {stepIdx == 3 && progressPanel} */}
       {combatPanel}
       {chooseGearPanel}
     </>
-  )
+  );
 
-  const gameScreen = (<>
-    <div className="game-main" style={{ backgroundImage: "url('/images/bg_alienworld3.png')" }}>
-      {loading && <div className="loading-main">
-        <Spin size="large"></Spin>
-      </div>}
-      {stepIdx == 3 && progressPanel}
-      {stepIdx == 4 && resultPanel}
-      <div className="main-top">
-        {stepIdx >= 2 && <div className="backBtn commonBtn" onClick={onBack}>Back</div>}
-        {stepIdx == 1 && <div></div>}
-        <div className="round">Round {state.playerState.roundId}</div>
-        <button className="leaveBtn commonBtn" onClick={leaveRound}>Leave Round</button>
-      </div>
-      <div className="main-body">
-        {stepIdx == 1 && step1}
-        {stepIdx >= 2 && step2}
-        {/* {stepIdx == 3 && combatScreen}
+  const gameScreen = (
+    <>
+      <div className="game-main" style={{ backgroundImage: "url('/images/bg_alienworld3.png')" }}>
+        {loading && (
+          <div className="loading-main">
+            <Spin size="large"></Spin>
+          </div>
+        )}
+        {stepIdx == 3 && progressPanel}
+        {stepIdx == 4 && resultPanel}
+        <div className="main-top">
+          {stepIdx >= 2 && (
+            <div className="backBtn commonBtn" onClick={onBack}>
+              Back
+            </div>
+          )}
+          {stepIdx == 1 && <div></div>}
+          <div className="round">Round {state.playerState.roundId}</div>
+          <button className="leaveBtn commonBtn" onClick={leaveRound}>
+            Leave Round
+          </button>
+        </div>
+        <div className="main-body">
+          {stepIdx == 1 && step1}
+          {stepIdx >= 2 && step2}
+          {/* {stepIdx == 3 && combatScreen}
         {stepIdx == 4 && alienWon && resultLostScreen}
         {stepIdx == 4 && !alienWon && resultWonScreen} */}
+        </div>
+        <div className="main-footer">
+          {stepIdx == 1 && <div className="logmsg">Beginning Battle ...</div>}
+          {stepIdx == 2 && (
+            <>
+              <div className="logmsg">Preparing To Fight ...</div>
+              <button className="commonBtn footerBtn" onClick={() => beginFight()}>
+                Begin Fight
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <div className="main-footer">
-        {stepIdx == 1 && (<div className="logmsg">Beginning Battle ...</div>)}
-        {stepIdx == 2 && (
-          <><div className="logmsg">
-            Preparing To Fight ...
-          </div>
-            <button className="commonBtn footerBtn" onClick={() => beginFight()}>Begin Fight</button></>)}
-      </div>
-    </div>
-  </>);
-
-  return (
-    <>
-      {state.playerState && state.playerState.roundId != 0 && gameScreen}
     </>
   );
+
+  return <>{state.playerState && state.playerState.roundId != 0 && gameScreen}</>;
 }

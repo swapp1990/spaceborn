@@ -13,6 +13,7 @@ contract Spaceborn {
     TokenDistributor tokenDistContract;
 
     uint256 public freeGearsRemaining = 100;
+    uint256 public allocatedReward = 5;
 
     struct UsedGear {
         uint256 rarityIdx;
@@ -281,9 +282,13 @@ contract Spaceborn {
         );
         // // uint256 finalProb = 100;
         uint256 factor = 5;
+        uint256 totalHealth = 0;
         for (uint256 i = 0; i < usedGears.length; i++) {
             UsedGear memory gear = usedGears[i];
-            gearsContract.decreaseHealth(gear.gearIdx, factor);
+            totalHealth += gear.gearsContract.decreaseHealth(
+                gear.gearIdx,
+                factor
+            );
         }
 
         uint256 playerReward = 100;
@@ -324,11 +329,11 @@ contract Spaceborn {
         uint256 finalProb = getFinalProbs(baseProbs, usedGears, alienCatIdx);
         if (rand100 > finalProb) {
             // alienContract.setAlienDead(alien_id);
-            emit PlayerWon(0, finalProb, msg.sender);
+            emit PlayerWon(0, finalProb, msg.sender, 0);
             // uint256 rarity = getGearRarity(alienContract.getAlienBaseProb(alien_id));
             // gearsContract.dropGear(alienContract.getAlienName(alien_id), rarity, msg.sender);
         } else {
-            emit AlienWon(0, finalProb, msg.sender);
+            emit AlienWon(0, finalProb, msg.sender, 0);
         }
     }
 

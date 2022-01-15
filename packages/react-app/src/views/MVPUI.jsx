@@ -1,8 +1,4 @@
-import {
-  Space,
-  Typography,
-  Modal,
-} from "antd";
+import { Space, Typography, Modal } from "antd";
 
 import React, { useEffect, useState, useContext, useReducer, useMemo } from "react";
 import "./mvpui.css";
@@ -17,15 +13,7 @@ import GContext from "../helpers/GContext";
 
 const { Text, Link, Title } = Typography;
 
-export default function MVPUI({
-  address,
-  mainnetProvider,
-  provider,
-  yourLocalBalance,
-  price,
-  tx,
-  contracts
-}) {
+export default function MVPUI({ address, mainnetProvider, provider, yourLocalBalance, price, tx, contracts }) {
   //Global state
   const { state, dispatch } = useContext(GContext);
 
@@ -41,8 +29,7 @@ export default function MVPUI({
   }, [contracts, address]);
   useEffect(() => {
     // console.log({ player: state.playerState });
-  }, [state.playerState])
-
+  }, [state.playerState]);
 
   const init = async () => {
     updatePlayerState();
@@ -65,7 +52,7 @@ export default function MVPUI({
       image: null,
       owner: address,
       joined: player.joined,
-      roundId: player.joinedRoundId.toNumber()
+      roundId: player.joinedRoundId.toNumber(),
     };
     dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
     // console.log("updated player state ", player.name);
@@ -112,18 +99,19 @@ export default function MVPUI({
           <WalletWindow address={address} tx={tx} contracts={contracts} provider={provider} />
         </div>
       </div>
-      {state.playerState && <div className="game">
-        {state.playerState.joined && <GameScreen address={address} tx={tx} contracts={contracts} />}
-        {!state.playerState.joined && <Dashboard address={address} tx={tx} contracts={contracts} />}
-      </div>}
-    </div >
-  )
+      {state.playerState && (
+        <div className="game">
+          {state.playerState.joined && <GameScreen address={address} tx={tx} contracts={contracts} />}
+          {!state.playerState.joined && <Dashboard address={address} tx={tx} contracts={contracts} />}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
-      {isPlayerState() && (
-        <CreatePlayer address={address} tx={tx} contracts={contracts} />
-      )}
-      {!isPlayerState() && uiBody}</>
-  )
+      {isPlayerState() && <CreatePlayer address={address} tx={tx} contracts={contracts} />}
+      {!isPlayerState() && uiBody}
+    </>
+  );
 }
