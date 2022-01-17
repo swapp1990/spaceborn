@@ -29,58 +29,25 @@ import { default as PopupWindow } from "../../components/PopupWindow";
 
 const { Text, Link, Title } = Typography;
 
-const GEAR_CATS = ["Weapon",
-  "Apparel",
-  "Vehicle",
-  "Pill",
-  "Gizmo"];
+const GEAR_CATS = ["Weapon", "Apparel", "Vehicle", "Pill", "Gizmo"];
 
-const ALIEN_CATS = ["Agility",
-  "Powerful",
-  "Mind Control",
-  "Charm",
-  "Replication",
-  "Mimic",
-  "Superintelligent",
-  "NPC"];
+const ALIEN_CATS = ["Agility", "Powerful", "Mind Control", "Charm", "Replication", "Mimic", "Superintelligent", "NPC"];
 
 const STRONG_AGAINST = {
-  "Vehicle": [0, 4, 5],
-  "Pill": [2, 7],
-  "Gizmo": [4, 6],
-  "Apparel": [3, 5, 6],
-  "Weapon": [1, 4]
-}
+  Vehicle: [0, 4, 5],
+  Pill: [2, 7],
+  Gizmo: [4, 6],
+  Apparel: [3, 5, 6],
+  Weapon: [1, 4],
+};
 
 const GEARS = {
-  "Weapon": ["Pistol",
-    "Cannon",
-    "Phaser",
-    "Sniper",
-    "Zapper"],
-  "Apparel": ["Exosuit",
-    "Power Armor",
-    "Biosuit",
-    "Gloves",
-    "Nnaosuit",
-    "Jacket"],
-  "Vehicle": ["Hoverboard",
-    "Superbike",
-    "Air-ship",
-    "Time Machine",
-    "Auto-Car",
-    "Hushicopter"],
-  "Gizmo": ["Neutralizer",
-    "Replicator",
-    "Battery",
-    "Fuel Canister",
-    "Supercomputer"],
-  "Pill": ["Soma",
-    "Nootropic",
-    "LSX",
-    "Regeneration",
-    "Food Replacement"]
-}
+  Weapon: ["Pistol", "Cannon", "Phaser", "Sniper", "Zapper"],
+  Apparel: ["Exosuit", "Power Armor", "Biosuit", "Gloves", "Nnaosuit", "Jacket"],
+  Vehicle: ["Hoverboard", "Superbike", "Air-ship", "Time Machine", "Auto-Car", "Hushicopter"],
+  Gizmo: ["Neutralizer", "Replicator", "Battery", "Fuel Canister", "Supercomputer"],
+  Pill: ["Soma", "Nootropic", "LSX", "Regeneration", "Food Replacement"],
+};
 
 export default function WalletWindow({ address, tx, contracts, provider }) {
   //Global state
@@ -107,7 +74,6 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     if (contracts && contracts.Spaceborn) {
       addEventListener("Spaceborn", "PlayerLostGear", onPlayerLostGear);
     }
-
   };
 
   const addEventListener = async (contractName, eventName, callback) => {
@@ -125,13 +91,13 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     console.log({ onGearDropped: msg });
     setTimeout(() => {
       updateWallet();
-    }, 2000)
+    }, 2000);
   }
 
   async function onPlayerLostGear(msg) {
     setTimeout(() => {
       updateWallet();
-    }, 2000)
+    }, 2000);
   }
 
   function unequip(gear) {
@@ -183,12 +149,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     let slotFound = state.gearSlots.find(g => g.slotId == gear.tokenIdx);
     // console.log({ slotFound })
     if (slotFound) {
-
     } else {
       let newState = [...state.gearSlots];
       let emptySlotIdx = state.gearSlots.findIndex(g => g.slotId === -1);
       if (emptySlotIdx == -1) {
-        console.log("No empty slot found")
+        console.log("No empty slot found");
         return;
       }
       newState[emptySlotIdx].slotId = gear.tokenIdx;
@@ -204,8 +169,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       newState[emptySlotIdx].usedGear = {
         catIdx: gear.catIdx,
         gearIdx: gear.gearIdx,
-        rarityIdx: gear.rarityIdx
-      }
+        rarityIdx: gear.rarityIdx,
+      };
       dispatch({ type: "setGearSlots", payload: newState, fieldName: "gearSlots" });
 
       let gearsCopy = [...walletGears];
@@ -230,8 +195,8 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     let alienTypeIdxs = STRONG_AGAINST[cat];
     let icons = [];
     alienTypeIdxs.forEach(id => {
-      icons.push({ "icon": getIconAlien(ALIEN_CATS[id]), "alienType": ALIEN_CATS[id] });
-    })
+      icons.push({ icon: getIconAlien(ALIEN_CATS[id]), alienType: ALIEN_CATS[id] });
+    });
     // console.log({ icons });
     return icons;
   }
@@ -239,22 +204,22 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
   function getRarityType(id) {
     switch (id) {
       case 0:
-        return "Common"
+        return "Common";
       case 1:
-        return "Uncommon"
+        return "Uncommon";
       case 2:
-        return "Rare"
+        return "Rare";
       case 4:
-        return "Ultra"
+        return "Ultra";
       default:
-        return ""
+        return "";
     }
   }
 
   /////////// Contract functions
   async function updateWallet() {
     const balanceLoot = await contracts.Gears.balanceOf(address);
-    console.log({ "balanceLoot": balanceLoot.toNumber() });
+    console.log({ balanceLoot: balanceLoot.toNumber() });
     dispatch({ type: "setWalletGearsCount", payload: balanceLoot.toNumber(), fieldName: "walletGearsCount" });
     // if (balanceLoot.toNumber() == walletGears.length) {
     //   console.log("wallet is updated!");
@@ -289,7 +254,6 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           // console.log(svgImg);
           walletGearsUpdate.push(gearJsObj);
         }
-
       } catch (e) {
         console.log(e);
       }
@@ -310,7 +274,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           console.log("claimed gear");
         }
         if (update.events) {
-          console.log({ "event": update.events });
+          console.log({ event: update.events });
           updateWallet();
         }
       }
@@ -343,9 +307,13 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
         <div className="gearImg">
           <img src={gear.icon} width="50" height="50" />
         </div>
-        {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>}
+        {!gear.approved && (
+          <button className="gearBtn" onClick={() => approve(gear)}>
+            Approve
+          </button>
+        )}
       </div>
-    )
+    );
   }
   function gearBox(gear, idx) {
     // console.log(gear);
@@ -356,40 +324,53 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
             <img src={gear.icon} width="50" height="50" />
           </div>
           <div className="gearIcons">
-            {gear.strongIcons.map((iconObj, idx) =>
+            {gear.strongIcons.map((iconObj, idx) => (
               <div className="gIcon" key={idx}>
-                <Tooltip title={'Strong against Alien: ' + iconObj.alienType}>
+                <Tooltip title={"Strong against Alien: " + iconObj.alienType}>
                   <img src={iconObj.icon} width="23" height="23" />
                 </Tooltip>
-              </div>)}
+              </div>
+            ))}
           </div>
 
           {/* <Gear1 className="gearSvg" /> */}
-          <div>{gear.itemName} ({gear.rarity})</div>
+          <div>
+            {gear.itemName} ({gear.rarity})
+          </div>
           <div>Health: {gear.health}</div>
         </div>
         <div className="gearSide">
           {/* {!gear.approved && <button className="gearBtn" onClick={() => approve(gear)}>Approve</button>} */}
-          {gear.approved && state.playerState && state.playerState.joined && !gear.equip && <button className="gearBtn" onClick={() => equip(gear)}>Equip</button>}
-          {gear.approved && gear.equip && <button className="gearBtn" onClick={() => unequip(gear)}>Unequip</button>}
-          <button className="gearBtn" onClick={() => viewNft(gear)}>View NFT</button>
+          {gear.approved && state.playerState && state.playerState.joined && !gear.equip && (
+            <button className="gearBtn" onClick={() => equip(gear)}>
+              Equip
+            </button>
+          )}
+          {gear.approved && gear.equip && (
+            <button className="gearBtn" onClick={() => unequip(gear)}>
+              Unequip
+            </button>
+          )}
+          <button className="gearBtn" onClick={() => viewNft(gear)}>
+            View NFT
+          </button>
         </div>
       </div>
-    )
+    );
   }
 
   function handlePopup(msg) {
     // console.log(msg);
-    setpopupWindowMsg({ ...msg, show: false })
+    setpopupWindowMsg({ ...msg, show: false });
   }
   function viewNft(gear) {
     // console.log({ gear })
     let msg = {
       show: true,
       title: gear.itemName,
-      imgSrc: gear.gearJson.image
-    }
-    setpopupWindowMsg(msg)
+      imgSrc: gear.gearJson.image,
+    };
+    setpopupWindowMsg(msg);
   }
 
   const walletWindow = (
@@ -404,7 +385,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
           <div className="count">{approveGears.length}</div>
         </div>
-        <hr style={{ "width": "200px" }} />
+        <hr style={{ width: "200px" }} />
         {/* <div className="panelSubTitle">*Approving gears makes it available for use in the game. This is a one time transaction.</div> */}
         <div className="appColl">
           {approveGears.length == 0 && <span>No gears in your wallet needs approval</span>}
@@ -422,7 +403,7 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
           </div>
           <div className="count">{walletGears.length}</div>
         </div>
-        <hr style={{ "width": "200px" }} />
+        <hr style={{ width: "200px" }} />
         <div className="invColl">
           {loading && <Spin size="large"></Spin>}
           <div className="gearWrapper">
@@ -432,9 +413,11 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
         </div>
       </div>
 
-      {popupWindowMsg && popupWindowMsg.show && <PopupWindow onCloseCallback={handlePopup} popupMsg={popupWindowMsg}></PopupWindow>}
+      {popupWindowMsg && popupWindowMsg.show && (
+        <PopupWindow onCloseCallback={handlePopup} popupMsg={popupWindowMsg}></PopupWindow>
+      )}
     </>
-  )
+  );
   return (
     <>
       <div>{walletWindow}</div>

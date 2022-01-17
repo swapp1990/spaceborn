@@ -66,6 +66,31 @@ contract Alien is ERC721, Ownable {
         }
     }
 
+    function mintMultipleAliens2(
+        string[] memory names,
+        uint256[] memory baseProbs,
+        uint256[] memory catIdxs,
+        uint256[] memory dropGearRarity,
+        uint256 roundId
+    ) public {
+        for (uint256 i = 0; i < names.length; i++) {
+            uint256 id = _tokenIds.current();
+            uint256 rand = getRandom(id);
+            _mint(msg.sender, id);
+            lastTokenId = id;
+            Alien storage alien = aliens[id];
+            alien.tokenId = id;
+            alien.name = names[i];
+            alien.baseProb = baseProbs[i];
+            alien.dropGearRarity = dropGearRarity[i];
+            alien.roundId = roundId;
+            // uint256 alienCatIdx = rand % categories.length;
+            alien.catIdx = catIdxs[i];
+            alien.exists = true;
+            _tokenIds.increment();
+        }
+    }
+
     function canFight(uint256 tokenId) public view returns (bool) {
         return aliens[tokenId].exists && !aliens[tokenId].isDead;
     }

@@ -3,17 +3,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Alien.sol";
 import "./Gears.sol";
-import "./TokenDistributor.sol";
 
 pragma experimental ABIEncoderV2;
 
-contract Spaceborn {
+contract SpacebornTest {
     Alien alienContract;
     Gears gearsContract;
-    TokenDistributor tokenDistContract;
-
-    uint256 public freeGearsRemaining = 100;
-    uint256 public allocatedReward = 5;
 
     struct UsedGear {
         uint256 rarityIdx;
@@ -21,42 +16,21 @@ contract Spaceborn {
         uint256 gearIdx;
     }
 
-    // struct GearCatToAlienCat {
-    //     uint256 gearCatIdx;
-    //     uint256 alienCatIdx;
-    // }
-
-    // mapping(string => uint256) alienNameToIdx;
-    // mapping(string => uint256) gearTypeToIdx;
     mapping(uint256 => uint256) public gearCat2AlienBuffs;
     mapping(uint256 => uint256) public round2GearLostProb;
 
-    constructor(
-        address alienAddress,
-        address gearsAddress,
-        address tokenDistAddress
-    ) public {
+    event PlayerWon(uint256 tokenId, uint256 finalProb);
+    event AlienWon(uint256 tokenId, uint256 finalProb);
+    event PlayerLostGear(uint256 tokenId, uint256 lostGearId);
+
+    constructor(address alienAddress, address gearsAddress) public {
         alienContract = Alien(alienAddress);
         gearsContract = Gears(gearsAddress);
-        tokenDistContract = TokenDistributor(tokenDistAddress);
+        // tokenDistContract = TokenDistributor(tokenDistAddress);
         gearsContract.approveGame(address(this));
         setupGame();
         initBuffs();
     }
-
-    event PlayerWon(
-        uint256 tokenId,
-        uint256 finalProbs,
-        address sender,
-        uint256 playerReward
-    );
-    event AlienWon(
-        uint256 tokenId,
-        uint256 finalProbs,
-        address sender,
-        uint256 playerReward
-    );
-    event PlayerLostGear(uint256 tokenId, uint256 lostGearId, address sender);
 
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
@@ -176,9 +150,9 @@ contract Spaceborn {
     }
 
     function setupGame() internal {
-        round2GearLostProb[1] = 99;
-        round2GearLostProb[2] = 70;
-        round2GearLostProb[3] = 90;
+        round2GearLostProb[1] = 50;
+        // round2GearLostProb[2] = 70;
+        // round2GearLostProb[3] = 90;
     }
 
     function getCat2AlienBuff(uint256 alienCatIdx, uint256 gearCatIdx)
@@ -256,16 +230,6 @@ contract Spaceborn {
         return modifiedBaseProbs;
     }
 
-    function claimRandomGear() public {
-        require(
-            gearsContract.balanceOf(msg.sender) == 0,
-            "Not eligible for free gear"
-        );
-        require(freeGearsRemaining > 0, "All free gears have been claimed");
-        gearsContract.dropGear("Moloch", 0, msg.sender);
-        freeGearsRemaining = freeGearsRemaining - 1;
-    }
-
     function claimGear(uint256 catIdx, uint256 rarityIdx) public {
         gearsContract.dropGearByCat("Moloch", rarityIdx, catIdx, msg.sender);
     }
@@ -285,56 +249,40 @@ contract Spaceborn {
             alienContract.getAlienCatIdx(alien_id)
         );
         // // uint256 finalProb = 100;
-        uint256 factor = 5;
-        uint256 totalHealth = 0;
-        for (uint256 i = 0; i < usedGears.length; i++) {
-            UsedGear memory gear = usedGears[i];
-            gearsContract.decreaseHealth(gear.gearIdx, factor);
-        }
+        // uint256 factor = 5;
+        // uint256 totalHealth = 0;
+        // for (uint256 i = 0; i < usedGears.length; i++) {
+        //     UsedGear memory gear = usedGears[i];
+        //     gearsContract.decreaseHealth(gear.gearIdx, factor);
+        // }
 
-        uint256 playerReward = 100;
-        tokenDistContract.rewardPlayer(msg.sender, playerReward);
-        tokenDistContract.rewardGameContract(address(this), 100);
+        // uint256 playerReward = 100;
+        // tokenDistContract.rewardPlayer(msg.sender, playerReward);
+        // tokenDistContract.rewardGameContract(address(this), 100);
+
         if (rand100 > finalProb) {
-            alienContract.setAlienDead(alien_id);
+            // alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);
             gearsContract.dropGear(
                 alienContract.getAlienName(alien_id),
                 rarity,
                 msg.sender
             );
-            emit PlayerWon(alien_id, finalProb, msg.sender, playerReward);
+            emit PlayerWon(alien_id, finalProb);
         } else {
-            emit AlienWon(alien_id, finalProb, msg.sender, playerReward);
+            uint256 dropProb = round2GearLostProb[roundId];
+            emit AlienWon(alien_id, finalProb);
+            // emit AlienWon(alien_id, finalProb, msg.sender, playerReward);
             if (usedGears.length > 0) {
-                uint256 dropProb = round2GearLostProb[roundId];
-                if (rand100 > dropProb) {
+                uint256 rand1002 = getRandom(clientRandom + 5);
+                if (rand1002 < dropProb) {
                     UsedGear memory gear = usedGears[
                         rand100 % usedGears.length
                     ];
-                    gearsContract.transferNft(gear.gearIdx, address(this));
-                    emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
+                    // gearsContract.transferNft(gear.gearIdx, address(this));
+                    emit PlayerLostGear(alien_id, rand1002);
                 }
             }
-        }
-    }
-
-    function fightAlienTest(
-        uint256 baseProbs,
-        uint256 clientRandom,
-        UsedGear[] memory usedGears,
-        uint256 alienCatIdx
-    ) public {
-        uint256 rand100 = getRandom(clientRandom);
-
-        uint256 finalProb = getFinalProbs(baseProbs, usedGears, alienCatIdx);
-        if (rand100 > finalProb) {
-            // alienContract.setAlienDead(alien_id);
-            emit PlayerWon(0, finalProb, msg.sender, 0);
-            // uint256 rarity = getGearRarity(alienContract.getAlienBaseProb(alien_id));
-            // gearsContract.dropGear(alienContract.getAlienName(alien_id), rarity, msg.sender);
-        } else {
-            emit AlienWon(0, finalProb, msg.sender, 0);
         }
     }
 
