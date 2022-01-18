@@ -21,7 +21,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true
   });
   let tokenDistContract = await ethers.getContract("TokenDistributor", deployer);
-  tokenContract.transfer(tokenDistContract.address, 60000);
+  await tokenDistContract.init();
+  let escrowBalCalculated = await tokenDistContract.initialEscrowBalance();
+  tokenContract.transfer(tokenDistContract.address, escrowBalCalculated);
+
   let escrowBal = await tokenContract.balanceOf(tokenDistContract.address);
   console.log({ escrowBal: escrowBal.toNumber() });
 
@@ -33,8 +36,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   let alienContract = await ethers.getContract("Alien", deployer);
   let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin", "Bob", "Camden", "Roger", "Sheryl"];
-  // let baseProbs = [10, 35, 95, 67, 89, 45, 22, 49, 76, 17];
-  let baseProbs = [95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95];
+  let baseProbs = [10, 35, 95, 67, 89, 45, 22, 49, 76, 17];
+  // let baseProbs = [95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95];
   let dropGearRarity = [0, 0, 2, 0, 0, 0, 1, 1, 0, 0];
   await alienContract.mintMultipleAliens(names, baseProbs, dropGearRarity, 1);
 
@@ -61,6 +64,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
   const game1Contract = await ethers.getContract("Spaceborn", deployer);
+  await tokenDistContract.addGameContract(game1Contract.address, 5);
 
   // let address = "0xeAe052b6C4B18F05d74DFc32Ecce5d43011195DB";
   // await gearsContract.mintGearTest("Moloch", 0, 0, address);

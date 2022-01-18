@@ -118,6 +118,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   };
 
   async function refreshGears() {
+    console.log("refreshGears");
     const balanceLoot = await contracts.Gears.balanceOf(address);
     const tokenId = await contracts.Gears.tokenOfOwnerByIndex(address, balanceLoot - 1);
     const gearObj = await contracts.Gears.gears(tokenId);
@@ -378,10 +379,13 @@ export default function GameScreen({ address, tx, contracts, provider }) {
                 let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
                 if (lostGearEvent) {
                   updateLostGear(lostGearEvent);
+                  refreshGears();
+                  console.log("PLAYER LOST GEAR!!!");
                 } else {
                   updateLostGear(null);
                   refreshGears();
                 }
+                dispatch({ type: "setWalletUpdateEvent", payload: true, fieldName: "updateWalletEvent" });
               } else if (eventInfo.event == "PlayerWon") {
                 const txt = "Player won with final prob of alien to be " + eventInfo.args.finalProbs.toNumber();
                 setgameActionMsg(txt);
@@ -551,7 +555,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
                 </div>
               </div>
             )}
-            <div>No gears lost!</div>
+            {!gearLostImg && <div>No gears lost!</div>}
           </div>
         )}
       </div>

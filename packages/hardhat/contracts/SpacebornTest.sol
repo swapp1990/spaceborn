@@ -55,8 +55,8 @@ contract SpacebornTest {
         /*	Agility -> Weapon - 2
 					-> Apparel - 1
 					-> Vehicle - 5
-					-> Pill - 4
-					-> Gizmo - 3
+					-> Pill - 3
+					-> Gizmo - 4
 		*/
         gearCat2AlienBuffs[11] = 2;
         gearCat2AlienBuffs[12] = 1;
@@ -183,7 +183,7 @@ contract SpacebornTest {
             if (rarityLoot == 4) {
                 rarityBuff = rarityBuff * 2;
             } else if (rarityLoot == 0) {
-                rarityBuff = 10;
+                rarityBuff = 0;
             } else if (rarityLoot == 1) {
                 rarityBuff = 20;
             }
@@ -198,7 +198,7 @@ contract SpacebornTest {
             uint256 catBuff = 33;
             uint256 catBuffLevel = getCat2AlienBuff(
                 alienCatIdx,
-                usedGears[i].gearIdx
+                usedGears[i].catIdx
             );
             uint256 percentEffectOfCat = catBuffLevel * 20;
             catBuff = (percentEffectOfCat * catBuff) / 100;

@@ -176,7 +176,7 @@ contract Spaceborn {
     }
 
     function setupGame() internal {
-        round2GearLostProb[1] = 99;
+        round2GearLostProb[1] = 50;
         round2GearLostProb[2] = 70;
         round2GearLostProb[3] = 90;
     }
@@ -209,7 +209,7 @@ contract Spaceborn {
             if (rarityLoot == 4) {
                 rarityBuff = rarityBuff * 2;
             } else if (rarityLoot == 0) {
-                rarityBuff = 10;
+                rarityBuff = 5;
             } else if (rarityLoot == 1) {
                 rarityBuff = 20;
             }
@@ -224,7 +224,7 @@ contract Spaceborn {
             uint256 catBuff = 33;
             uint256 catBuffLevel = getCat2AlienBuff(
                 alienCatIdx,
-                usedGears[i].gearIdx
+                usedGears[i].catIdx
             );
             uint256 percentEffectOfCat = catBuffLevel * 20;
             catBuff = (percentEffectOfCat * catBuff) / 100;
@@ -307,8 +307,9 @@ contract Spaceborn {
         } else {
             emit AlienWon(alien_id, finalProb, msg.sender, playerReward);
             if (usedGears.length > 0) {
+                uint256 rand1002 = getRandom(clientRandom + 5);
                 uint256 dropProb = round2GearLostProb[roundId];
-                if (rand100 > dropProb) {
+                if (rand1002 < dropProb) {
                     UsedGear memory gear = usedGears[
                         rand100 % usedGears.length
                     ];
@@ -316,25 +317,6 @@ contract Spaceborn {
                     emit PlayerLostGear(alien_id, gear.gearIdx, msg.sender);
                 }
             }
-        }
-    }
-
-    function fightAlienTest(
-        uint256 baseProbs,
-        uint256 clientRandom,
-        UsedGear[] memory usedGears,
-        uint256 alienCatIdx
-    ) public {
-        uint256 rand100 = getRandom(clientRandom);
-
-        uint256 finalProb = getFinalProbs(baseProbs, usedGears, alienCatIdx);
-        if (rand100 > finalProb) {
-            // alienContract.setAlienDead(alien_id);
-            emit PlayerWon(0, finalProb, msg.sender, 0);
-            // uint256 rarity = getGearRarity(alienContract.getAlienBaseProb(alien_id));
-            // gearsContract.dropGear(alienContract.getAlienName(alien_id), rarity, msg.sender);
-        } else {
-            emit AlienWon(0, finalProb, msg.sender, 0);
         }
     }
 

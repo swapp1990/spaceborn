@@ -34,10 +34,10 @@ const GEAR_CATS = ["Weapon", "Apparel", "Vehicle", "Pill", "Gizmo"];
 const ALIEN_CATS = ["Agility", "Powerful", "Mind Control", "Charm", "Replication", "Mimic", "Superintelligent", "NPC"];
 
 const STRONG_AGAINST = {
-  Vehicle: [0, 4, 5],
-  Pill: [2, 7],
-  Gizmo: [4, 6],
-  Apparel: [3, 5, 6],
+  Vehicle: [0, 5],
+  Pill: [2, 7, 6],
+  Gizmo: [4, 6, 1],
+  Apparel: [3, 5],
   Weapon: [1, 4],
 };
 
@@ -63,6 +63,14 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
       init();
     }
   }, [contracts, address]);
+
+  useEffect(() => {
+    if (state.updateWalletEvent) {
+      updateWallet();
+      console.log("updateWallet Event");
+      dispatch({ type: "setWalletUpdateEvent", payload: false, fieldName: "updateWalletEvent" });
+    }
+  }, [state.updateWalletEvent]);
 
   const init = async () => {
     // console.log("init");
@@ -263,7 +271,9 @@ export default function WalletWindow({ address, tx, contracts, provider }) {
     setApproveGears(needsApproved);
     // console.log(walletGearsUpdate);
     let approvedGears = walletGearsUpdate.filter(w => w.approved == true);
-    setWalletGears(approvedGears.reverse());
+    if (approvedGears.length > 0) {
+      setWalletGears(approvedGears.reverse());
+    }
     setLoading(false);
   }
 
