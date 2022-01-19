@@ -1,13 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  List,
-  Spin,
-} from "antd";
-import { useMoralisWeb3Api } from "react-moralis"
+import { Button, Card, Form, Input, List, Spin } from "antd";
+import { useMoralisWeb3Api } from "react-moralis";
 import GContext from "../../helpers/GContext";
 import "./create.scss";
 
@@ -19,20 +12,27 @@ export default function CreatePlayer({ address, tx, contracts }) {
   const [balanceTokens, setBalanceTokens] = useState(0);
   const [playerInfo, setplayerInfo] = useState();
   const [selectedPfp, setselectedPfp] = useState(null);
-  const [pfpList, setPfpList] = useState({ "MSB": [], "ARC": [] })
+  const [pfpList, setPfpList] = useState({ MSB: [], ARC: [] });
 
   const [form] = Form.useForm();
   const Web3Api = useMoralisWeb3Api();
 
   useEffect(async () => {
-
+    // await tokenContract.balanceOf(tokenDistContract.address);
   }, []);
 
-  useEffect(() => {
-    if (contracts) {
+  useEffect(async () => {
+    if (contracts && address) {
       // console.log(contracts.Player);
+      // let escrowBal = await contracts.MangoToken.balanceOf(contracts.TokenDistributor.address);
+      // console.log(contracts.TokenDistributor.address);
+      // console.log({ escrowBal: escrowBal.toNumber() });
+      // setBalEscrow(escrowBal.toNumber());
+      // console.log(address);
+      // let accBal = await contracts.MangoToken.balanceOf(address);
+      // setBalAccount(accBal.toNumber());
     }
-  }, [contracts]);
+  }, [contracts, address]);
 
   const onFinish = values => {
     // console.log(values);
@@ -81,9 +81,10 @@ export default function CreatePlayer({ address, tx, contracts }) {
   async function getAllNfts() {
     setLoading(true);
     const options = {
-      chain: 'eth', address: address
-    }
-    const res = await Web3Api.account.getNFTs(options)
+      chain: "eth",
+      address: address,
+    };
+    const res = await Web3Api.account.getNFTs(options);
     // console.log(res.result)
     const moonshotBotsContract = "0x8b13e88ead7ef8075b58c94a7eb18a89fd729b18";
     const nfts_msb = res.result.filter(r => r.token_address === moonshotBotsContract);
@@ -92,13 +93,11 @@ export default function CreatePlayer({ address, tx, contracts }) {
       nfts_msb.forEach(async e => {
         let metaJson = await getMetadataFromTokenUri(e.token_uri);
         let currPfpList = pfpList["MSB"];
-        currPfpList.push(
-          {
-            "name": "MSB",
-            "img": metaJson.image,
-            "token_id": Number(e.token_id)
-          }
-        );
+        currPfpList.push({
+          name: "MSB",
+          img: metaJson.image,
+          token_id: Number(e.token_id),
+        });
         setPfpList({ ...pfpList, ["MSB"]: currPfpList });
       });
 
@@ -108,13 +107,11 @@ export default function CreatePlayer({ address, tx, contracts }) {
       nfts_arc.forEach(async e => {
         let metaJson = await getMetadataFromTokenUri(e.token_uri);
         let currPfpList = pfpList["ARC"];
-        currPfpList.push(
-          {
-            "name": "ARC",
-            "img": metaJson.image,
-            "token_id": Number(e.token_id)
-          }
-        );
+        currPfpList.push({
+          name: "ARC",
+          img: metaJson.image,
+          token_id: Number(e.token_id),
+        });
         setPfpList({ ...pfpList, ["ARC"]: currPfpList });
       });
       setLoading(false);
@@ -122,7 +119,6 @@ export default function CreatePlayer({ address, tx, contracts }) {
       console.log(e);
       setLoading(false);
     }
-
   }
 
   async function updatePlayerState() {
@@ -139,7 +135,7 @@ export default function CreatePlayer({ address, tx, contracts }) {
       image: null,
       owner: address,
       joined: player.joined,
-      roundId: player.joinedRoundId.toNumber()
+      roundId: player.joinedRoundId.toNumber(),
     };
     dispatch({ type: "setPlayerState", payload: playerState, fieldName: "playerState" });
     console.log("updated player state ", player.name);
@@ -153,8 +149,14 @@ export default function CreatePlayer({ address, tx, contracts }) {
   }
 
   function handleChange(pfpObj) {
-    console.log({ pfpObj })
+    console.log({ pfpObj });
     setselectedPfp(pfpObj);
+  }
+
+  async function transferTest() {
+    await tx(contracts.TokenDistributor.rewardPlayer(address, 100), update => {
+      console.log(update);
+    });
   }
 
   async function confirmCreate() {
@@ -171,23 +173,22 @@ export default function CreatePlayer({ address, tx, contracts }) {
       playerInfoNew.pfpTokenId = 0;
     }
     setLoading(true);
-    console.log({ playerInfoNew })
-    await tx(contracts.Player.mint(playerInfoNew),
-      update => {
-        if (update) {
-          if (update.code) {
-            setLoading(false);
-          }
-          if (update.status === "confirmed" || update.status === 1) {
-            console.log("player created");
-          }
-          if (update.events) {
-            console.log({ "event": update.events });
-            updatePlayerState();
-            setLoading(false);
-          }
+    console.log({ playerInfoNew });
+    await tx(contracts.Player.mint(playerInfoNew), update => {
+      if (update) {
+        if (update.code) {
+          setLoading(false);
         }
-      });
+        if (update.status === "confirmed" || update.status === 1) {
+          console.log("player created");
+        }
+        if (update.events) {
+          console.log({ event: update.events });
+          updatePlayerState();
+          setLoading(false);
+        }
+      }
+    });
   }
 
   // const loadOwnedNFTs = async () => {
@@ -241,23 +242,49 @@ export default function CreatePlayer({ address, tx, contracts }) {
                 <div className="projWrapper">
                   <div className="projTitle">Moonshot Bots</div>
                   <div className="projSel">
-                    {pfpList["MSB"].length == 0 && <div className="projNot">No Moonshot Bots NFT found. You can mint one from <a href="https://bots.moonshotcollective.space/" target="_blank">https://bots.moonshotcollective.space/</a></div>}
-                    {pfpList["MSB"].map((e, key) => <div key={key} className="pfpEntry">
-                      <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
-                      <label for={key}><img src={e.img} /></label>
-                    </div>)}
+                    {pfpList["MSB"].length == 0 && (
+                      <div className="projNot">
+                        No Moonshot Bots NFT found. You can mint one from{" "}
+                        <a href="https://bots.moonshotcollective.space/" target="_blank">
+                          https://bots.moonshotcollective.space/
+                        </a>
+                      </div>
+                    )}
+                    {pfpList["MSB"].map((e, key) => (
+                      <div key={key} className="pfpEntry">
+                        <input type="checkbox" id={key} checked={isSelected(e)} onChange={() => handleChange(e)} />
+                        <label for={key}>
+                          <img src={e.img} />
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="projWrapper">
                   <div className="projTitle">Arcadians</div>
                   <div className="projSel">
-                    {pfpList["ARC"].length == 0 && <div className="projNot">No Arcadians NFT found. You can mint one from <a href="https://arcadians.io/" target="_blank">https://arcadians.io/</a></div>}
-                    {pfpList["ARC"].map((e, key) => <div key={key} className="pfpEntry">
-                      <input type="checkbox" id={'S' + key} checked={isSelected(e)} onChange={() => handleChange(e)} />
-                      <label for={'S' + key}><img src={e.img} /></label>
-                    </div>)}
+                    {pfpList["ARC"].length == 0 && (
+                      <div className="projNot">
+                        No Arcadians NFT found. You can mint one from{" "}
+                        <a href="https://arcadians.io/" target="_blank">
+                          https://arcadians.io/
+                        </a>
+                      </div>
+                    )}
+                    {pfpList["ARC"].map((e, key) => (
+                      <div key={key} className="pfpEntry">
+                        <input
+                          type="checkbox"
+                          id={"S" + key}
+                          checked={isSelected(e)}
+                          onChange={() => handleChange(e)}
+                        />
+                        <label for={"S" + key}>
+                          <img src={e.img} />
+                        </label>
+                      </div>
+                    ))}
                   </div>
-
                 </div>
               </div>
 
@@ -269,7 +296,9 @@ export default function CreatePlayer({ address, tx, contracts }) {
             <div>{pfpGallery}</div>
             <div>Selected PFP: {selectedPfp.name}</div> */}
               <div>
-                <Button onClick={confirmCreate} disabled={loading}>Confirm Create Player</Button>
+                <Button onClick={confirmCreate} disabled={loading}>
+                  Confirm Create Player
+                </Button>
               </div>
             </>
           )}
@@ -296,8 +325,18 @@ export default function CreatePlayer({ address, tx, contracts }) {
         </Card>
       </div>
     </div>
+  );
 
+  const testScreen = (
+    <div>
+      {/* <div>Token Account Balance: {balAccount}</div>
+      <div>Token Escrow Balance: {balEscrow}</div> */}
+      <div>
+        <Button onClick={transferTest}>Transfer</Button>
+      </div>
+    </div>
   );
 
   return <>{createPlayerScreen}</>;
+  // return <>{testScreen}</>;
 }

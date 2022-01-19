@@ -294,7 +294,7 @@ contract Spaceborn {
 
         uint256 playerReward = 100;
         tokenDistContract.rewardPlayer(msg.sender, playerReward);
-        tokenDistContract.rewardGameContract(address(this), 100);
+        // tokenDistContract.rewardGameContract(address(this), 100);
         if (rand100 > finalProb) {
             alienContract.setAlienDead(alien_id);
             uint256 rarity = alienContract.getAlienGearRarity(alien_id);

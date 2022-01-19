@@ -63,6 +63,7 @@ export default function GameScreen({ address, tx, contracts, provider }) {
   useEffect(() => {
     if (contracts && contracts.Alien) {
       // console.log("init");
+      init();
       updateTokenBalance();
       resetGearSlots();
     }
@@ -97,8 +98,26 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     }
   }, [stepIdx]);
 
+  ///////////////////////////////////////////////////////////////////////////////////////
+
   const init = async () => {
-    initEmptyEquip();
+    let escrowBal = await contracts.TokenDistributor.initialEscrowBalance();
+    // // await tx(contracts.TokenDistributor.init(), update => {
+    // //   console.log(update);
+    // // });
+    console.log({ escrowBal: escrowBal.toNumber() });
+
+    let game2currtokens = await contracts.TokenDistributor.game2currtokens(contracts.Spaceborn.address);
+    console.log({ game2currtokens: game2currtokens.toNumber() });
+
+    // let allowance = await contracts.MangoToken.allowance();
+    // console.log(approved);
+    // let approved = await contracts.TokenDistributor.approvedGamesRegistry(contracts.Spaceborn.address);
+    // console.log({ approved });
+    // console.log(contracts.Spaceborn.address);
+    // await tx(contracts.MangoToken.transfer(contracts.TokenDistributor.address, escrowBal), update => {
+    //   console.log(update);
+    // });
   };
 
   const onBack = () => {
@@ -344,11 +363,13 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     return { backgroundColor: "black" };
   }
 
+  async function approveTransfer() {}
+
   async function beginFight() {
     setgameActionMsg("");
     const clientRandom = Math.floor(Math.random() * 100);
     const foundGears = state.gearSlots.filter(e => e.slotId != -1).map(i => i.usedGear);
-    // console.log({ foundGears });
+    console.log({ foundGears });
     setStepIdx(3);
     setAlienWon(null);
     await tx(
@@ -379,11 +400,11 @@ export default function GameScreen({ address, tx, contracts, provider }) {
                 let lostGearEvent = update.events.find(e => e.event != null && e.event == "PlayerLostGear");
                 if (lostGearEvent) {
                   updateLostGear(lostGearEvent);
-                  refreshGears();
+                  // refreshGears();
                   console.log("PLAYER LOST GEAR!!!");
                 } else {
                   updateLostGear(null);
-                  refreshGears();
+                  // refreshGears();
                 }
                 dispatch({ type: "setWalletUpdateEvent", payload: true, fieldName: "updateWalletEvent" });
               } else if (eventInfo.event == "PlayerWon") {
@@ -435,6 +456,20 @@ export default function GameScreen({ address, tx, contracts, provider }) {
     updateAliens(deadAlienIdxs);
   }
 
+  async function onMintAliens() {
+    let names = ["Allen", "Bernard", "Lucy", "Karen", "Chad", "Kevin", "Bob", "Camden", "Roger", "Sheryl"];
+    let baseProbs = [10, 35, 95, 67, 89, 45, 22, 49, 76, 17];
+    // // let baseProbs = [95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95];
+    let dropGearRarity = [0, 0, 2, 0, 0, 0, 1, 1, 0, 0];
+    await tx(
+      contracts.Alien.mintMultipleAliens(names, baseProbs, dropGearRarity, 1),
+      update => {
+        console.log(update);
+      },
+      error => console.error(error),
+    );
+  }
+
   //////////// Render
   const alienCard = (alien, i) => {
     return (
@@ -458,6 +493,9 @@ export default function GameScreen({ address, tx, contracts, provider }) {
         <button className="commonBtn" onClick={onRefreshAliens}>
           Refresh
         </button>
+        {/* <button className="commonBtn" onClick={onMintAliens}>
+          Mint
+        </button> */}
       </div>
       <div className="alien-cards">
         {randomAliens.map((alien, i) => alienCard(alien, i))}

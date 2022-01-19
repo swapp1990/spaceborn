@@ -1,6 +1,21 @@
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+// contract TokenDistributor is Ownable {
+//     ERC20 public immutable mango;
+//     uint256 public escrowPercent = 75;
+
+//     constructor(address _mango, address _owner) {
+//         mango = ERC20(_mango);
+//         transferOwnership(_owner);
+//     }
+
+//     function rewardPlayer(address receipient, uint256 _rewardMango) public {
+//         mango.transfer(receipient, _rewardMango);
+//         // escrowPercent = 65;
+//     }
+// }
+
 contract TokenDistributor is Ownable {
     ERC20 public immutable mango;
     uint256 public initialEscrowBalance;
@@ -32,6 +47,7 @@ contract TokenDistributor is Ownable {
             (initialEscrowBalance * allocationPercent) /
             100;
         game2currtokens[gameContract] = game2maxtokens[gameContract];
+        mango.approve(gameContract, 5000);
     }
 
     function rewardPlayer(address receipient, uint256 _rewardMango) public {
@@ -53,7 +69,7 @@ contract TokenDistributor is Ownable {
             game2currtokens[msg.sender] > 0,
             "allocated token balance is 0"
         );
-        mango.transfer(gameContractReceipient, _rewardMango);
+        // mango.transfer(gameContractReceipient, _rewardMango);
         game2currtokens[msg.sender] -= _rewardMango;
     }
 }
