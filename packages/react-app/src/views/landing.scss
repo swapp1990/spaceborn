@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
 
+.pink {
+  color: #f73b76
+}
+.basicBtn {
+  text-transform: uppercase;
+  background-color: transparent;
+  border: 5px solid #FFD630;
+  padding: 20px;
+  cursor: pointer;
+}
 .landing_main {
   height: 100vh;
   width: 100vw;
@@ -46,7 +56,7 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       .title {
         color: white;
@@ -56,16 +66,30 @@
         line-height: 119px;
         letter-spacing: 0em;
         text-align: center;
-        margin-top: 28%;
+        height: 50%;
+        display: flex;
+        align-items: flex-end;
+      }
+      .tagline {
+        width: 70%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        font-size: 48px;
+        height: 20%;
+        // padding-top: 50px;
       }
       .playBtn {
         cursor: pointer;
         width: 100%;
         display: flex;
+        align-items: flex-end;
         justify-content: center;
-        margin-top: 170px;
+        height: 15%;
+        // margin-top: 170px;
       }
       .scroll {
+        height: 10%;
         margin-top: 50px;
       }
     }
@@ -73,47 +97,59 @@
   .gameInfo {
     height: 100vh;
     width: 100vw;
+    display: flex;
+    justify-content: center;
+    .gameConcept {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        border: 5px solid white;
+        border-radius: 10px;
+      }
+    }
     .gameText {
+      width: 50%;
       color: white;
       font-size: 40px;
-      padding: 30px;
-    }
-    .borderTitle {
-      position: relative;
-      .title {
-        color: white;
-        font-size: 65px;
-        margin-left: 30%;
-        padding-top: 5%;
-        text-transform: uppercase;
-      }
-      img {
-        position: absolute;
-        top: 18%;
-        width: 56%;
-        height: 88%;
-      }
-      .imgRight {
-        right: 0;
-      }
-    }
-    .about {
+      padding: 100px;
       display: flex;
       flex-direction: column;
-      .aboutSection {
-        padding: 30px;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        font-size: 24px;
+      justify-content: center;
+    }
+   
+  }
+  .gameEngine {
+    height: 100vh;
+    width: 100vw;
+    .engineWrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      .engineImg {
+        width: 40%;
+        img {
+          width: 100%;
+        }
       }
-      .aboutTitle {
-        font-size: 40px;
+      .engineDesc {
+        width: 60%;
         display: flex;
-        align-items: center;
+        flex-direction: column;
         justify-content: center;
-        text-align: center;
-        padding: 30px;
+        .enginePoints {
+          margin: auto;
+          max-width: 800px;
+          font-size: 28px;
+          opacity: 0.8;
+        }
+        .engineMore {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
   }
@@ -121,33 +157,83 @@
     height: 100vh;
     width: 100vw;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     margin: 50px;
+    margin-top: 150px;
     .points {
-      font-size: 28px;
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      height: 40%;
+      .bullet {
+        width: 33%;
+        .title {
+          text-transform: uppercase;
+          font-size: 48px;
+        }
+        .desc {
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 2.0rem;
+          font-size: 21px;
+          opacity: 0.8;
+          margin-left: 30px;
+          margin-right: 30px;
+        }
+      }
+    }
+    .frame {
+      height: 60%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        border: 5px solid white;
+        border-radius: 10px;
+        width: 80%;
+        height: 80%;
+        max-height: 300px;
+        max-width: 800px;
+        // margin-top: 50px;
+      }
     }
   }
   .gameToken {
     height: 100vh;
     width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .tokenInfo {
-      margin-top: 150px;
-      width: 30%;
-      height: 100%;
+    .tokenWrapper {
       display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      margin-left: 50px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      .tokenInfo {
+        margin-top: 150px;
+        width: 30%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        margin-left: 50px;
+        .name {
+          font-size: 48px;
+        }
+        .points {
+          margin-top: 50px;
+          font-size: 32px;
+        }
+      }
+      .tokenDist {
+        margin-right: 100px;
+        height: 100%;
+        width: 70%;
+      }
     }
-    .tokenDist {
-      width: 70%;
-    }
+    
   }
   .gameSteps {
     width: 100vw;
@@ -226,10 +312,34 @@
       .contactWrapper {
         margin-top: 100px;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
-        width: 70%;
+        width: 100%;
+        // background-color: rgba($color: #f73b76, $alpha: 0.3);
+        .contactIcon {
+          background-color: #f73b76;
+          cursor: pointer;
+        }
       }
+  }
+}
+.borderTitle {
+  position: relative;
+  .title {
+    color: white;
+    font-size: 65px;
+    margin-left: 30%;
+    padding-top: 5%;
+    text-transform: uppercase;
+  }
+  img {
+    position: absolute;
+    top: 18%;
+    width: 56%;
+    height: 88%;
+  }
+  .imgRight {
+    right: 0;
   }
 }
 .box {
@@ -262,4 +372,17 @@
     .flip {
     transform: scaleX(-1);
     }
+}
+.snap-child-center {
+  z-index: 10;
+  scroll-snap-align: center;
+  flex: none;
+}
+
+.snap-parent-y-mandatory {
+  scroll-snap-type: y mandatory;
+  overflow: scroll;
+  height: 100vh;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
